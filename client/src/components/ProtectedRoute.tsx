@@ -1,23 +1,36 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import useRole from "../store/useRole";
-import { redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 type Props = {
   children: ReactNode;
-  shouldBeAdmin?: false;
+  shouldBeAdmin?: boolean;
 };
 
-const ProtectedRoute = ({ children, shouldBeAdmin }: Props) => {
+const ProtectedRoute = ({ children, shouldBeAdmin = false }: Props) => {
   const role = useRole((state) => state.role);
 
   if (!role) {
-    return redirect("/");
+    return <Navigate to={"/"} />;
   }
+
+  console.log(role);
 
   return (
     <>
-      {shouldBeAdmin && role === "admin" ? children : redirect("/")}
-      {!shouldBeAdmin && role === "user" ? children : redirect("/")}
+      {shouldBeAdmin ? (
+        role === "admin" ? (
+          children
+        ) : (
+          <Navigate to={"/"} />
+        )
+      ) : role === "user" ? (
+        children
+      ) : (
+        <Navigate to={"/"} />
+      )}
     </>
   );
 };
+
+export default ProtectedRoute;
