@@ -3,6 +3,7 @@ import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
+import PdfGenerator from "./components/GeneratePdf";
 function App() {
   return (
     <>
@@ -29,6 +30,8 @@ function App() {
             }
             path="/admin"
           />
+          {/* PdfGenerator Page */}
+          <Route element={<PdfGenerator />} path="/generate-pdf" />
         </Routes>
       </BrowserRouter>
     </>
