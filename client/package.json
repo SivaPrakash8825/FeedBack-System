@@ -12,7 +12,8 @@
   "dependencies": {
     "prettier-plugin-tailwindcss": "^0.5.11",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
