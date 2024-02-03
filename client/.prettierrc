@@ -1,0 +1,4 @@
+{
+  "sortClassNames": true,
+  "plugins": ["prettier-plugin-tailwindcss"]
+}
