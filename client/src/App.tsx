@@ -3,11 +3,13 @@ import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
+import useRole from "./store/useRole";
 function App() {
+  const role = useRole((state) => state.role);
+
   return (
     <>
       <BrowserRouter>
-        <h1>Hello</h1>
         <Routes>
           {/* Login Page */}
           <Route element={<LoginPage />} path="/" />
