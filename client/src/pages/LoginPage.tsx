@@ -2,6 +2,7 @@ import { useState } from "react";
 import LOGO from "../assets/logo.jpg";
 import InputTextField from "../components/InputTextField";
 import RadioField from "../components/RadioField";
+import Button from "../components/Button";
 
 type Props = {};
 
@@ -35,9 +36,7 @@ const LoginPage = (props: Props) => {
             options={["day scholar", "hosteller"]}
           />
         )}
-        <button className=" w-full rounded-md bg-black py-2.5 font-semibold text-white">
-          Login
-        </button>
+        <Button title="Login" />
       </section>
     </main>
   );
