@@ -1,4 +1,24 @@
 {
+  "name": "feedback-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SivaPrakash8825/FeedBack-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SivaPrakash8825/FeedBack-System/issues"
+  },
+  "homepage": "https://github.com/SivaPrakash8825/FeedBack-System#readme",
   "dependencies": {
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
