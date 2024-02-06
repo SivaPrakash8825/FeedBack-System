@@ -20,6 +20,34 @@ app.use(
   })
 );
 
+// get question data
+app.get("/getQuestions", (req, res) => {
+  try {
+    db.query("Select * from questions", (err, ress) => {
+      if (err) {
+        return res.status(400).send(err.message);
+      }
+      return res.send(ress);
+    });
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
+// // get question data
+// app.post("/setQuestions", (req, res) => {
+//   try {
+//     db.query("Select * from questions", (err, ress) => {
+//       if (err) {
+//         return res.status(400).send(err.message);
+//       }
+//       return res.send(ress);
+//     });
+//   } catch (error) {
+//     return res.status(400).send(error.message);
+//   }
+// });
+
 db.connect((error) => {
   if (error) {
     console.log(error);

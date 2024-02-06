@@ -4,9 +4,9 @@ import InputTextField from "../components/InputTextField";
 import RadioField from "../components/RadioField";
 import Button from "../components/Button";
 
-type Props = {};
+// type Props = {};
 
-const LoginPage = (props: Props) => {
+const LoginPage = () => {
   const [option, setOption] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");

@@ -1,11 +1,25 @@
 import React, { ChangeEvent, useState } from "react";
 import * as XLSX from "xlsx";
+import { Question } from "../../types";
+// const db = require("./db");
 
 const ExcelToJsonConverter = () => {
   const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     event.target.files && setFile(event?.target?.files[0]);
+  };
+
+  const createQuestions = (questions: any) => {
+    // Add Questions to table
+    const parameters = questions.reduce(
+      (acc, { options, question, type }) => [
+        ...acc,
+        JSON.stringify({ question, options }),
+        type,
+      ],
+      [],
+    );
   };
 
   const convertSheetDataToJson = () => {
@@ -25,9 +39,12 @@ const ExcelToJsonConverter = () => {
       const sheet = workbook.Sheets[sheetName];
 
       // Convert sheet data to JSON
-      const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: null });
+      const jsonData = XLSX.utils.sheet_to_json(sheet, {
+        defval: null,
+      }) as unknown as Question;
 
       console.log(jsonData);
+      // createQuestions(jsonData)
       // You can now use jsonData in your application state or send it to the server
     };
 
