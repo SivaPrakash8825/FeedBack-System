@@ -5,7 +5,7 @@ import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
 // import useRole from "./store/useRole";
 import { JsonToExcel } from "./components/JsonToExcel";
-// import ExcelToJsonConverter from "./components/ExcelToJson";
+import { ExcelToJson } from "./components/ExcelToJson";
 
 function App() {
   // const role = useRole((state) => state.role);
