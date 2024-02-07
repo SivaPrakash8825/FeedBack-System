@@ -4,8 +4,8 @@ type Props = {
   label: string;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
-  value?: string;
-  setValue: (val: string) => void;
+  value: string | number;
+  setValue: (val: string | number) => void;
 };
 
 const InputTextField = ({
@@ -17,7 +17,7 @@ const InputTextField = ({
 }: Props) => {
   return (
     <div className="flex flex-col gap-1">
-      {label && <label className="font-semibold ">{label}</label>}
+      {label && <label className="font-semibold  capitalize">{label}</label>}
       <input
         type={type}
         placeholder={placeholder}

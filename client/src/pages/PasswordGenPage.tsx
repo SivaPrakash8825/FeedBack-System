@@ -2,56 +2,111 @@ import { useState } from "react";
 // import InputTextField from "../components/InputTextField";
 import SelectTextField from "../components/SelectTextField";
 import InputTextField from "../components/InputTextField";
+import Button from "../components/Button";
+import axios from "axios";
 // SelectTextField
 
 
 const PasswordGenPage = () => {
 //   const [value, setValue] = useState({
 // value
-//   });
-  const [value, setValue] = useState<{ list?: string[]; label: string; value: string; }[]>([
+  //   });
+  const [academicyr, setAcademicyr] = useState("");
+  const [graduation, setGraduation] = useState("");
+  const [department, setDepartment] = useState("");
+  const [semester, setSemester] = useState("");
+  const [section, setSection] = useState("");
+  const [asstype, setAsstype] = useState("");
+  const [noOfstd, setNoOfstd] = useState(0);
+  const [validfrom, setValidfrom] = useState("");
+  const [validto, setValidto] = useState("");
+  
+  const [password, setPassword] = useState("");
+  
+  const value= [
     {
       list: ["2021-22", "2022-23"],
       label: "academic year",
-      value:"none"
+      value: academicyr,
+      setValue:setAcademicyr
     },
     {
       list: ["UG", "PG"],
       label:"graduation",
-      value:"none"
+      value:graduation,
+      setValue:setGraduation
     },
     {
       list: ["CS", "AD","ME","EE","EC"],
       label:"department",
-      value:"none"
+      value: department,
+      setValue:setDepartment
     },
     {
       list: ["1", "2","3","4","5","6","7","8"],
       label:"semester",
-      value:"none"
+      value:semester,
+      setValue:setSemester
     },
     {
-      list: ["1-A", "2-B","3-C"],
+      list: ["A", "B","C"],
       label:"section",
-      value:"none"
+      value: section,
+      setValue:setSection
     },
     {
-      list: ["1-pre", "2-post","3-msmg-pre","4-msmg-post"],
+      list: ["pre", "post","msmg-pre","msmg-post"],
       label:"assignment type",
-      value:"none"
+      value: asstype,
+      setValue:setAsstype
     }, {
       label: "number of student",
-      value: "",
+      value: noOfstd,
+      setValue: setNoOfstd,
+type:"number",
     }, {
-      label: "date",
-      value: "",
+      label: "from date",
+      value: validfrom,
+      setValue: setValidfrom,
+      type:"date"
+    },  {
+      label: "to date",
+      value: validto,
+      setValue:setValidto,
+      type:"date"
     }, {
       label: "password",
-      value:"",
+      value: password,
+      setValue:setPassword,
+      type:"password"
     }
-  ]);
+  ];
   
-  // console.log(value);
+  const genLoginId = async () => {
+    
+    
+    const isAnyEmpty = value.some(item => item.value =="" || 0);
+    if (isAnyEmpty) {
+      alert("fill the details")
+    } else {
+      const { data } = await axios.post("http://localhost:3010/generateLogin", {
+        
+        count: noOfstd,
+        validfrom: validfrom,
+        validto: validto,
+        dept: department,
+        degree: graduation,
+        sem: parseInt(semester),
+        section: section,
+        assessmenttype: asstype,
+        academicyear: academicyr,
+        password: password
+        
+      }, { withCredentials: true });
+      console.log(data);
+      
+    }
+}
   
 
   return (
@@ -59,17 +114,17 @@ const PasswordGenPage = () => {
       <section className="mx-auto w-full max-w-4xl p-3">
         <h1 className="text-2xl font-semibold">Generate User Credentials</h1>
         <div className="mt-2 flex flex-col gap-3 rounded-md border-2 border-black p-5 ">
-          {/* <InputTextField label="Academic Year" setValue={setValue} /> */}
+         
           {
             value.map((data,index) => {
               return (
                 
-                data.list ? <SelectTextField list={data.list} value={data.value} index={index} setValue={setValue} label={data.label} key={index} /> :
-                  <InputTextField label={data.label} setValue={setValue} />
+                data.list ? <SelectTextField list={data.list} value={data.value} setValue={data.setValue} label={data.label} key={index} /> :
+                  <InputTextField key={index} label={data.label} type={data.type}  value={data.value} setValue={data.setValue} />
               )
             })
           }
-          
+          <Button title="Generate" onClick={genLoginId}/>
         </div>
       </section>
     </main>
