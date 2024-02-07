@@ -39,7 +39,7 @@ function App() {
           <Route
             element={
               <>
-                <JsonToExcel />
+                <ExcelToJson />
               </>
             }
             path="/dummy"

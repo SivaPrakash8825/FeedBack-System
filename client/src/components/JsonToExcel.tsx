@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect } from "react";
 import * as XLSX from "xlsx";
-import { Question, QuestionDb } from "../../types";
+import { QuestionDb } from "../../types";
 
 export const JsonToExcel = () => {
   const convertJsonToSheet = (data: QuestionDb[]) => {
