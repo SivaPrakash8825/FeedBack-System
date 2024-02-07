@@ -428,3 +428,21 @@ const createQuestions = () => {
 };
 
 createQuestions();
+
+const generateLogin = () => {
+  try {
+    db.query(
+      "CREATE TABLE IF NOT EXISTS feedbacklogin (id INT,validfrom DATE NOT NULL,validto DATE NOT NULL ,dept VARCHAR(20),sem INT,section VARCHAR(40),username VARCHAR(30),password VARCHAR(30),PRIMARY KEY (dept, sem, section,username));",
+      (error, result) => {
+        if (error) {
+          console.log(error);
+          return 0;
+        }
+        return 1;
+      }
+    );
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};
+generateLogin();
