@@ -23,7 +23,7 @@ app.use(
 // get question data
 app.get("/getQuestions", (req, res) => {
   try {
-    db.query("Select * from questions", (err, ress) => {
+    db.query("SELECT * FROM questions", (err, ress) => {
       if (err) {
         return res.status(400).send(err.message);
       }
