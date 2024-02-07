@@ -4,8 +4,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
 import useRole from "./store/useRole";
+import { JsonToExcel } from "./components/JsonToExcel";
+import { ExcelToJson } from "./components/ExcelToJson";
 import Header from "./components/Header";
-import PasswordGenpage from "./pages/PasswordGenPage";
+import PasswordGenPage from "./pages/PasswordGenPage";
+
 function App() {
   const role = useRole((state) => state.role);
 
@@ -34,13 +37,24 @@ function App() {
             }
             path="/admin"
           />
+          {/* login id generator */}
           <Route
             element={
               <ProtectedRoute shouldBeAdmin>
-                <PasswordGenpage />
+                <PasswordGenPage />
               </ProtectedRoute>
             }
             path="/admin/generate"
+          />
+
+          {/* Dummy */}
+          <Route
+            element={
+              <>
+                <ExcelToJson />
+              </>
+            }
+            path="/dummy"
           />
         </Routes>
       </BrowserRouter>

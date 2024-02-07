@@ -89,7 +89,7 @@ type:"number",
     if (isAnyEmpty) {
       alert("fill the details")
     } else {
-      const { data } = await axios.post("http://localhost:3010/generateLogin", {
+      const { data } = await axios.post(`${import.meta.env.VITE_ENDPOINT}/generateLogin`, {
         
         count: noOfstd,
         validfrom: validfrom,
