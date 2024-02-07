@@ -28,44 +28,96 @@ db.connect((error) => {
   }
 });
 
-app.post("/", (req, res) => {
-  const data = req.body;
-  try {
+//api data format
+
+// {
+//   "count":20,
+//   "dept":"AD",
+//   "degree":"UG",
+//   "sem":2,
+//   "section":"C",
+//   "assessmenttype":"mgmt-pre",
+//   "academicyear":"2023-2024",
+//   "password":"Kcet@"
+// }
+app.post("/generateLogin", (req, res) => {
+  const {
+    count,
+    dept,
+    degree,
+    sem,
+    section,
+    assessmenttype,
+    academicyear,
+    password,
+  } = req.body;
+  if (password == "Kcet@") {
+    const options = {
+      a: 1,
+      b: 2,
+      c: 3,
+      pre: 1,
+      post: 2,
+      "mgmt-pre": 3,
+      "mgmt-final": 4,
+      other: 5,
+    };
+
+    let parameters = [];
+    let placeholder = [];
+    let academicyr = academicyear.substring(2, 4);
+
+    let degreetype = degree.charAt(0);
+
+    let sec = options[`${section.toLowerCase()}`];
+    let assessment = options[`${assessmenttype.toLowerCase()}`];
+    const array = [
+      "AA",
+      "CS",
+      "EE",
+      "EI",
+      "CI",
+      "BT",
+      "IT",
+      "ME",
+      "MT",
+      "EC",
+      "PT",
+      "PS",
+      "MB",
+    ];
+    const key = array.indexOf(dept);
+    let skey = key + 15;
+
+    for (let i = 0; i < count; i++) {
+      let number = assessment * 100 + i;
+      let pn = (number * 42) % 1000;
+      if (pn < 100) {
+        pn *= 10;
+      }
+      const username = `${dept}${sec}${sem.toString()}${academicyr}${degreetype}${number}`;
+      const password = `${dept}@${skey}${pn.toString(8)}${pn.toString(16)}${
+        key < 0 ? -1 * key : key
+      }${sec}`;
+
+      parameters = [...parameters, dept, sem, section, username, password];
+      placeholder = [...placeholder, "(?,?,?,?,?)"];
+    }
+
     db.query(
-      "CREATE TABLE IF NOT EXISTS feedbacklogin (id INT PRIMARY KEY AUTO_INCREMENT, date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, dept VARCHAR(20), sem INT, username VARCHAR(30), password VARCHAR(30));",
+      `replace into feedbacklogin(dept,sem,section,username,password) values${placeholder}`,
+      parameters,
       (error, result) => {
         if (result) {
-          let parameters = [];
-          let placeholder = [];
-          for (let i = 0; i < data.count; i++) {
-            parameters = [
-              ...parameters,
-              data.dept,
-              data.sem,
-              data.dept + data.sem.toString() + (100 + i + 1),
-              data.dept + "@" + data.sem + (100 + i + 1),
-            ];
-            placeholder = [...placeholder, "(?,?,?,?)"];
-          }
-
-          db.query(
-            `insert into feedbacklogin(dept,sem,username,password) values${placeholder}`,
-            parameters,
-            (error, result) => {
-              if (result) {
-                res.status(200).send({ msg: "inserted" });
-              } else {
-                res.status(400).send({ msg: "error" });
-              }
-            }
-          );
+          res.status(200).send({ msg: "inserted" });
         } else {
+          console.log(error);
           res.status(400).send({ msg: "error" });
         }
       }
     );
-  } catch (e) {
-    res.status(400).send(e);
+  } else {
+    res.status(200).send({ msg: "invalid password" });
   }
 });
 
