@@ -32,6 +32,8 @@ db.connect((error) => {
 
 // {
 //   "count":20,
+//   "validfrom":"02-12-23",
+//   "validto":"04-12-23",
 //   "dept":"AD",
 //   "degree":"UG",
 //   "sem":2,
@@ -43,7 +45,10 @@ db.connect((error) => {
 app.post("/generateLogin", (req, res) => {
   const {
     count,
+    validfrom,
+    validto,
     dept,
+
     degree,
     sem,
     section,
@@ -100,12 +105,23 @@ app.post("/generateLogin", (req, res) => {
         key < 0 ? -1 * key : key
       }${sec}`;
 
-      parameters = [...parameters, dept, sem, section, username, password];
-      placeholder = [...placeholder, "(?,?,?,?,?)"];
+      parameters = [
+        ...parameters,
+        i + 1,
+
+        validfrom,
+        validto,
+        dept,
+        sem,
+        section,
+        username,
+        password,
+      ];
+      placeholder = [...placeholder, "(?,?,?,?,?,?,?,?)"];
     }
 
     db.query(
-      `replace into feedbacklogin(dept,sem,section,username,password) values${placeholder}`,
+      `replace into feedbacklogin(id,validfrom,validto,dept,sem,section,username,password) values${placeholder}`,
       parameters,
       (error, result) => {
         if (result) {
