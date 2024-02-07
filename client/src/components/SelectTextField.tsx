@@ -1,27 +1,19 @@
 import { HTMLInputTypeAttribute, useState } from "react";
+import Spinner from "./Spinner";
+import  "../index.css"
 
 type Props = {
   label?: string;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
   value: string;
+  list: string[];
   setValue: (val: string) => void;
 };
 
-const SelectTextField = ({ label, placeholder, setValue, value }: Props) => {
+const SelectTextField = ({ label, placeholder, list,value }: Props) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const list = [
-    "One",
-    "Two",
-    "One",
-    "Two",
-    "One",
-    "Two",
-    "One",
-    "Two",
-    "One",
-    "Two",
-  ];
+  
 
   return (
     <div className="flex flex-col gap-1">
@@ -33,7 +25,7 @@ const SelectTextField = ({ label, placeholder, setValue, value }: Props) => {
         <p className="">{value || placeholder || "Red"}</p>
         {/* Dropdown */}
         {showDropdown && (
-          <div className="absolute left-0 top-full flex max-h-48 w-full translate-y-2 flex-col overflow-hidden overflow-y-auto rounded-md border-2 border-gray-600 bg-white">
+          <div className={`absolute left-0 top-full flex max-h-48 w-full translate-y-2 flex-col  overflow-hidden overflow-y-auto scrollbar ${list.length > 0 ?"":"py-2 justify-center items-center"} rounded-md border-2 border-gray-600 bg-white`}>
             {list.length > 0 ? (
               list.map((li) => (
                 <p className="cursor-pointer px-2 py-1.5 transition-all  hover:bg-gray-100">
@@ -41,7 +33,7 @@ const SelectTextField = ({ label, placeholder, setValue, value }: Props) => {
                 </p>
               ))
             ) : (
-              <p className="py-1.5  font-medium">No Data</p>
+              <Spinner />
             )}
           </div>
         )}
