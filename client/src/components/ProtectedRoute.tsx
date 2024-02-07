@@ -13,6 +13,7 @@ const ProtectedRoute = ({ children, shouldBeAdmin = false }: Props) => {
   if (!role) {
     return <Navigate to={"/"} />;
   }
+console.log(shouldBeAdmin);
 
   return (
     <>

@@ -5,7 +5,7 @@ import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
 import useRole from "./store/useRole";
 import Header from "./components/Header";
-import GeneratePage from "./pages/GeneratePage";
+import PasswordGenpage from "./pages/PasswordGenPage";
 function App() {
   const role = useRole((state) => state.role);
 
@@ -37,7 +37,7 @@ function App() {
           <Route
             element={
               <ProtectedRoute shouldBeAdmin>
-                <GeneratePage />
+                <PasswordGenpage />
               </ProtectedRoute>
             }
             path="/admin/generate"

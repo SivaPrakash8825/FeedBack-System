@@ -3,11 +3,8 @@ import LOGO from "../assets/logo.jpg";
 import InputTextField from "../components/InputTextField";
 import RadioField from "../components/RadioField";
 import Button from "../components/Button";
-import SelectTextField from "../components/SelectTextField";
 
-type Props = {};
-
-const LoginPage = (props: Props) => {
+const LoginPage = () => {
   const [option, setOption] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -30,7 +27,7 @@ const LoginPage = (props: Props) => {
           setValue={setPassword}
           label="Password"
         />
-        <SelectTextField label="Select" />
+        
         {username.trim() !== "admin" && (
           <RadioField
             option={option}

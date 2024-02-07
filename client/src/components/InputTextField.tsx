@@ -1,10 +1,10 @@
 import { HTMLInputTypeAttribute } from "react";
 
 type Props = {
-  label?: string;
+  label: string;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
-  value: string;
+  value?: string;
   setValue: (val: string) => void;
 };
 
