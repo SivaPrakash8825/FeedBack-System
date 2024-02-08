@@ -38,7 +38,19 @@ const PasswordGenPage = () => {
       setValue:setGraduation
     },
     {
-      list: ["CS", "AD","ME","EE","EC"],
+      list: ["AA",
+      "CS",
+      "EE",
+      "EI",
+      "CI",
+      "BT",
+      "IT",
+      "ME",
+      "MT",
+      "EC",
+      "PT",
+      "PS",
+      "MB"],
       label:"department",
       value: department,
       setValue:setDepartment
