@@ -205,7 +205,7 @@ app.post("/generateLogin", (req, res) => {
 // check login auth admin
 app.post("/loginAuth", (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, option } = req.body;
     db.query(
       "SELECT * FROM masterLogin WHERE username = ? and password = ?",
       [username, password],
@@ -222,7 +222,7 @@ app.post("/loginAuth", (req, res) => {
           return res.status(200).send("admin");
         } else {
           db.query(
-            "SELECT * FROM feedbackLogin WHERE username = ? and password = ?",
+            "SELECT * FROM feedbackLogin WHERE username = ? and password = ? and validfrom <= CURDATE() AND validto >= CURDATE();",
             [username, password],
             (err, result) => {
               if (err) {

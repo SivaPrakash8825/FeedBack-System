@@ -33,7 +33,8 @@ const LoginPage = () => {
           `${import.meta.env.VITE_ENDPOINT}/loginAuth`,
           {
             username: username, // "AD3223U311"
-            password: password, //"AD@14115426c13"
+            password: password, // "AD@14115426c13"
+            option: option,
           },
           {
             withCredentials: true,

@@ -69,7 +69,7 @@ export const JsonToExcel = () => {
       XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
       // Generate Excel file and trigger download
-      XLSX.writeFile(wb, "survey_data.xlsx");
+      XLSX.writeFile(wb, "Questions.xlsx");
     } catch (error) {
       console.log("convertJsonToSheet Error : ", error.message);
     }
