@@ -122,7 +122,7 @@ app.post("/generateLogin", (req, res) => {
     let parameters = [];
     let placeholder = [];
     let academicyr = academicyear.substring(2, 4);
-
+    let ExcelData = [];
     let degreetype = degree.charAt(0);
 
     let sec = options[`${section.toLowerCase()}`];
@@ -155,7 +155,19 @@ app.post("/generateLogin", (req, res) => {
       const password = `${dept}@${skey}${pn.toString(8)}${pn.toString(16)}${
         key < 0 ? -1 * key : key
       }${sec}`;
-
+      ExcelData = [
+        ...ExcelData,
+        {
+          id: i + 1,
+          validfrom: validfrom,
+          validto: validto,
+          dept: dept,
+          sem: sem,
+          section: section,
+          username: username,
+          password: password,
+        },
+      ];
       parameters = [
         ...parameters,
         i + 1,
@@ -176,7 +188,7 @@ app.post("/generateLogin", (req, res) => {
       parameters,
       (error, result) => {
         if (result) {
-          res.status(200).send({ msg: "inserted" });
+          res.status(200).send(ExcelData);
         } else {
           console.log(error);
           res.status(400).send({ msg: "error" });

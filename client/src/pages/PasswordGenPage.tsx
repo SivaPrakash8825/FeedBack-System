@@ -4,6 +4,7 @@ import SelectTextField from "../components/SelectTextField";
 import InputTextField from "../components/InputTextField";
 import Button from "../components/Button";
 import axios from "axios";
+import generateExcel from "../utils/JsonToExcel"
 // SelectTextField
 
 
@@ -85,6 +86,7 @@ type:"number",
   const genLoginId = async () => {
     
     
+    
     const isAnyEmpty = value.some(item => item.value =="" || 0);
     if (isAnyEmpty) {
       alert("fill the details")
@@ -104,8 +106,11 @@ type:"number",
         
       }, { withCredentials: true });
       
-      console.log(data);
       
+      
+      // const headers = Object.keys(data[0])
+      // data.forEach(val=>(rows.push([val.id,val.validfrom,val.validto,val.dept,val.sem,val.section,val.username,val.password])))
+      generateExcel({data})
     }
 }
   
