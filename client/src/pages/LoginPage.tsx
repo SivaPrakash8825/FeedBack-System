@@ -15,6 +15,9 @@ const LoginPage = () => {
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
   const { role, setRole } = useRole();
+  const setOptionFun = (val: string | null) => {
+    setOption(val);
+  }
 
   useEffect(() => {
     role == "admin"
@@ -81,10 +84,12 @@ const LoginPage = () => {
           setValue={setPassword}
           label="Password"
         />
+        
         {username.trim() !== "admin" && (
           <RadioField
+            
             option={option}
-            setOption={setOption}
+            setOption={setOptionFun}
             options={["day scholar", "hosteller"]}
           />
         )}

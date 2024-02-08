@@ -6,7 +6,7 @@ interface RoleType {
 }
 
 const useRole = create<RoleType>()((set) => ({
-  role: null,
+  role: "user",
   setRole: (role) => set({ role }),
 }));
 
