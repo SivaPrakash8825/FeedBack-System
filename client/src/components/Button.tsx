@@ -25,6 +25,7 @@ const Button = ({
     >
       <p>{title}</p>
       {loading && <Spinner size="sm" type={type} />}
+      {/* <button onClick={}></button> */}
     </div>
   );
 };

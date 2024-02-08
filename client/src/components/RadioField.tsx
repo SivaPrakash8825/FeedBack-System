@@ -1,17 +1,21 @@
 type Props = {
   options: string[];
-  setOption: (opt: string | null) => void;
+  setOption: (opt: string,index?:number) => void;
   option: string | null;
+  index?: number;
+  array?:boolean
 };
 
-const RadioField = ({ options, option, setOption }: Props) => {
+const RadioField = ({ options, option, setOption, index, array = false }: Props) => {
+ 
+  
   return (
-    <div className="flex items-center justify-around gap-3 ">
+    <div className={`flex  ${options.length>2?"flex-col":"justify-around items-center"}   gap-3 `}>
       {options.map((opt, i) => (
         <div
           key={i}
-          onClick={() => setOption(opt)}
-          className="flex cursor-pointer items-center gap-2"
+          onClick={() => (array?setOption(opt,index):setOption(opt))}
+          className={`flex cursor-pointer items-center gap-2`}
         >
           {/* Radio  */}
           <div

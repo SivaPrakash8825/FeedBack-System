@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LOGO from "../assets/logo.jpg";
 import InputTextField from "../components/InputTextField";
 import RadioField from "../components/RadioField";
 import Button from "../components/Button";
+import axios from "axios";
+import { Navigate, useNavigate } from "react-router-dom";
+import useRole from "../store/useRole";
 
 // type Props = {};
 
@@ -10,6 +13,58 @@ const LoginPage = () => {
   const [option, setOption] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const navigate = useNavigate();
+  const { role, setRole } = useRole();
+  const setOptionFun = (val: string | null) => {
+    setOption(val);
+  }
+
+  useEffect(() => {
+    role == "admin"
+      ? navigate("/admin")
+      : role == "user"
+        ? navigate("/feedback")
+        : navigate("/");
+  }, [role]);
+
+  const handleSubmit = async () => {
+    // console.log("clicked");
+    if (username.trim() != "" && password.trim() != "") {
+      console.log("in");
+      try {
+        const { data: checkRole } = await axios.post(
+          `${import.meta.env.VITE_ENDPOINT}/loginAuth`,
+          {
+            username: username, // "AD3223U311"
+            password: password, //"AD@14115426c13"
+          },
+          {
+            withCredentials: true,
+          },
+        );
+        console.log(checkRole);
+        if (checkRole == "admin") {
+          // Admin
+          console.log("Yeah Admin");
+          setRole("admin");
+          return navigate("/admin");
+          // return;
+        } else if (checkRole == "user") {
+          // User
+          console.log("Yeah User");
+          setRole("user");
+          return navigate("/feedback");
+        } else {
+          console.log("Not Both");
+          alert("Who are you?");
+        }
+      } catch (error) {
+        console.log(error.request.response);
+      }
+    } else {
+      alert("Enter Valid Details!");
+    }
+  };
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center gap-10 bg-white px-10 py-4 ">
@@ -32,12 +87,13 @@ const LoginPage = () => {
         
         {username.trim() !== "admin" && (
           <RadioField
+            
             option={option}
-            setOption={setOption}
+            setOption={setOptionFun}
             options={["day scholar", "hosteller"]}
           />
         )}
-        <Button title="Login" />
+        <Button onClick={handleSubmit} title="Login" />
       </section>
     </main>
   );
