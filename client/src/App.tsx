@@ -6,9 +6,36 @@ import AdminPage from "./pages/AdminPage";
 // import useRole from "./store/useRole";
 import { JsonToExcel } from "./components/JsonToExcel";
 import { ExcelToJson } from "./components/ExcelToJson";
+import { useEffect } from "react";
+import useRole from "./store/useRole";
+import axios from "axios";
 
 function App() {
   // const role = useRole((state) => state.role);
+  const { role, setRole } = useRole();
+
+  const adminChecker = async () => {
+    try {
+      const { data: roleType } = await axios.get(
+        `${import.meta.env.VITE_ENDPOINT}/me`,
+        {
+          withCredentials: true,
+        },
+      );
+      console.log(roleType);
+      if (roleType == "admin" || roleType == "user") {
+        console.log("roletype", roleType);
+
+        setRole(roleType);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  useEffect(() => {
+    adminChecker();
+  }, []);
 
   return (
     <>

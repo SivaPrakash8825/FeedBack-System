@@ -6,17 +6,29 @@ dotenv.config({
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const bodyparser = require("body-parser");
 const db = require("./db");
 const port = process.env.PORT || 3010;
+const jwt = require("jsonwebtoken");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
 
-app.use(bodyparser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.use(bodyparser.json());
+// app.use(bodyparser.urlencoded({ extended: true }));
+
+app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin: ["http://localhost:5173"],
     credentials: true,
+  })
+);
+app.use(
+  session({
+    secret: process.env.JWT_SECRETKEY + "", // Change this to a random string
+    resave: false,
+    saveUninitialized: true,
+    // cookie: { secure: false, sameSite: "strict" }, // Set secure to true if using HTTPS
   })
 );
 
@@ -93,6 +105,8 @@ db.connect((error) => {
 //   "academicyear":"2023-2024",
 //   "password":"Kcet@"
 // }
+
+// generate login username password
 app.post("/generateLogin", (req, res) => {
   const {
     count,
@@ -185,6 +199,68 @@ app.post("/generateLogin", (req, res) => {
     );
   } else {
     res.status(200).send({ msg: "invalid password" });
+  }
+});
+
+// check login auth admin
+app.post("/loginAuth", (req, res) => {
+  try {
+    const { username, password } = req.body;
+    db.query(
+      "SELECT * FROM masterLogin WHERE username = ? and password = ?",
+      [username, password],
+      (err, result) => {
+        if (err) {
+          return res.status(400).send(err.message);
+        }
+        if (result[0]) {
+          const token = jwt.sign(
+            { role: "admin" },
+            process.env.JWT_SECRETKEY + ""
+          );
+          req.session.user = token;
+          return res.status(200).send("admin");
+        } else {
+          db.query(
+            "SELECT * FROM feedbackLogin WHERE username = ? and password = ?",
+            [username, password],
+            (err, result) => {
+              if (err) {
+                return res.status(400).send(err.message);
+              }
+              if (result[0]) {
+                const token = jwt.sign(
+                  { role: "user" },
+                  process.env.JWT_SECRETKEY + ""
+                );
+                req.session.user = token;
+                return res.status(200).send("user");
+              } else {
+                return res.status(200).send("Data Not Found!");
+              }
+            }
+          );
+        }
+      }
+    );
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
+app.get("/me", (req, res) => {
+  try {
+    if (req.session.user) {
+      const verify = jwt.verify(
+        req.session.user,
+        process.env.JWT_SECRETKEY + ""
+      );
+      return res.status(200).send(verify.role);
+    }
+    return res.status(200).send("no session");
+    // return;
+  } catch (error) {
+    res.status(400).send(error.message);
   }
 });
 

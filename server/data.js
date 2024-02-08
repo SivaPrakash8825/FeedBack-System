@@ -50,7 +50,36 @@ const generateLogin = () => {
       }
     );
   } catch (e) {
-    return console.log(error);
+    console.log(e.message);
   }
 };
 generateLogin();
+
+// Create Table Master Login
+const createMasterLogin = () => {
+  try {
+    db.query(
+      "CREATE TABLE IF NOT EXISTS masterLogin (id INT NOT NULL,dept VARCHAR(20),username VARCHAR(30),password VARCHAR(30),PRIMARY KEY (dept,username));",
+      (err, res) => {
+        if (!err) {
+          const query =
+            "REPLACE INTO masterLogin (id,dept, username,password) VALUES (?,?,?,?);";
+
+          db.query(query, [1, "all", "admin", "admin"], (error, results) => {
+            if (error) {
+              console.log(error.message);
+            } else {
+              console.log("MasterLogin Data Inserted :)");
+            }
+          });
+        } else {
+          console.log(err.message);
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+createMasterLogin();
