@@ -3,12 +3,13 @@ import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
-// import useRole from "./store/useRole";
-import { JsonToExcel } from "./components/JsonToExcel";
+import useRole from "./store/useRole";
+// import { JsonToExcel } from "./components/JsonToExcel";
 import { ExcelToJson } from "./components/ExcelToJson";
 import { useEffect } from "react";
-import useRole from "./store/useRole";
+import Header from "./components/Header";
 import axios from "axios";
+import PasswordGenPage from "./pages/PasswordGenPage";
 
 function App() {
   // const role = useRole((state) => state.role);
@@ -40,17 +41,18 @@ function App() {
   return (
     <>
       <BrowserRouter>
+        {role && <Header />}
         <Routes>
           {/* Login Page */}
           <Route element={<LoginPage />} path="/" />
           {/* Feedback Page */}
           <Route
             element={
-              <ProtectedRoute>
+              <ProtectedRoute >
                 <FeedbackPage />
               </ProtectedRoute>
             }
-            path="/feedback"
+            path="/feedback/theory"
           />
           {/* Admin Page */}
           <Route
@@ -60,6 +62,15 @@ function App() {
               </ProtectedRoute>
             }
             path="/admin"
+          />
+          {/* login id generator */}
+          <Route
+            element={
+              <ProtectedRoute shouldBeAdmin>
+                <PasswordGenPage />
+              </ProtectedRoute>
+            }
+            path="/admin/generate"
           />
 
           {/* Dummy */}
