@@ -341,17 +341,15 @@ const createMasterLogin = () => {
           const query =
             "REPLACE INTO masterLogin (id,dept, username,password) VALUES (?,?,?,?);";
 
-          db.query(
-            query,
-            [1, "all", "admin", "KamarajCse@1710"],
-            (error, results) => {
-              if (error) {
-                console.log(error.message);
-              } else {
-                console.log("MasterLogin Data Inserted :)");
-              }
+          db.query(query, [1, "all", "admin", "admin"], (error, results) => {
+            if (error) {
+              console.log(error.message);
+            } else {
+              console.log("MasterLogin Data Inserted :)");
             }
-          );
+          });
+        } else {
+          console.log(err.message);
         }
       }
     );
