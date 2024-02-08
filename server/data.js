@@ -280,33 +280,38 @@ const questions = [
 // Create Table questions & insert questions to it.
 const createQuestions = () => {
   // Creates Table
-  db.query(
-    "CREATE TABLE IF NOT EXISTS `feedback`.`questions` (`id` INT NOT NULL ,`question` VARCHAR(250) PRIMARY KEY NULL,type TEXT);",
-    (err, res) => {
-      if (!err) {
-        // Add Questions to table
-        const values = questions
-          .map(
-            ({ id, type, question }) =>
-              `(${id},'${type}','${JSON.stringify(question)}')`
-          )
-          .join(",");
-        const query = `REPLACE INTO questions (id,type, question) VALUES ${values}`;
+  try {
+    db.query(
+      "CREATE TABLE IF NOT EXISTS `feedback`.`questions` (`id` INT NOT NULL ,`question` VARCHAR(250) PRIMARY KEY NULL,type TEXT);",
+      (err, res) => {
+        if (!err) {
+          // Add Questions to table
+          const values = questions
+            .map(
+              ({ id, type, question }) =>
+                `(${id},'${type}','${JSON.stringify(question)}')`
+            )
+            .join(",");
+          const query = `REPLACE INTO questions (id,type, question) VALUES ${values}`;
 
-        db.query(query, (error, results) => {
-          if (error) {
-            console.log(error.message);
-          } else {
-            console.log("Questions Inserted :)");
-          }
-        });
+          db.query(query, (error, results) => {
+            if (error) {
+              console.log(error.message);
+            } else {
+              console.log("Questions Inserted :)");
+            }
+          });
+        }
       }
-    }
-  );
+    );
+  } catch (error) {
+    console.log(error.message);
+  }
 };
 
 createQuestions();
 
+// Create Table feedbacklogin
 const generateLogin = () => {
   try {
     db.query(
@@ -314,13 +319,45 @@ const generateLogin = () => {
       (error, result) => {
         if (error) {
           console.log(error);
-          return 0;
+          return;
         }
-        return 1;
+        console.log("Generated Login Inserted :)");
+        return;
       }
     );
   } catch (e) {
-    res.status(400).send(e);
+    console.log(e.message);
   }
 };
 generateLogin();
+
+// Create Table Master Login
+const createMasterLogin = () => {
+  try {
+    db.query(
+      "CREATE TABLE IF NOT EXISTS masterLogin (id INT NOT NULL,dept VARCHAR(20),username VARCHAR(30),password VARCHAR(30),PRIMARY KEY (dept,username));",
+      (err, res) => {
+        if (!err) {
+          const query =
+            "REPLACE INTO masterLogin (id,dept, username,password) VALUES (?,?,?,?);";
+
+          db.query(
+            query,
+            [1, "all", "admin", "KamarajCse@1710"],
+            (error, results) => {
+              if (error) {
+                console.log(error.message);
+              } else {
+                console.log("MasterLogin Data Inserted :)");
+              }
+            }
+          );
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+createMasterLogin();
