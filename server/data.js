@@ -3,7 +3,7 @@ dotenv.config({
   path: "./.env",
 });
 const db = require("./db");
-const questions = require("./constants");
+const { masterTableData, questions } = require("./constants");
 
 // Create Table questions & insert questions to it.
 const createQuestions = () => {
@@ -83,3 +83,53 @@ const createMasterLogin = () => {
 };
 
 createMasterLogin();
+
+// Create Table Master Table
+const createMasterTable = () => {
+  try {
+    db.query(
+      "CREATE TABLE `mastertable` (`Academic yr` varchar(100) NOT NULL,`Dept` varchar(20) NOT NULL,`UG/PG` varchar(20) NOT NULL,`Theory/Lab` text,`Semester` int NOT NULL,`Section` varchar(30) NOT NULL,`Sub Code` varchar(100) NOT NULL,`Sub Name` varchar(230) NOT NULL,`Staff` text,`StaffParent Dept` text,`Open Elective/Regular/Core Elective` text,`Sub Grouping` text,PRIMARY KEY (`Academic yr`,`Dept`,`UG/PG`,`Semester`,`Sub Name`,`Sub Code`,`Section`));",
+      (err, res) => {
+        if (!err) {
+          const values = masterTableData
+            .map(
+              ({
+                "Academic yr": academicYear,
+                Dept,
+                "UG/PG": ugpg,
+                "Theory/Lab": theoryLab,
+                Semester,
+                Section,
+                "Sub Code": subCode,
+                "Sub Name": subName,
+                Staff,
+                "StaffParent Dept": staffParentDept,
+                "Open Elective/Regular/Core Elective": electiveType,
+                "Sub Grouping": subGrouping,
+              }) =>
+                `('${academicYear}', '${Dept}', '${ugpg}', '${theoryLab}', ${Semester}, '${Section}', '${subCode}', '${subName}', '${Staff}', '${staffParentDept}', '${electiveType}', '${subGrouping}')`
+            )
+            .join(",");
+
+          // Construct the REPLACE INTO query
+          const query = `REPLACE INTO mastertable (\`Academic yr\`, Dept, \`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\`) VALUES ${values}`;
+
+          db.query(query, (err, result) => {
+            if (err) {
+              return console.log(err.message);
+            }
+            return console.log("Master Table Created & Master data Added");
+          });
+
+          // console.log("Master Table Created & Master data Added");
+        } else {
+          console.log(err.message);
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+createMasterTable();

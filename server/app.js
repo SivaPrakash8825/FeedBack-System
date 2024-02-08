@@ -202,7 +202,7 @@ app.post("/generateLogin", (req, res) => {
   }
 });
 
-// check login auth admin
+// check login auth user and set session in server side
 app.post("/loginAuth", (req, res) => {
   try {
     const { username, password } = req.body;
@@ -248,6 +248,7 @@ app.post("/loginAuth", (req, res) => {
   }
 });
 
+// get session data and valid user checker
 app.get("/me", (req, res) => {
   try {
     if (req.session.user) {
@@ -263,6 +264,8 @@ app.get("/me", (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
+app.post("/getCourses", (req, res) => {});
 
 app.listen(port, () => {
   console.log(`server start listening on ${port}`);
