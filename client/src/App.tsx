@@ -4,7 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
 import useRole from "./store/useRole";
-import { JsonToExcel } from "./components/JsonToExcel";
+// import { JsonToExcel } from "./components/JsonToExcel";
 import { ExcelToJson } from "./components/ExcelToJson";
 import Header from "./components/Header";
 import PasswordGenPage from "./pages/PasswordGenPage";
@@ -22,11 +22,11 @@ function App() {
           {/* Feedback Page */}
           <Route
             element={
-              <ProtectedRoute>
+              <ProtectedRoute >
                 <FeedbackPage />
               </ProtectedRoute>
             }
-            path="/feedback"
+            path="/feedback/theory"
           />
           {/* Admin Page */}
           <Route
