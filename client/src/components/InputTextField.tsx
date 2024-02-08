@@ -4,8 +4,8 @@ type Props = {
   label: string;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
-  value: string | number;
-  setValue: (val: string | number) => void;
+  value: string;
+  setValue: (val: string) => void;
 };
 
 const InputTextField = ({

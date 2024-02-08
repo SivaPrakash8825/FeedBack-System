@@ -281,7 +281,7 @@ const questions = [
 const createQuestions = () => {
   // Creates Table
   db.query(
-    "CREATE TABLE IF NOT EXISTS `feedback`.`questions` (`id` INT NOT NULL ,`question` VARCHAR(250) PRIMARY KEY NULL,type TEXT);",
+    "CREATE TABLE IF NOT EXISTS `feedback`.`questions` (`id` INT NOT NULL ,`question` VARCHAR(250) PRIMARY KEY NOT NULL,type TEXT);",
     (err, res) => {
       if (!err) {
         // Add Questions to table

@@ -17,7 +17,7 @@ const PasswordGenPage = () => {
   const [semester, setSemester] = useState("");
   const [section, setSection] = useState("");
   const [asstype, setAsstype] = useState("");
-  const [noOfstd, setNoOfstd] = useState(0);
+  const [noOfstd, setNoOfstd] = useState("");
   const [validfrom, setValidfrom] = useState("");
   const [validto, setValidto] = useState("");
   
@@ -91,7 +91,7 @@ type:"number",
     } else {
       const { data } = await axios.post(`${import.meta.env.VITE_ENDPOINT}/generateLogin`, {
         
-        count: noOfstd,
+        count: parseInt(noOfstd),
         validfrom: validfrom,
         validto: validto,
         dept: department,
@@ -103,6 +103,7 @@ type:"number",
         password: password
         
       }, { withCredentials: true });
+      
       console.log(data);
       
     }
@@ -113,9 +114,9 @@ type:"number",
     <main className="flex min-h-screen w-full flex-col items-center px-6 py-4">
       <section className="mx-auto w-full max-w-4xl p-3">
         <h1 className="text-2xl font-semibold">Generate User Credentials</h1>
-        <div className="mt-2 flex flex-col gap-3 rounded-md border-2 border-black p-5 ">
+        <div className="mt-2 flex flex-col gap-y-3  rounded-md border-2  border-black p-5 ">
          
-          {
+          <div className="grid grid-cols-2 gap-3">{
             value.map((data,index) => {
               return (
                 
@@ -123,8 +124,8 @@ type:"number",
                   <InputTextField key={index} label={data.label} type={data.type}  value={data.value} setValue={data.setValue} />
               )
             })
-          }
-          <Button title="Generate" onClick={genLoginId}/>
+          }</div>
+          <Button title="Generate" onClick={genLoginId} disable={password=="Kcet@"?false:true} />
         </div>
       </section>
     </main>
