@@ -54,6 +54,7 @@ function App() {
             }
             path="/feedback/:type"
           />
+          <Route path="/feedback" element={ <LoginPage/>} />
           {/* Admin Page */}
           <Route
             element={

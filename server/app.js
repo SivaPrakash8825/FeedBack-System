@@ -310,15 +310,24 @@ app.get("/me", (req, res) => {
 // store user feedback answer
 app.post("/storeanswer", (req, res) => {
   const { username, marks, coursecode, comments } = req.body;
-  console.log(coursecode, comments);
+  const detials = FindUserDetails(username);
   try {
     db.query(
-      "REPLACE INTO theory(username,coursecode,marks,comments) VALUES(?,?,?,?)",
-      [username, coursecode, marks, comments],
+      "REPLACE INTO theory(username,coursecode,academicyear,section,dept,sem,assessmenttype,degreetype,marks,comments) VALUES(?,?,?,?,?,?,?,?,?,?)",
+      [
+        username,
+        coursecode,
+        detials.academicyear,
+        detials.section,
+        detials.dept,
+        detials.sem,
+        detials.assessmenttype,
+        detials.degreetype,
+        marks,
+        comments,
+      ],
       (error, result) => {
-        console.log(error);
         if (result) {
-          console.log(result);
           res.status(200).send({ msg: "submitted" });
         }
       }

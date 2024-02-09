@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import RadioField from "../components/RadioField";
 import Button from "../components/Button";
 import axios from "axios";
-import {useParams} from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { Navigate } from "react-router-dom";
 
 const FeedbackPage = () => {
   const ref=useRef< HTMLTextAreaElement | null >(null);
@@ -74,8 +75,12 @@ const FeedbackPage = () => {
           coursecode: "VAI223",
           comments:ref.current.value
         },{withCredentials:true})
-        console.log(data);
+        console.log(data.msg);
         
+        if (data.msg) {
+          alert("afd");
+           <Navigate to={"/feedback"}/>
+        }
       }
     }
 
