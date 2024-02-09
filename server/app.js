@@ -32,10 +32,41 @@ app.use(
   })
 );
 
+// extract user detials by username
+const FindUserDetails = (username) => {
+  const assessmenttype = {
+    1: "PRE",
+    2: "POST",
+    3: "mgmt-pre",
+    4: "mgmt-final",
+    5: "other",
+  };
+  const section = {
+    1: "A",
+    2: "B",
+    3: "C",
+  };
+  const degree = {
+    U: "UG",
+    P: "PG",
+  };
+  const year = parseInt(username.substring(4, 6));
+
+  return {
+    section: section[username.charAt(2)],
+    dept: username.substring(0, 2),
+    sem: parseInt(username.charAt(3)),
+    academicyear: `20${year}-${year + 1}`,
+    degreetype: degree[username.at(6)],
+    assessmenttype: assessmenttype[username.at(7)],
+  };
+};
+
 // get question data
-app.get("/getQuestions", (req, res) => {
+app.get("/getQuestions/:type", (req, res) => {
+  const { type } = req.params;
   try {
-    db.query("SELECT * FROM questions", (err, ress) => {
+    db.query(`SELECT * FROM questions WHERE type=?`, [type], (err, ress) => {
       if (err) {
         return res.status(400).send(err.message);
       }
@@ -142,7 +173,7 @@ app.post("/generateLogin", (req, res) => {
     let sec = options[`${section.toLowerCase()}`];
     let assessment = options[`${assessmenttype.toLowerCase()}`];
     const array = [
-      "AA",
+      "AD",
       "CS",
       "EE",
       "EI",
@@ -198,7 +229,7 @@ app.post("/generateLogin", (req, res) => {
     }
 
     db.query(
-      `replace into feedbacklogin(id,validfrom,validto,dept,sem,section,username,password) values${placeholder}`,
+      `REPLACE INTO feedbacklogin(id,validfrom,validto,dept,sem,section,username,password) VALUES${placeholder}`,
       parameters,
       (error, result) => {
         if (result) {
@@ -273,6 +304,28 @@ app.get("/me", (req, res) => {
     // return;
   } catch (error) {
     res.status(400).send(error.message);
+  }
+});
+
+// store user feedback answer
+app.post("/storeanswer", (req, res) => {
+  const { username, marks, coursecode, comments } = req.body;
+  console.log(coursecode, comments);
+  try {
+    db.query(
+      "REPLACE INTO theory(username,coursecode,marks,comments) VALUES(?,?,?,?)",
+      [username, coursecode, marks, comments],
+      (error, result) => {
+        console.log(error);
+        if (result) {
+          console.log(result);
+          res.status(200).send({ msg: "submitted" });
+        }
+      }
+    );
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e.message);
   }
 });
 

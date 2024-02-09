@@ -83,3 +83,22 @@ const createMasterLogin = () => {
 };
 
 createMasterLogin();
+
+const createTheorytable = () => {
+  try {
+    db.query(
+      "CREATE TABLE `feedback`.`theory` (`username` VARCHAR(40)  NOT NULL,`coursecode` VARCHAR(45) NOT NULL,`marks` TEXT NULL,`comments` VARCHAR(300) NULL,PRIMARY KEY (`username`, `coursecode`));",
+      (err, res) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("theory table created");
+        }
+      }
+    );
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+createTheorytable();

@@ -38,7 +38,7 @@ const PasswordGenPage = () => {
       setValue:setGraduation
     },
     {
-      list: ["AA",
+      list: ["AD",
       "CS",
       "EE",
       "EI",
@@ -68,7 +68,7 @@ const PasswordGenPage = () => {
       setValue:setSection
     },
     {
-      list: ["pre", "post","msmg-pre","msmg-post"],
+      list: ["pre", "post","mgmt-pre","mgmt-final"],
       label:"assignment type",
       value: asstype,
       setValue:setAsstype
