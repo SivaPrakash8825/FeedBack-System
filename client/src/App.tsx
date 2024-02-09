@@ -52,8 +52,9 @@ function App() {
                 <FeedbackPage />
               </ProtectedRoute>
             }
-            path="/feedback/theory"
+            path="/feedback/:type"
           />
+          <Route path="/feedback" element={ <LoginPage/>} />
           {/* Admin Page */}
           <Route
             element={
