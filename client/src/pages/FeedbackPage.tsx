@@ -42,11 +42,6 @@ const FeedbackPage = () => {
       setQuestion(prevState => {
         return prevState.map((obj, ind) => {
           if (ind === index - 1) {
-            // setAnswer((pre) => {
-            //   pre[ind] = mark;
-              
-            //   return pre;
-            // })
             const mark = obj.options.length - obj.options.indexOf(opt);
             return { ...obj, option: opt, mark: mark }; // Update only the object feild
           }  
@@ -54,9 +49,6 @@ const FeedbackPage = () => {
         });
       });
     }
-    // console.log(flag);
-    
-    // !flag?setBtnLock(true):null
   }
   
   
@@ -78,14 +70,11 @@ const FeedbackPage = () => {
         console.log(data.msg);
         
         if (data.msg) {
-          alert("afd");
-           <Navigate to={"/feedback"}/>
+          
+           <Navigate to={"/"}/>
         }
       }
-    }
-
-    
-    
+    }  
   }
 
   useEffect(() => {
@@ -95,7 +84,6 @@ const FeedbackPage = () => {
   
   
   const Frame = ({ questions, index, setOption }: { questions: { question: string; options: string[]; option: string|null; }, index: number, setOption: (opt: string,index?: number | undefined) => void }) => {
-   
    
     return (
       <div className=" w-full h-full   flex flex-col gap-y-2   ">
@@ -122,7 +110,6 @@ const FeedbackPage = () => {
       <div className="w-2/3 flex flex-col gap-y-8 my-3 border-2 border-black  rounded-md px-14 py-6">
         {questions && questions.map((data,index) => {
           return (
-    
             <Frame key={index} questions={data} index={index+1} setOption={setOption } />
   )
 })}
