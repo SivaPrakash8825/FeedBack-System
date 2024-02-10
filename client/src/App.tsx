@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import Header from "./components/Header";
 import axios from "axios";
 import PasswordGenPage from "./pages/PasswordGenPage";
+import ReportGenPage from "./pages/ReportGenPage";
 
 function App() {
   // const role = useRole((state) => state.role);
@@ -83,6 +84,13 @@ function App() {
             }
             path="/dummy"
           />
+
+          {/* Report generate page */}
+          <Route path="/admin/reportgenerate" element={
+            <ProtectedRoute shouldBeAdmin>
+              <ReportGenPage/>
+            </ProtectedRoute>
+           } />
         </Routes>
       </BrowserRouter>
     </>

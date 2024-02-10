@@ -62,7 +62,7 @@ const FeedbackPage = () => {
         const marks = questions.map(data => data.mark)
         const values=JSON.stringify({answers:marks});
         const { data } = await axios.post(`${import.meta.env.VITE_ENDPOINT}/storeanswer`, {
-          username:"CS2222U200",
+          username:"AD1121U100",
           marks: values,
           coursecode: "VAI223",
           comments:ref.current.value

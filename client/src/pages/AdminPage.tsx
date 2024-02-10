@@ -8,3 +8,4 @@ const AdminPage = (props: Props) => {
 };
 
 export default AdminPage;
+   

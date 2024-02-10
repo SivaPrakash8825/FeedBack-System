@@ -338,6 +338,26 @@ app.post("/storeanswer", (req, res) => {
   }
 });
 
+app.post("/generateReport", (req, res) => {
+  const { dept, degree, sem, section, assessmenttype, academicyear, password } =
+    req.body;
+  if (password == "Kcet@") {
+    db.query(
+      `SELECT * FROM  theory WHERE academicyear=? AND section=? AND dept=? AND sem=? AND assessmenttype=? AND degreetype=?;`,
+      [academicyear, section, dept, sem, assessmenttype, degree],
+      (error, result) => {
+        if (result) {
+          res.status(200).send(result);
+        } else {
+          res.status(400).send({ msg: "error" });
+        }
+      }
+    );
+  } else {
+    res.status(200).send({ msg: "invalid password" });
+  }
+});
+
 app.listen(port, () => {
   console.log(`server start listening on ${port}`);
 });
