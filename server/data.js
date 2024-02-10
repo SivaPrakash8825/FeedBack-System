@@ -133,3 +133,22 @@ const createMasterTable = () => {
 };
 
 createMasterTable();
+
+const createTheorytable = () => {
+  try {
+    db.query(
+      "CREATE TABLE `feedback`.`theory` (`username` VARCHAR(30) NOT NULL,`coursecode` VARCHAR(45) NOT NULL,`academicyear` VARCHAR(10) NULL,`section` VARCHAR(45) NOT NULL,`dept` VARCHAR(45) NOT NULL,`sem` INT NOT NULL,`assessmenttype` varchar(10) NOT NULL,`degreetype` VARCHAR(5) NULL,`marks` TEXT NULL,`comments` VARCHAR(400) NULL, PRIMARY KEY (`username`, `coursecode`, `section`, `dept`, `sem`));",
+      (err, res) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("theory table created");
+        }
+      }
+    );
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+createTheorytable();

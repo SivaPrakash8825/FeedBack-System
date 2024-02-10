@@ -38,7 +38,7 @@ const PasswordGenPage = () => {
     },
     {
       list: [
-        "AA",
+        "AD",
         "CS",
         "EE",
         "EI",
@@ -51,7 +51,6 @@ const PasswordGenPage = () => {
         "PT",
         "PS",
         "MB",
-        "AD",
       ],
       label: "department",
       value: department,

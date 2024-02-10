@@ -38,7 +38,7 @@ function App() {
                 <FeedbackPage />
               </ProtectedRoute>
             }
-            path="/feedback/theory"
+            path="/feedback/:type"
           />
 
           {/* Admin Page */}
