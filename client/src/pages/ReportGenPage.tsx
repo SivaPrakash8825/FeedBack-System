@@ -1,5 +1,5 @@
 import axios from 'axios';
-import  { useState } from 'react'
+import  { useEffect, useState } from 'react'
 import Button from '../components/Button';
 import InputTextField from '../components/InputTextField';
 import SelectTextField from '../components/SelectTextField';
@@ -7,6 +7,7 @@ import generatePdf from "../utils/Generatepdf2"
 
 
 const ReportGenPage = () => {
+  const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
     const [academicyr, setAcademicyr] = useState("");
     const [graduation, setGraduation] = useState("");
     const [department, setDepartment] = useState("");
@@ -16,7 +17,15 @@ const ReportGenPage = () => {
     const [subtype, setSubtype] = useState("");
     const [reporttype, setReporttype] = useState("");
     const [subcode, setSubcode] = useState("");
-    const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("");
+  
+  useEffect(() => {
+    const curYear = new Date().getFullYear();
+    for (let i = curYear - 5; i < curYear + 3; i++){
+      setAcademicyearlist((pre) => [...pre, `${i}-${(i+1)%100}`]);
+    }
+    
+  },[])
     
     const value= [
       {
@@ -45,7 +54,7 @@ const ReportGenPage = () => {
  
         },
       {
-        list: ["2021-22", "2022-23"],
+        list: academicyearlist,
         label: "academic year",
         value: academicyr,
         setValue:setAcademicyr

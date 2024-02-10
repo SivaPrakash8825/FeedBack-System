@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import InputTextField from "../components/InputTextField";
 import SelectTextField from "../components/SelectTextField";
 import InputTextField from "../components/InputTextField";
@@ -11,6 +11,7 @@ const PasswordGenPage = () => {
   //   const [value, setValue] = useState({
   // value
   //   });
+  const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
   const [department, setDepartment] = useState("");
@@ -23,9 +24,18 @@ const PasswordGenPage = () => {
 
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    const curYear = new Date().getFullYear();
+    for (let i = curYear - 5; i < curYear + 3; i++){
+      setAcademicyearlist((pre) => [...pre, `${i}-${(i+1)%100}`]);
+    }
+    
+  },[])
+// console.log(academicyearlist);
+
   const value = [
     {
-      list: ["2021-22", "2022-23", "2023-24"],
+      list: academicyearlist,
       label: "academic year",
       value: academicyr,
       setValue: setAcademicyr,
