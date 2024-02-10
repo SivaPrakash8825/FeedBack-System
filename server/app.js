@@ -186,7 +186,6 @@ app.post("/generateLogin", (req, res) => {
       "PT",
       "PS",
       "MB",
-      "AD",
     ];
     const key = array.indexOf(dept);
     let skey = key + 15;
