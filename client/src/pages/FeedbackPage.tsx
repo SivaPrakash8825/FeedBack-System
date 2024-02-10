@@ -2,14 +2,22 @@ import { useEffect, useRef, useState } from "react";
 import RadioField from "../components/RadioField";
 import Button from "../components/Button";
 import axios from "axios";
-import { useParams } from 'react-router-dom'
-import { Navigate } from "react-router-dom";
+import { useLocation, useParams } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import useUserDetails from "../store/useUserDetails";
+
 
 const FeedbackPage = () => {
   const ref=useRef< HTMLTextAreaElement | null >(null);
   const [questions, setQuestion] = useState<{ question: string; options: string[]; option: string | null; mark: number }[]>([]);
   const [btnLock, setBtnLock] = useState(true);
- 
+  const [subject,setSubject]=useState<{ coursecode: string }>()
+  const navigate = useNavigate();
+  const { userDetails } = useUserDetails();
+  const location = useLocation();
+  
+
+
   const { type } = useParams<string>();
 
   const getQuestions = async () => { 
@@ -62,23 +70,29 @@ const FeedbackPage = () => {
         const marks = questions.map(data => data.mark)
         const values=JSON.stringify({answers:marks});
         const { data } = await axios.post(`${import.meta.env.VITE_ENDPOINT}/storeanswer`, {
-          username:"AD1121U100",
+          username:userDetails?.username,
           marks: values,
-          coursecode: "VAI223",
+          type:type,
+          coursecode: subject?.coursecode,
           comments:ref.current.value
         },{withCredentials:true})
         console.log(data.msg);
         
         if (data.msg) {
-          
-           <Navigate to={"/"}/>
+          navigate(-1)
+           
         }
       }
     }  
   }
 
   useEffect(() => {
-
+    const searchParams = new URLSearchParams(location.search);
+    const subjectString:string | null = searchParams.get('subject');
+    if (subjectString) {
+      const res: { coursecode: string } = JSON.parse(decodeURIComponent(subjectString));
+      setSubject(res);
+    }
     getQuestions();    
   },[])
   

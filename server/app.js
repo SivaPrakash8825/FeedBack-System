@@ -310,11 +310,12 @@ app.get("/me", (req, res) => {
 
 // store user feedback answer
 app.post("/storeanswer", (req, res) => {
-  const { username, marks, coursecode, comments } = req.body;
+  const { username, marks, coursecode, type, comments } = req.body;
+  console.log(type);
   const detials = FindUserDetails(username);
   try {
     db.query(
-      "REPLACE INTO theory(username,coursecode,academicyear,section,dept,sem,assessmenttype,degreetype,marks,comments) VALUES(?,?,?,?,?,?,?,?,?,?)",
+      `REPLACE INTO ${type}(username,coursecode,academicyear,section,dept,sem,assessmenttype,degreetype,marks,comments) VALUES(?,?,?,?,?,?,?,?,?,?)`,
       [
         username,
         coursecode,
@@ -415,10 +416,11 @@ app.post("/getCourses", (req, res) => {
     console.log(academicyr, dept, degree, sem, section, year);
 
     db.query(
-      "SELECT * FROM mastertable WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ?;",
-      [academicyr, dept, degree, sem, section],
+      "SELECT * FROM mastertable WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? and `Sub Code` not in (select coursecode from theory  where username=?) and `Sub Code` not in (select coursecode from lab  where username=?);",
+      [academicyr, dept, degree, sem, section, username, username],
       (err, result) => {
         if (err) {
+          console.log(err);
           return res.status(400).send(err.message);
         }
         if (result.length != 0) {
