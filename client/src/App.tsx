@@ -38,7 +38,7 @@ function App() {
                 <FeedbackPage />
               </ProtectedRoute>
             }
-            path="/feedback/:type"
+            path="/feedback/:username/:type"
           />
 
           {/* Admin Page */}
@@ -63,9 +63,12 @@ function App() {
           {/* Feedback Homepage */}
           <Route
             element={
-              // <ProtectedRoute>
-              <FeedbackHomePage username={username} setUsername={setUsername} />
-              // </ProtectedRoute>
+              <ProtectedRoute>
+                <FeedbackHomePage
+                  username={username}
+                  setUsername={setUsername}
+                />
+              </ProtectedRoute>
             }
             path="/feedback/:username"
           />
