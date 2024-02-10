@@ -14,7 +14,6 @@ const ProtectedRoute = ({ children, shouldBeAdmin = false }: Props) => {
     return <Navigate to={"/"} />;
   }
 
-
   return (
     <>
       {shouldBeAdmin ? (
@@ -29,6 +28,7 @@ const ProtectedRoute = ({ children, shouldBeAdmin = false }: Props) => {
         <Navigate to={"/"} />
       )}
     </>
+    // children
   );
 };
 

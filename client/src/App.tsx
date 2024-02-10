@@ -6,56 +6,42 @@ import AdminPage from "./pages/AdminPage";
 import useRole from "./store/useRole";
 // import { JsonToExcel } from "./components/JsonToExcel";
 import { ExcelToJson } from "./components/ExcelToJson";
-import { useEffect } from "react";
+import { useState } from "react";
 import Header from "./components/Header";
-import axios from "axios";
 import PasswordGenPage from "./pages/PasswordGenPage";
 import ReportGenPage from "./pages/ReportGenPage";
+import FeedbackHomePage from "./pages/FeedbackHomePage";
+import NotFoundPage from "./pages/NotFoundPage";
+import ForAuth from "./components/ForAuth";
 
 function App() {
   // const role = useRole((state) => state.role);
-  const { role, setRole } = useRole();
-
-  const adminChecker = async () => {
-    try {
-      const { data: roleType } = await axios.get(
-        `${import.meta.env.VITE_ENDPOINT}/me`,
-        {
-          withCredentials: true,
-        },
-      );
-      console.log(roleType);
-      if (roleType == "admin" || roleType == "user") {
-        console.log("roletype", roleType);
-
-        setRole(roleType);
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  useEffect(() => {
-    adminChecker();
-  }, []);
+  const [username, setUsername] = useState<string>("");
+  const { role } = useRole();
 
   return (
     <>
       <BrowserRouter>
+        <ForAuth />
         {role && <Header />}
         <Routes>
           {/* Login Page */}
-          <Route element={<LoginPage />} path="/" />
+          <Route
+            element={
+              <LoginPage username={username} setUsername={setUsername} />
+            }
+            path="/"
+          />
           {/* Feedback Page */}
           <Route
             element={
-              <ProtectedRoute >
+              <ProtectedRoute>
                 <FeedbackPage />
               </ProtectedRoute>
             }
-            path="/feedback/:type"
+            path="/feedback/:username/:type"
           />
-          <Route path="/feedback" element={ <LoginPage/>} />
+
           {/* Admin Page */}
           <Route
             element={
@@ -75,6 +61,19 @@ function App() {
             path="/admin/generate"
           />
 
+          {/* Feedback Homepage */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <FeedbackHomePage
+                  username={username}
+                  setUsername={setUsername}
+                />
+              </ProtectedRoute>
+            }
+            path="/feedback/:username"
+          />
+
           {/* Dummy */}
           <Route
             element={
@@ -91,6 +90,7 @@ function App() {
               <ReportGenPage/>
             </ProtectedRoute>
            } />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </>
