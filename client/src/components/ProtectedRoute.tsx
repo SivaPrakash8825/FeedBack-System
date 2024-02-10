@@ -10,25 +10,25 @@ type Props = {
 const ProtectedRoute = ({ children, shouldBeAdmin = false }: Props) => {
   const role = useRole((state) => state.role);
 
-  // if (!role) {
-  //   return <Navigate to={"/"} />;
-  // }
+  if (!role) {
+    return <Navigate to={"/"} />;
+  }
 
   return (
-    // <>
-    //   {shouldBeAdmin ? (
-    //     role === "admin" ? (
-    //       children
-    //     ) : (
-    //       <Navigate to={"/"} />
-    //     )
-    //   ) : role === "user" ? (
-    //     children
-    //   ) : (
-    //     <Navigate to={"/"} />
-    //   )}
-    // </>
-    children
+    <>
+      {shouldBeAdmin ? (
+        role === "admin" ? (
+          children
+        ) : (
+          <Navigate to={"/"} />
+        )
+      ) : role === "user" ? (
+        children
+      ) : (
+        <Navigate to={"/"} />
+      )}
+    </>
+    // children
   );
 };
 

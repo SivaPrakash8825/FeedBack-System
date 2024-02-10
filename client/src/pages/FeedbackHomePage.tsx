@@ -97,7 +97,7 @@ const FeedbackHomePage = ({ username }: Props) => {
                         className={
                           "hover:underline hover:underline-offset-[1px]"
                         }
-                        to={"/feedback/theory"}
+                        to={`/feedback/${userName}/test`}
                       >
                         {subject["Sub Code"]} {subject["Sub Name"]} -{" "}
                         {subject["Staff"]}
