@@ -18,6 +18,27 @@ const ReportGenPage = () => {
     const [reporttype, setReporttype] = useState("");
     const [subcode, setSubcode] = useState("");
   const [password, setPassword] = useState("");
+  const [subcodelist, setSubCodeList] = useState<string[]>([]);
+
+
+  const fetchCourseCode = async () => {
+    const { data } = await axios.post(`${import.meta.env.VITE_ENDPOINT}/getcoursecode` ,{
+      
+        dept: department,
+      degree: graduation,
+      sem: parseInt(semester),
+      section: section,
+      
+      academicyear: academicyr,
+     
+      }   
+    )
+  
+    data.forEach(val => {
+      setSubCodeList(pre=>([...pre,val["Sub Code"]]))
+    })
+    
+  }
   
   useEffect(() => {
     const curYear = new Date().getFullYear();
@@ -25,7 +46,18 @@ const ReportGenPage = () => {
       setAcademicyearlist((pre) => [...pre, `${i}-${(i+1)%100}`]);
     }
     
-  },[])
+  }, [])
+  
+  useEffect(() => {
+    if (academicyr && graduation && department && semester && section  && reporttype.toLowerCase()=="markwise") {
+      fetchCourseCode();
+      
+    } else if (reporttype.toLowerCase() == "markwise") {
+      setReporttype("");
+      alert("fill the above details")
+    }
+    
+  },[reporttype])
     
     const value= [
       {
@@ -46,13 +78,6 @@ const ReportGenPage = () => {
         value: department,
         setValue:setDepartment
       },
-      {
-        list:["theory","lab","infra"],
-        label: "subject type",
-        value: subtype,
-        setValue: setSubtype,
- 
-        },
       {
         list: academicyearlist,
         label: "academic year",
@@ -78,22 +103,29 @@ const ReportGenPage = () => {
         setValue:setSection
       },
       {
+      label: "report type",
+      value: reporttype,
+      setValue: setReporttype,
+      list:["MarkWise","subjectwise"]
+    },
+    {
+  list:subcodelist,
+      label: "subject code",
+      value: subcode,
+      setValue:setSubcode,
+      },
+      {
+        list:["theory","lab","infra"],
+        label: "subject type",
+        value: subtype,
+        setValue: setSubtype,
+        
+      },
+      {
         list: ["pre", "post","mgmt-pre","mgmt-final"],
         label:"assignment type",
         value: asstype,
         setValue:setAsstype
-        },
-        {
-        label: "report type",
-        value: reporttype,
-        setValue: setReporttype,
-        list:["MarkWise","subjectwise"]
-      },
-      {
-    list:["VAI11","CAI899"],
-        label: "subject code",
-        value: subcode,
-        setValue:setSubcode,
         },
         {
         label: "password",
@@ -155,7 +187,10 @@ const ReportGenPage = () => {
           <div className="mt-2 flex flex-col gap-y-3  rounded-md border-2  border-black p-5 ">
            
             <div className="grid grid-cols-2 gap-3">{
-              value.map((data,index) => {
+              value.map((data, index) => {
+                if ((reporttype.toLowerCase() == "subjectwise" && data.label=="subject code") || (reporttype.toLowerCase() == "" && data.label=="subject code")) {
+                  return  null;
+                }
                 return (
                   
                   data.list ? <SelectTextField list={data.list} value={data.value} setValue={data.setValue} label={data.label} key={index} /> :

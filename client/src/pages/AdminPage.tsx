@@ -13,6 +13,10 @@ const AdminPage = (props: Props) => {
         title="Generate Page"
         onClick={() => navigate("/admin/generate")}
       />
+      <Button
+        title="report gen Page"
+        onClick={() => navigate("/admin/reportgenerate")}
+      />
     </div>
   );
 };

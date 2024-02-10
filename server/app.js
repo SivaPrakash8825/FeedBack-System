@@ -447,6 +447,27 @@ app.post("/getCourses", (req, res) => {
   }
 });
 
+app.post("/getcoursecode", (req, res) => {
+  const { dept, degree, sem, section, academicyear } = req.body;
+
+  try {
+    db.query(
+      `SELECT \`Sub Code\` FROM  mastertable WHERE \`Academic yr\`=? AND Section=? AND Dept=? AND Semester=? AND \`UG/PG\`=?;`,
+      [academicyear, section, dept, sem, degree],
+      (error, result) => {
+        if (result) {
+          res.status(200).send(result);
+        } else {
+          res.status(400).send({ msg: "error" });
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error.message);
+    res.status(200).send(error.message);
+  }
+});
+
 app.listen(port, () => {
   console.log(`server start listening on ${port}`);
 });
