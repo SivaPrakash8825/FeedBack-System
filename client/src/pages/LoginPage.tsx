@@ -7,25 +7,27 @@ import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import useRole from "../store/useRole";
 
-// type Props = {};
+type Props = {
+  username: string;
+  setUsername: React.Dispatch<React.SetStateAction<string>>;
+};
 
-const LoginPage = () => {
+const LoginPage = ({ setUsername, username }: Props) => {
   const [option, setOption] = useState<string | null>(null);
-  const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
   const { role, setRole } = useRole();
   const setOptionFun = (val: string | null) => {
     setOption(val);
-  }
+  };
 
-  useEffect(() => {
-    role == "admin"
-      ? navigate("/admin")
-      : role == "user"
-        ? navigate("/feedback")
-        : navigate("/");
-  }, [role]);
+  // useEffect(() => {
+  //   role == "admin"
+  //     ? navigate("/admin")
+  //     : role == "user"
+  //       ? navigate(`/feedback`)
+  //       : navigate("/");
+  // }, [role]);
 
   const handleSubmit = async () => {
     // console.log("clicked");
@@ -35,8 +37,8 @@ const LoginPage = () => {
         const { data: checkRole } = await axios.post(
           `${import.meta.env.VITE_ENDPOINT}/loginAuth`,
           {
-            username: username, // "AD3223U311"
-            password: password, //"AD@14115426c13"
+            username: username, // AD1323UNaN
+            password: password, // AD@28NaNNaN131
           },
           {
             withCredentials: true,
@@ -53,7 +55,12 @@ const LoginPage = () => {
           // User
           console.log("Yeah User");
           setRole("user");
-          return navigate("/feedback");
+          return navigate(
+            `/feedback/${username}`,
+            // {
+            //   state: { username, password },
+            // }
+          );
         } else {
           console.log("Not Both");
           alert("Who are you?");
@@ -84,10 +91,9 @@ const LoginPage = () => {
           setValue={setPassword}
           label="Password"
         />
-        
+
         {username.trim() !== "admin" && (
           <RadioField
-            
             option={option}
             setOption={setOptionFun}
             options={["day scholar", "hosteller"]}
