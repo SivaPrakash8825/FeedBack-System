@@ -10,12 +10,16 @@ const AdminPage = (props: Props) => {
   return (
     <div>
       <Button
-        title="Generate Page"
+        title="Password Generate Page"
         onClick={() => navigate("/admin/generate")}
+      />
+      <Button
+        type="secondary"
+        title="Report Generate Page"
+        onClick={() => navigate("/admin/reportgenerate")}
       />
     </div>
   );
 };
 
 export default AdminPage;
-   

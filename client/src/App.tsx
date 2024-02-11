@@ -39,7 +39,7 @@ function App() {
                 <FeedbackPage />
               </ProtectedRoute>
             }
-            path="/feedback/:username/:type"
+            path="/feedback/:username/:type/:coursecode"
           />
 
           {/* Admin Page */}
@@ -85,11 +85,14 @@ function App() {
           />
 
           {/* Report generate page */}
-          <Route path="/admin/reportgenerate" element={
-            <ProtectedRoute shouldBeAdmin>
-              <ReportGenPage/>
-            </ProtectedRoute>
-           } />
+          <Route
+            path="/admin/reportgenerate"
+            element={
+              <ProtectedRoute shouldBeAdmin>
+                <ReportGenPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
