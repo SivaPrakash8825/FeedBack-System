@@ -1,9 +1,15 @@
 
 import { jsPDF } from "jspdf";
-import autoTable, { UserOptions } from "jspdf-autotable";
+import autoTable, { UserOptions,RowInput } from "jspdf-autotable";
 import logoImage from "../assets/logo.jpg";
-
-const Generatepdf2 = (header, rows) => {
+type props = {
+  header: string[];
+  rows: RowInput[];
+  avgheader?: string[];
+  avgrows?: RowInput[];
+}
+const Generatepdf2 = ({header, rows,avgheader,avgrows}:props) => {
+    
     
     
     const pdf = new jsPDF('landscape');
@@ -31,7 +37,7 @@ const Generatepdf2 = (header, rows) => {
     const tableProps: UserOptions = {
       startY: 85,
       head: [header],
-      body: rows.length==1?rows[0]:rows,
+      body: rows,
       theme: "grid",
       styles: {
         fontSize: 5,
@@ -42,7 +48,23 @@ const Generatepdf2 = (header, rows) => {
     };
 
     // Add table to the PDF document
-    autoTable(pdf, tableProps);
+  autoTable(pdf, tableProps);
+  
+  if (avgheader && avgrows) {
+    const tableProps2: UserOptions = {
+      startY: 205,
+      head: [avgheader],
+      body: [avgrows],
+      theme: "grid",
+      styles: {
+        fontSize: 5,
+        cellPadding: 2,
+        valign: "middle",
+        halign: "center",
+      },
+    };
+    autoTable(pdf, tableProps2);
+   }
 
     // Save the PDF with a specific filename
     pdf.save("table.pdf");

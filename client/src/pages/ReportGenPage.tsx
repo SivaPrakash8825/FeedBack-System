@@ -147,35 +147,64 @@ const ReportGenPage = () => {
           section: section,
           assessmenttype: asstype,
           academicyear: academicyr,
+          coursecode:subcode,
           password: password
           
         }, { withCredentials: true });
-          const header = []
+        const header = []
+        const avgheader = [];
           const rows=[]
-          header.push(...Object.keys(data[0]).filter(val=>val!="marks"));
+          const avgrows=[]
+        header.push(...Object.keys(data[0]).filter(val => val != "marks"));
+        
           
           JSON.parse(data[0].marks).answers.forEach((val,index) => {
                header.push(`Q${index+1}`)
-           })  
-           
-          data.forEach(val => {
-              const row = []
-              const value=Object.keys(data[0]).filter(val => val != "marks").map(key => {
-                  return val[key];
-              })
-              
-              
-              row.push(...value)
-              if (val.marks) {
-                  JSON.parse(val.marks).answers.forEach((mark) => {
-                    row.push(mark)
-                }) 
-           
-              }
-              rows.push([row])
-              
+            avgheader.push(`Q${index + 1}`)
+            avgrows.push(0);
+          })  
+        header.push("Total");
+        avgheader.push("AVG");
+        avgrows.push(0);
+        data.forEach((val,ind) => {
+          const row = []
+          const value = Object.keys(data[0]).filter(val => val != "marks").map(key => {
+            return val[key];
           })
-          generatePdf( header,rows);
+              
+              
+          row.push(...value)
+          if (val.marks) {
+            let total = 0;
+            JSON.parse(val.marks).answers.forEach((mark, index) => {
+              total += mark;
+              row.push(mark)
+              if (data.length - 1 == ind)
+              {
+                avgrows[index] = (avgrows[index] + mark) / (data.length);
+              } else {
+                avgrows[index] += mark;
+                }
+              
+            })
+            //  console.log(total);
+            if (data.length - 1 == ind)
+              {
+                avgrows[avgrows.length - 1] = (avgrows[avgrows.length-1] + total) / (data.length);
+              } else {
+                avgrows[avgrows.length - 1] += total;
+                }
+            
+            row.push(total)
+          }
+              
+          rows.push(row)
+              
+        })
+
+        
+        
+          generatePdf( {header,rows,avgheader,avgrows});
       }
   }
     

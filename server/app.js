@@ -341,14 +341,24 @@ app.post("/storeanswer", (req, res) => {
 });
 
 app.post("/generateReport", (req, res) => {
-  const { dept, degree, sem, section, assessmenttype, academicyear, password } =
-    req.body;
+  const {
+    dept,
+    degree,
+    sem,
+    section,
+    assessmenttype,
+    coursecode,
+    academicyear,
+    password,
+  } = req.body;
+  // console.log(subcode);
   if (password == "Kcet@") {
     db.query(
-      `SELECT * FROM  theory WHERE academicyear=? AND section=? AND dept=? AND sem=? AND assessmenttype=? AND degreetype=?;`,
-      [academicyear, section, dept, sem, assessmenttype, degree],
+      `SELECT * FROM  theory WHERE academicyear=? AND section=? AND dept=? AND sem=? AND assessmenttype=? AND degreetype=? AND coursecode=?;`,
+      [academicyear, section, dept, sem, assessmenttype, degree, coursecode],
       (error, result) => {
         if (result) {
+          console.log(result);
           res.status(200).send(result);
         } else {
           res.status(400).send({ msg: "error" });
