@@ -148,13 +148,16 @@ const ReportGenPage = () => {
           assessmenttype: asstype,
           academicyear: academicyr,
           coursecode:subcode,
-          password: password
+          password: password,
+          subtype:subtype,
           
         }, { withCredentials: true });
         const header = []
         const avgheader = [];
           const rows=[]
-          const avgrows=[]
+        const avgrows = []
+        console.log(data);
+        
         header.push(...Object.keys(data[0]).filter(val => val != "marks"));
         
           
@@ -202,6 +205,7 @@ const ReportGenPage = () => {
               
         })
 
+        // console.log(rows);
         
         
           generatePdf( {header,rows,avgheader,avgrows});

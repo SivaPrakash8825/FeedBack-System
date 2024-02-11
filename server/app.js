@@ -350,11 +350,12 @@ app.post("/generateReport", (req, res) => {
     coursecode,
     academicyear,
     password,
+    subtype,
   } = req.body;
   // console.log(subcode);
   if (password == "Kcet@") {
     db.query(
-      `SELECT * FROM  theory WHERE academicyear=? AND section=? AND dept=? AND sem=? AND assessmenttype=? AND degreetype=? AND coursecode=?;`,
+      `SELECT * FROM  ${subtype} WHERE academicyear=? AND section=? AND dept=? AND sem=? AND assessmenttype=? AND degreetype=? AND coursecode=?;`,
       [academicyear, section, dept, sem, assessmenttype, degree, coursecode],
       (error, result) => {
         if (result) {
