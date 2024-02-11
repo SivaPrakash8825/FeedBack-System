@@ -1,3 +1,126 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.header{
+    width:100%;
+    border:1px solid rgba(0, 0, 0, 0.139);
+}
+.style-ul2{
+    color:lightgrey;
+    display:block;
+    padding: 15px;
+    margin-left:19%;
+}
+.style-li1{
+    background-color:blue;
+    border-radius:10px;
+    padding:10px;
+    position:relative;
+    display:inline;
+    margin-right:45px;
+    color:white;
+    cursor:pointer;
+}
+.style-li1:hover,.style-ul1:hover{
+    color:rgb(246, 255, 0);
+}
+img{
+    border-color: black;
+    display:inline-flex;
+    justify-content: center;
+    align-items: center;
+    width:25%;
+    height:110px;
+    position:static;
+}
+.img-header{
+    display:inline;
+    margin-left: 20%;
+    font-size: x-large;
+}
+.style-ul1{
+    display:inline;
+    margin-left:25%;
+    background-color: blue;
+    color:white;
+    padding:10px;
+    border-radius:10px;
+    cursor:pointer;
+}
+li{
+    display:inline-block;
+    width:200px;
+}
+#li2{
+    margin-top: 1em;
+}
+input{
+    background-color: #eee;
+    cursor: pointer;
+    display:inline;
+    width: 25%;
+    gap:30px;
+    margin-bottom: 1em;
+    border:1px solid black;
+}
+input:hover{
+    color:black
+}
+select{
+    background-color:white;
+    color:black;
+    display:inline;
+    grid: auto-flow 50px / repeat(3, 150px);
+    width: 100px;
+    border: 1px solid black;
+    margin-bottom: 1em;
+}
+select:hover{
+    cursor:pointer;
+}
+.box{
+    position:relative;
+    width:600px;
+    height:350px;
+    border:1px solid blue;
+    margin:auto;
+}
+.Details{
+    background-color:blue;
+    color:white;
+    padding:10px;
+    display:block;
+}
+#Parts{
+    top:5px;
+    margin-left:2%;
+}
+footer{
+    margin-bottom:1em;
+    background-color: black;
+    text-align: center;
+    color:white;
+    height:100%;
+    width:100%;
+}
+/*#s1{
+    margin-left: 20%;
+    padding:1px;
+}
+#s2{
+    margin-left: 11%;
+}
+#s3{
+    margin-left:14%;
+}
+#s4{
+    margin-left: 16%;
+}
+#s5{
+    margin-left: 8.5%;
+}
+#s6{
+    margin-left:10%;
+}*/

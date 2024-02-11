@@ -27,6 +27,7 @@ const LoginPage = (props: Props) => {
           value={password}
           setValue={setPassword}
           label="Password"
+          type="password"
         />
         {username.trim() !== "admin" && (
           <RadioField
