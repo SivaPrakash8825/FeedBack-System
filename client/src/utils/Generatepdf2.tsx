@@ -2,6 +2,7 @@
 import { jsPDF } from "jspdf";
 import autoTable, { UserOptions,RowInput } from "jspdf-autotable";
 import logoImage from "../assets/logo.jpg";
+import { Sign } from "crypto";
 type props = {
   header: string[];
   rows: RowInput[];
@@ -34,7 +35,8 @@ const Generatepdf2 = ({header, rows,avgheader,avgrows}:props) => {
     // Define table headers
     
     // Set table properties
-    const tableProps: UserOptions = {
+  const tableProps: UserOptions = {
+    
       startY: 85,
       head: [header],
       body: rows,
@@ -49,21 +51,36 @@ const Generatepdf2 = ({header, rows,avgheader,avgrows}:props) => {
 
     // Add table to the PDF document
   autoTable(pdf, tableProps);
-  
   if (avgheader && avgrows) {
-    const tableProps2: UserOptions = {
-      startY: 205,
-      head: [avgheader],
-      body: [avgrows],
-      theme: "grid",
-      styles: {
-        fontSize: 5,
-        cellPadding: 2,
-        valign: "middle",
-        halign: "center",
-      },
-    };
-    autoTable(pdf, tableProps2);
+    const startYFirstTable = tableProps.startY;
+  const estimatedFirstTableHeight = (rows.length + 1) * 10; // Assuming each row height is 10
+    if (startYFirstTable && estimatedFirstTableHeight) {
+      const lines = pdf.splitTextToSize("ARTIFICIALINTELLIGENCE &DATASCIENCEDEPARTMENT Question Wise Average ", maxWidth);
+
+      const startYSecondTable = startYFirstTable + estimatedFirstTableHeight + 10;
+      pdf.text(lines, pdfWidth / 2,  startYSecondTable-2 , { align: "center" });
+      const tableProps2: UserOptions = {
+        startY: startYSecondTable,
+        head: [avgheader],
+        body: [avgrows],
+        theme: "grid",
+        styles: {
+          fontSize: 5,
+          cellPadding: 2,
+          valign: "middle",
+          halign: "center",
+        },
+      };
+      autoTable(pdf, tableProps2);
+      const sign = pdf.splitTextToSize("HOD Signature", maxWidth);
+
+      
+      pdf.text(sign, pdfWidth -50,  startYSecondTable+30 );
+    } 
+
+    
+  
+    
    }
 
     // Save the PDF with a specific filename
