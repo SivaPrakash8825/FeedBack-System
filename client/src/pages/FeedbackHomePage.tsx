@@ -97,7 +97,7 @@ const FeedbackHomePage = ({ username }: Props) => {
                         className={
                           "hover:underline hover:underline-offset-[1px]"
                         }
-                        to={`/feedback/${userName}/test`}
+                        to={`/feedback/${userName}/${subject["Theory/Lab"]}?subject=${encodeURIComponent(JSON.stringify({coursecode:subject["Sub Code"]}))}`}
                       >
                         {subject["Sub Code"]} {subject["Sub Name"]} -{" "}
                         {subject["Staff"]}

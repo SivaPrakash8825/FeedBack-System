@@ -9,6 +9,7 @@ import { ExcelToJson } from "./components/ExcelToJson";
 import { useState } from "react";
 import Header from "./components/Header";
 import PasswordGenPage from "./pages/PasswordGenPage";
+import ReportGenPage from "./pages/ReportGenPage";
 import FeedbackHomePage from "./pages/FeedbackHomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ForAuth from "./components/ForAuth";
@@ -83,6 +84,12 @@ function App() {
             path="/dummy"
           />
 
+          {/* Report generate page */}
+          <Route path="/admin/reportgenerate" element={
+            <ProtectedRoute shouldBeAdmin>
+              <ReportGenPage/>
+            </ProtectedRoute>
+           } />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
