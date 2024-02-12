@@ -23,7 +23,7 @@ const InputTextField = ({
         placeholder={placeholder}
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="w-full rounded-md border-2 border-gray-200 p-2 outline-gray-600"
+        className="w-full rounded-md border-2 border-gray-200 p-2 outline-gray-500"
       />
     </div>
   );

@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import LOGO from "../assets/logo.jpg";
+import Button from "../components/Button";
 import InputTextField from "../components/InputTextField";
 import RadioField from "../components/RadioField";
-import Button from "../components/Button";
-import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
 import useRole from "../store/useRole";
+import useToast from "../store/useToast";
 
 type Props = {
   username: string;
@@ -16,24 +17,17 @@ const LoginPage = ({ setUsername, username }: Props) => {
   const [option, setOption] = useState<string | null>(null);
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
-  const { role, setRole } = useRole();
+  const setRole = useRole((state) => state.setRole);
+  const setToast = useToast((state) => state.setToast);
   const setOptionFun = (val: string | null) => {
     setOption(val);
   };
-
-  // useEffect(() => {
-  //   role == "admin"
-  //     ? navigate("/admin")
-  //     : role == "user"
-  //       ? navigate(`/feedback`)
-  //       : navigate("/");
-  // }, [role]);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    // console.log("clicked");
     if (username.trim() != "" && password.trim() != "") {
-      console.log("in");
       try {
+        setLoading(true);
         const { data: checkRole } = await axios.post(
           `${import.meta.env.VITE_ENDPOINT}/loginAuth`,
           {
@@ -44,32 +38,32 @@ const LoginPage = ({ setUsername, username }: Props) => {
             withCredentials: true,
           },
         );
-        console.log(checkRole);
         if (checkRole == "admin") {
-          // Admin
-          console.log("Yeah Admin");
           setRole("admin");
           return navigate("/admin");
-          // return;
         } else if (checkRole == "user") {
-          // User
-          console.log("Yeah User");
-          setRole("user");
-          return navigate(
-            `/feedback/${username}`,
-            // {
-            //   state: { username, password },
-            // }
-          );
+          if (!option) {
+            setToast({
+              msg: "Choose Hosteller or Day Scholar",
+              variant: "error",
+            });
+          } else {
+            setRole("user");
+            return navigate(`/feedback/${username}`);
+          }
         } else {
-          console.log("Not Both");
-          alert("Who are you?");
+          setToast({ msg: "Invalid Credentials", variant: "error" });
         }
       } catch (error) {
         console.log(error.request.response);
+      } finally {
+        setLoading(false);
       }
     } else {
-      alert("Enter Valid Details!");
+      setToast({
+        msg: "Fill All Details !!",
+        variant: "error",
+      });
     }
   };
 
@@ -80,7 +74,7 @@ const LoginPage = ({ setUsername, username }: Props) => {
       {/* Title */}
       <h3 className="text-2xl font-semibold">Online Feedback System</h3>
       {/* Box */}
-      <section className="borde-2 bg-gra-50 flex w-10/12 flex-col gap-6 rounded-lg border-gray-100 p-8 lg:w-4/12 2xl:w-3/12">
+      <section className="flex w-10/12 flex-col gap-6 rounded-lg border-2 border-gray-200 bg-gray-50 p-8 lg:w-4/12 2xl:w-3/12">
         <InputTextField
           value={username}
           setValue={setUsername}
@@ -90,6 +84,7 @@ const LoginPage = ({ setUsername, username }: Props) => {
           value={password}
           setValue={setPassword}
           label="Password"
+          type="password"
         />
 
         {username.trim() !== "admin" && (
@@ -99,7 +94,12 @@ const LoginPage = ({ setUsername, username }: Props) => {
             options={["day scholar", "hosteller"]}
           />
         )}
-        <Button onClick={handleSubmit} title="Login" />
+        <Button
+          width="full"
+          onClick={handleSubmit}
+          title="Login"
+          loading={loading}
+        />
       </section>
     </main>
   );
