@@ -387,20 +387,20 @@ app.post("/generateReportSubject", (req, res) => {
     academicyear,
     password,
     subcode,
-    type,
+    subtype,
   } = req.body;
   const acyr = academicyear.slice(0, 5) + academicyear.slice(-2);
-  console.log(
-    dept,
-    degree,
-    sem,
-    section,
-    assessmenttype,
-    acyr,
-    password,
-    subcode,
-    type
-  );
+  // console.log(
+  //   dept,
+  //   degree,
+  //   sem,
+  //   section,
+  //   assessmenttype,
+  //   acyr,
+  //   password,
+  //   subcode,
+  //   type
+  // );
   if (password == "Kcet@") {
     db.query(
       "SELECT a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.`Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept;",

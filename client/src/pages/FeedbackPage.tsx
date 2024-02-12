@@ -19,7 +19,7 @@ const FeedbackPage = () => {
   >([]);
   const [btnLock, setBtnLock] = useState(true);
   const [subject, setSubject] = useState<{ coursecode: string }>();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { userDetails } = useUserDetails();
   const location = useLocation();
 
@@ -30,7 +30,7 @@ const FeedbackPage = () => {
       `${import.meta.env.VITE_ENDPOINT}/getQuestions/${type}`,
     );
     data.length > questions.length
-      ? data.forEach((value) => {
+      ? data.forEach((value: { question: string }) => {
           const val = JSON.parse(
             value.question.slice(1, value.question.length - 1),
           );

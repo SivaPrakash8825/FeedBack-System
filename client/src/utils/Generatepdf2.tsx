@@ -12,6 +12,8 @@ const Generatepdf2 = (
   semester: number,
   subtype: string,
   section: string,
+  avgheader?: string[],
+  avgrows?: RowInput[],
 ) => {
   console.log(type);
   const semType = semester % 2 == 0 ? "EVEN" : "ODD";
@@ -55,7 +57,6 @@ const Generatepdf2 = (
 
   // Set table properties
   const startY = 72;
-  const tableRowsHeight = rows.length * 10;
   const tableProps: UserOptions = {
     startY,
     head: [headers],
@@ -73,15 +74,39 @@ const Generatepdf2 = (
     },
   };
 
-  // Add table to the PDF document
-  // const tableHeight = pdf.tableHeight(tableProps);
   autoTable(pdf, tableProps);
 
-  // Insert text after the table
-  // const textAfterTable = `HOD/${department}`;
-  // const textAfterTableLines = pdf.splitTextToSize(textAfterTable, maxWidth);
-  // const textAfterTableHeight = textAfterTableLines.length * 12; // Assuming font size 12
-  // const textAfterTableY = startY + tableRowsHeight + 10; // Adjust spacing as needed
+  if (avgheader && avgrows) {
+    const startYFirstTable = tableProps.startY;
+    const estimatedFirstTableHeight = (rows.length + 1) * 10; // Assuming each row height is 10
+    if (startYFirstTable && estimatedFirstTableHeight) {
+      const lines = pdf.splitTextToSize(
+        "ARTIFICIALINTELLIGENCE &DATASCIENCEDEPARTMENT Question Wise Average ",
+        maxWidth,
+      );
+
+      const startYSecondTable =
+        startYFirstTable + estimatedFirstTableHeight + 10;
+      pdf.text(lines, pdfWidth / 2, startYSecondTable - 2, { align: "center" });
+      const tableProps2: UserOptions = {
+        startY: startYSecondTable,
+        head: [avgheader],
+        body: [avgrows],
+        theme: "grid",
+        styles: {
+          fontSize: 5,
+          cellPadding: 2,
+          valign: "middle",
+          halign: "center",
+        },
+      };
+      autoTable(pdf, tableProps2);
+      const sign = pdf.splitTextToSize("HOD Signature", maxWidth);
+
+      pdf.text(sign, pdfWidth - 50, startYSecondTable + 30);
+    }
+  }
+
   pdf.setFontSize(10);
   pdf.text(`HOD/${department}`, pdfWidth - 20, pdf.lastAutoTable.finalY + 20, {
     align: "right",
