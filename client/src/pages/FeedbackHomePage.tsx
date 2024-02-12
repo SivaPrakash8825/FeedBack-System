@@ -18,7 +18,7 @@ type Props = {
 const FeedbackHomePage = ({ username }: Props) => {
   // const { username, password } = useLocation().state;
   const { username: userName } = useParams();
-  console.log("useParams : ", userName);
+  // console.log("useParams : ", userName);
   const [isLoading, setIsLoading] = useState(true);
   // const [userDetails, setUserDetails] = useState<UserDetails>();
   const { setUserDetails, userDetails } = useUserDetails();
@@ -40,7 +40,7 @@ const FeedbackHomePage = ({ username }: Props) => {
     }
 
     const result = Object.values(subjectsByType);
-    console.log(result);
+    // console.log(result);
 
     setCourses(result);
     setIsLoading(false);
@@ -55,7 +55,7 @@ const FeedbackHomePage = ({ username }: Props) => {
           username: userName,
         },
       );
-      console.log(coursesData);
+      // console.log(coursesData);
       setUserDetails(coursesData);
       convertData(coursesData);
       // setIsLoading(false);
@@ -97,7 +97,7 @@ const FeedbackHomePage = ({ username }: Props) => {
                         className={
                           "hover:underline hover:underline-offset-[1px]"
                         }
-                        to={`/feedback/${userName}/${subject["Theory/Lab"]}?subject=${encodeURIComponent(JSON.stringify({coursecode:subject["Sub Code"]}))}`}
+                        to={`/feedback/${userName}/${subject["Theory/Lab"]}?subject=${encodeURIComponent(JSON.stringify({ coursecode: subject["Sub Code"] }))}`}
                       >
                         {subject["Sub Code"]} {subject["Sub Name"]} -{" "}
                         {subject["Staff"]}

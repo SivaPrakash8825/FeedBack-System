@@ -329,9 +329,11 @@ app.post("/storeanswer", (req, res) => {
         comments,
       ],
       (error, result) => {
+        if (error) console.log(error);
         if (result) {
           res.status(200).send({ msg: "submitted" });
         }
+        // console.log(error);
       }
     );
   } catch (e) {
@@ -372,6 +374,61 @@ app.post("/generateReport", (req, res) => {
     });
   }
 });
+
+// generate subject wise report
+
+app.post("/generateReportSubject", (req, res) => {
+  const {
+    dept,
+    degree,
+    sem,
+    section,
+    assessmenttype,
+    academicyear,
+    password,
+    subcode,
+    subtype,
+  } = req.body;
+  const acyr = academicyear.slice(0, 5) + academicyear.slice(-2);
+  // console.log(
+  //   dept,
+  //   degree,
+  //   sem,
+  //   section,
+  //   assessmenttype,
+  //   acyr,
+  //   password,
+  //   subcode,
+  //   type
+  // );
+  if (password == "Kcet@") {
+    db.query(
+      "SELECT a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.`Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept;",
+      [acyr, dept, degree, sem, section, assessmenttype],
+      (error, result) => {
+        if (result) {
+          // const averages = result.map((r, i) => {
+          //   const { answers: a } = JSON.parse(r.marks);
+          //   const sum = a.reduce((acc, val) => acc + val, 0);
+          //   const outOf = 50;
+          //   const avg = sum / a.length;
+          //   return (avg / 5) * 50;
+          //   // return a;
+          // });
+          // console.log(result);
+          res.status(200).send(result);
+        } else {
+          res.status(400).send({ msg: error });
+        }
+      }
+    );
+  } else {
+    res.status(200).send({
+      msg: "invalid password",
+    });
+  }
+});
+
 // logout and destroy the session
 app.get("/logout", (req, res) => {
   try {
