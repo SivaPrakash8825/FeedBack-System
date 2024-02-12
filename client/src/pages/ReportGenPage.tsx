@@ -151,19 +151,29 @@ const ReportGenPage = () => {
           section: section,
           assessmenttype: asstype,
           academicyear: academicyr,
+          coursecode: subcode,
           password: password,
+          subtype: subtype,
         },
         { withCredentials: true },
       );
       const header = [];
-      const rows: any[] = [];
+      const avgheader = [];
+      const rows = [];
+      const avgrows = [];
+      console.log(data);
+
       header.push(...Object.keys(data[0]).filter((val) => val != "marks"));
 
-      JSON.parse(data[0].marks).answers.forEach((_: any, index: number) => {
+      JSON.parse(data[0].marks).answers.forEach((val, index) => {
         header.push(`Q${index + 1}`);
+        avgheader.push(`Q${index + 1}`);
+        avgrows.push(0);
       });
-
-      data.forEach((val: any) => {
+      header.push("Total");
+      avgheader.push("AVG");
+      avgrows.push(0);
+      data.forEach((val, ind) => {
         const row = [];
         const value = Object.keys(data[0])
           .filter((val) => val != "marks")
@@ -173,20 +183,40 @@ const ReportGenPage = () => {
 
         row.push(...value);
         if (val.marks) {
-          JSON.parse(val.marks).answers.forEach((mark: any) => {
+          let total = 0;
+          JSON.parse(val.marks).answers.forEach((mark, index) => {
+            total += mark;
             row.push(mark);
+            if (data.length - 1 == ind) {
+              avgrows[index] = (avgrows[index] + mark) / data.length;
+            } else {
+              avgrows[index] += mark;
+            }
           });
+          //  console.log(total);
+          if (data.length - 1 == ind) {
+            avgrows[avgrows.length - 1] =
+              (avgrows[avgrows.length - 1] + total) / data.length;
+          } else {
+            avgrows[avgrows.length - 1] += total;
+          }
+
+          row.push(total);
         }
-        rows.push([row]);
+
+        rows.push(row);
       });
-      generatePdf(header, rows);
+
+      // console.log(rows);
+
+      generatePdf({ header, rows, avgheader, avgrows });
     }
   };
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center px-6 py-4">
       <section className="mx-auto w-full max-w-4xl p-3">
-        <h1 className="text-2xl font-semibold">Report Generation</h1>
+        <h1 className="text-2xl font-semibold">Generate User Credentials</h1>
         <div className="mt-2 flex flex-col gap-y-3  rounded-md border-2  border-black p-5 ">
           <div className="grid grid-cols-2 gap-3">
             {value.map((data, index) => {
@@ -227,5 +257,3 @@ const ReportGenPage = () => {
     </main>
   );
 };
-
-export default ReportGenPage;
