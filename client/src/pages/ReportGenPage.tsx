@@ -15,52 +15,66 @@ const ReportGenPage = () => {
   const [asstype, setAsstype] = useState("");
   const [subtype, setSubtype] = useState("");
   const [reporttype, setReporttype] = useState("");
-  const [subcode, setSubcode] = useState("");
+  // const [subcode, setSubcode] = useState("");
   const [password, setPassword] = useState("");
-  const [subcodelist, setSubCodeList] = useState<string[]>([]);
+  // const [subcodelist, setSubCodeList] = useState<string[]>([]);
 
-  const fetchCourseCode = async () => {
-    const { data } = await axios.post(
-      `${import.meta.env.VITE_ENDPOINT}/getcoursecode`,
-      {
-        dept: department,
-        degree: graduation,
-        sem: parseInt(semester),
-        section: section,
+  // const fetchCourseCode = async () => {
+  //   const { data } = await axios.post(
+  //     `${import.meta.env.VITE_ENDPOINT}/getcoursecode`,
+  //     {
+  //       dept: department,
+  //       degree: graduation,
+  //       sem: parseInt(semester),
+  //       section: section,
 
-        academicyear: academicyr,
-      },
-    );
+  //       academicyear: academicyr,
+  //     },
+  //   );
 
-    data.forEach((val: any) => {
-      setSubCodeList((pre) => [...pre, val["Sub Code"]]);
-    });
-  };
+  //   data.forEach((val: any) => {
+  //     setSubCodeList((pre) => [...pre, val["Sub Code"]]);
+  //   });
+  // };
 
   useEffect(() => {
     const curYear = new Date().getFullYear();
-    for (let i = curYear - 5; i < curYear + 3; i++) {
-      setAcademicyearlist((pre) => [...pre, `${i}-${(i + 1) % 100}`]);
+    const years = [];
+    for (let i = curYear - 5; i < curYear + 2; i++) {
+      years.push(`${i}-${(i + 1) % 100}`);
     }
+    setAcademicyearlist(years);
   }, []);
 
-  useEffect(() => {
-    if (
-      academicyr &&
-      graduation &&
-      department &&
-      semester &&
-      section &&
-      reporttype.toLowerCase() == "markwise"
-    ) {
-      fetchCourseCode();
-    } else if (reporttype.toLowerCase() == "markwise") {
-      setReporttype("");
-      alert("fill the above details");
-    }
-  }, [reporttype]);
+  // useEffect(() => {
+  //   if (
+  //     academicyr &&
+  //     graduation &&
+  //     department &&
+  //     semester &&
+  //     section &&
+  //     reporttype.toLowerCase() == "markwise"
+  //   ) {
+  //     fetchCourseCode();
+  //   } else if (reporttype.toLowerCase() == "markwise") {
+  //     setReporttype("");
+  //     alert("fill the above details");
+  //   }
+  // }, [reporttype]);
 
   const value = [
+    {
+      list: academicyearlist,
+      label: "academic year",
+      value: academicyr,
+      setValue: setAcademicyr,
+    },
+    {
+      list: ["theory", "lab", "infra"],
+      label: "subject type",
+      value: subtype,
+      setValue: setSubtype,
+    },
     {
       list: [
         "AD",
@@ -80,12 +94,6 @@ const ReportGenPage = () => {
       label: "department",
       value: department,
       setValue: setDepartment,
-    },
-    {
-      list: academicyearlist,
-      label: "academic year",
-      value: academicyr,
-      setValue: setAcademicyr,
     },
     {
       list: ["UG", "PG"],
@@ -111,20 +119,15 @@ const ReportGenPage = () => {
       setValue: setReporttype,
       list: ["MarkWise", "subjectwise"],
     },
+    // {
+    //   list: subcodelist,
+    //   label: "subject code",
+    //   value: subcode,
+    //   setValue: setSubcode,
+    // },
+
     {
-      list: subcodelist,
-      label: "subject code",
-      value: subcode,
-      setValue: setSubcode,
-    },
-    {
-      list: ["theory", "lab", "infra"],
-      label: "subject type",
-      value: subtype,
-      setValue: setSubtype,
-    },
-    {
-      list: ["pre", "post", "mgmt-pre", "mgmt-final"],
+      list: ["pre", "post"],
       label: "assignment type",
       value: asstype,
       setValue: setAsstype,
@@ -151,7 +154,7 @@ const ReportGenPage = () => {
           section: section,
           assessmenttype: asstype,
           academicyear: academicyr,
-          coursecode: subcode,
+          // coursecode: subcode,
           password: password,
           subtype: subtype,
         },
@@ -159,13 +162,13 @@ const ReportGenPage = () => {
       );
       const header = [];
       const avgheader = [];
-      const rows = [];
-      const avgrows = [];
+      const rows: any[] = [];
+      const avgrows: any[] = [];
       console.log(data);
 
       header.push(...Object.keys(data[0]).filter((val) => val != "marks"));
 
-      JSON.parse(data[0].marks).answers.forEach((val, index) => {
+      JSON.parse(data[0].marks).answers.forEach((_: any, index: number) => {
         header.push(`Q${index + 1}`);
         avgheader.push(`Q${index + 1}`);
         avgrows.push(0);
@@ -173,7 +176,7 @@ const ReportGenPage = () => {
       header.push("Total");
       avgheader.push("AVG");
       avgrows.push(0);
-      data.forEach((val, ind) => {
+      data.forEach((val: any, ind: number) => {
         const row = [];
         const value = Object.keys(data[0])
           .filter((val) => val != "marks")
@@ -184,15 +187,17 @@ const ReportGenPage = () => {
         row.push(...value);
         if (val.marks) {
           let total = 0;
-          JSON.parse(val.marks).answers.forEach((mark, index) => {
-            total += mark;
-            row.push(mark);
-            if (data.length - 1 == ind) {
-              avgrows[index] = (avgrows[index] + mark) / data.length;
-            } else {
-              avgrows[index] += mark;
-            }
-          });
+          JSON.parse(val.marks).answers.forEach(
+            (mark: number, index: number) => {
+              total += mark;
+              row.push(mark);
+              if (data.length - 1 == ind) {
+                avgrows[index] = (avgrows[index] + mark) / data.length;
+              } else {
+                avgrows[index] += mark;
+              }
+            },
+          );
           //  console.log(total);
           if (data.length - 1 == ind) {
             avgrows[avgrows.length - 1] =
@@ -207,8 +212,6 @@ const ReportGenPage = () => {
         rows.push(row);
       });
 
-      // console.log(rows);
-
       generatePdf({ header, rows, avgheader, avgrows });
     }
   };
@@ -216,14 +219,15 @@ const ReportGenPage = () => {
   return (
     <main className="flex min-h-screen w-full flex-col items-center px-6 py-4">
       <section className="mx-auto w-full max-w-4xl p-3">
-        <h1 className="text-2xl font-semibold">Generate User Credentials</h1>
+        <h1 className="text-2xl font-semibold">Report Generation</h1>
         <div className="mt-2 flex flex-col gap-y-3  rounded-md border-2  border-black p-5 ">
           <div className="grid grid-cols-2 gap-3">
-            {value.map((data, index) => {
+            {value.map((data, index: number) => {
               if (
-                (reporttype.toLowerCase() == "subjectwise" &&
-                  data.label == "subject code") ||
-                (reporttype.toLowerCase() == "" && data.label == "subject code")
+                subtype.toLowerCase() === "infra" &&
+                ["subject code", "report type", "section", "semester"].includes(
+                  data.label,
+                )
               ) {
                 return null;
               }
@@ -244,7 +248,6 @@ const ReportGenPage = () => {
                   setValue={data.setValue}
                 />
               );
-              // null
             })}
           </div>
           <Button
@@ -257,3 +260,5 @@ const ReportGenPage = () => {
     </main>
   );
 };
+
+export default ReportGenPage;

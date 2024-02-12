@@ -21,6 +21,7 @@ const PasswordGenPage = () => {
   const [password, setPassword] = useState("");
 
   const setToast = useToast((state) => state.setToast);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const curYear = new Date().getFullYear();
@@ -115,24 +116,40 @@ const PasswordGenPage = () => {
     } else if (parseInt(noOfstd) <= 0) {
       return setToast({ msg: "Enter Valid No. of Students", variant: "error" });
     } else {
-      const { data } = await axios.post(
-        `${import.meta.env.VITE_ENDPOINT}/generateLogin`,
-        {
-          count: parseInt(noOfstd),
-          validfrom: validfrom,
-          validto: validto,
-          dept: department,
-          degree: graduation,
-          sem: parseInt(semester),
-          section: section,
-          assessmenttype: asstype,
-          academicyear: academicyr,
-          password: password,
-        },
-        { withCredentials: true },
-      );
+      try {
+        setLoading(true);
+        const { data } = await axios.post(
+          `${import.meta.env.VITE_ENDPOINT}/generateLogin`,
+          {
+            count: parseInt(noOfstd),
+            validfrom: validfrom,
+            validto: validto,
+            dept: department,
+            degree: graduation,
+            sem: parseInt(semester),
+            section: section,
+            assessmenttype: asstype,
+            academicyear: academicyr,
+            password: password,
+          },
+          { withCredentials: true },
+        );
 
-      generateExcel({ data });
+        const getYear = {
+          1: "I",
+          2: "II",
+          3: "III",
+          4: "IV",
+        };
+
+        const fileName = `${getYear[Math.ceil(parseInt(semester) / 2) as 1 | 2 | 3 | 4]}yr_${department}-${section}_feedback.xlsx`;
+
+        generateExcel({ data, fileName });
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -166,6 +183,7 @@ const PasswordGenPage = () => {
             title="Generate"
             onClick={genLoginId}
             disable={password == "Kcet@" ? false : true}
+            loading={loading}
           />
         </div>
       </section>

@@ -347,22 +347,20 @@ app.post("/generateReport", (req, res) => {
     sem,
     section,
     assessmenttype,
-    coursecode,
     academicyear,
     password,
     subtype,
   } = req.body;
-  // console.log(subcode);
   if (password == "Kcet@") {
     db.query(
-      `SELECT * FROM  ${subtype} WHERE academicyear=? AND section=? AND dept=? AND sem=? AND assessmenttype=? AND degreetype=? AND coursecode=?;`,
-      [academicyear, section, dept, sem, assessmenttype, degree, coursecode],
+      `SELECT * FROM  ${subtype} WHERE academicyear=? AND section=? AND dept=? AND sem=? AND assessmenttype=? AND degreetype=? ;`,
+      [academicyear, section, dept, sem, assessmenttype, degree],
       (error, result) => {
         if (result) {
           console.log(result);
           res.status(200).send(result);
         } else {
-          res.status(400).send({ msg: "error" });
+          res.status(400).send({ msg: error.message });
         }
       }
     );
