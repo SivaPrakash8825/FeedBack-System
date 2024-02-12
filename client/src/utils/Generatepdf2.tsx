@@ -61,11 +61,15 @@ const Generatepdf2 = (
     head: [headers],
     body: rows,
     theme: "grid",
+    tableLineColor: "white",
     styles: {
       fontSize: 9,
       cellPadding: 2,
       valign: "middle",
       halign: "center",
+    },
+    headStyles: {
+      fillColor: "black",
     },
   };
 
