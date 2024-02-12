@@ -28,7 +28,6 @@ const ProtectedRoute = ({ children, shouldBeAdmin = false }: Props) => {
         <Navigate to={"/"} />
       )}
     </>
-    // children
   );
 };
 

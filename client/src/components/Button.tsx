@@ -20,12 +20,11 @@ const Button = ({
   return (
     <div
       onClick={onClick}
-      className={`flex items-center justify-center gap-4 ${disable ? "pointer-events-none  opacity-[.4]" : "cursor-pointer"}  rounded-md border-2 border-black py-2 font-semibold 
-      ${type === "primary" ? "bg-black text-white" : "bg-white text-black"} ${width === "full" ? "w-full" : "px-6"}`}
+      className={`flex items-center justify-center gap-4 ${disable ? "pointer-events-none  opacity-[.4]" : "cursor-pointer"}  rounded-md border-2 border-black py-2 font-semibold transition-all
+      ${type === "primary" ? "bg-black text-white hover:bg-black/70" : "bg-white text-black hover:bg-gray-200"} ${width === "full" ? "w-full" : "mx-auto w-max px-6"}  `}
     >
       <p>{title}</p>
       {loading && <Spinner size="sm" type={type} />}
-      {/* <button onClick={}></button> */}
     </div>
   );
 };

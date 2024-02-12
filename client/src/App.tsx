@@ -4,7 +4,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
 import useRole from "./store/useRole";
-// import { JsonToExcel } from "./components/JsonToExcel";
 import { ExcelToJson } from "./components/ExcelToJson";
 import { useState } from "react";
 import Header from "./components/Header";
@@ -13,11 +12,11 @@ import ReportGenPage from "./pages/ReportGenPage";
 import FeedbackHomePage from "./pages/FeedbackHomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ForAuth from "./components/ForAuth";
+import Toast from "./components/Toast";
 
 function App() {
-  // const role = useRole((state) => state.role);
+  const role = useRole((state) => state.role);
   const [username, setUsername] = useState<string>("");
-  const { role } = useRole();
 
   return (
     <>
@@ -32,7 +31,19 @@ function App() {
             }
             path="/"
           />
-          {/* Feedback Page */}
+          {/* List Of Staffs / Labs*/}
+          <Route
+            element={
+              <ProtectedRoute>
+                <FeedbackHomePage
+                  username={username}
+                  setUsername={setUsername}
+                />
+              </ProtectedRoute>
+            }
+            path="/feedback/:username"
+          />
+          {/* Feedback MCQ Page */}
           <Route
             element={
               <ProtectedRoute>
@@ -61,17 +72,14 @@ function App() {
             path="/admin/generate"
           />
 
-          {/* Feedback Homepage */}
+          {/* Report generate page */}
           <Route
+            path="/admin/reportgenerate"
             element={
-              <ProtectedRoute>
-                <FeedbackHomePage
-                  username={username}
-                  setUsername={setUsername}
-                />
+              <ProtectedRoute shouldBeAdmin>
+                <ReportGenPage />
               </ProtectedRoute>
             }
-            path="/feedback/:username"
           />
 
           {/* Dummy */}
@@ -84,14 +92,9 @@ function App() {
             path="/dummy"
           />
 
-          {/* Report generate page */}
-          <Route path="/admin/reportgenerate" element={
-            <ProtectedRoute shouldBeAdmin>
-              <ReportGenPage/>
-            </ProtectedRoute>
-           } />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        <Toast />
       </BrowserRouter>
     </>
   );
