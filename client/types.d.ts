@@ -34,6 +34,7 @@ export interface UserDetails {
   sem: number;
   section: string;
   year: string;
+  studentType: string;
 }
 
 interface SubjectsWithName {

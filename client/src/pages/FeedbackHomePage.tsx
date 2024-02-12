@@ -20,6 +20,7 @@ const FeedbackHomePage = ({ username }: Props) => {
   const { username: userName } = useParams();
   console.log("useParams : ", userName);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCompleted, setIsCompleted] = useState(true);
   // const [userDetails, setUserDetails] = useState<UserDetails>();
   const { setUserDetails, userDetails } = useUserDetails();
   const [courses, setCourses] = useState<SubjectsWithName[]>([]);
@@ -73,6 +74,10 @@ const FeedbackHomePage = ({ username }: Props) => {
       {isLoading ? (
         <div>
           <Spinner size="lg" type="primary" />
+        </div>
+      ) : isCompleted ? (
+        <div>
+          <h1 className="text-2xl font-semibold ">Completed</h1>
         </div>
       ) : (
         <div className="flex w-10/12 flex-col  items-center  justify-center gap-7 md:w-1/2">
