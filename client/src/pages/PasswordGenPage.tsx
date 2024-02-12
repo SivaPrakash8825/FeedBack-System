@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
-// import InputTextField from "../components/InputTextField";
 import SelectTextField from "../components/SelectTextField";
 import InputTextField from "../components/InputTextField";
 import Button from "../components/Button";
 import axios from "axios";
 import generateExcel from "../utils/JsonToExcel";
-// SelectTextField
+import useToast from "../store/useToast";
 
 const PasswordGenPage = () => {
-  //   const [value, setValue] = useState({
-  // value
-  //   });
   const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
@@ -24,14 +20,16 @@ const PasswordGenPage = () => {
 
   const [password, setPassword] = useState("");
 
+  const setToast = useToast((state) => state.setToast);
+
   useEffect(() => {
     const curYear = new Date().getFullYear();
-    for (let i = curYear - 5; i < curYear + 3; i++){
-      setAcademicyearlist((pre) => [...pre, `${i}-${(i+1)%100}`]);
+    const years = [];
+    for (let i = curYear - 5; i < curYear + 2; i++) {
+      years.push(`${i}-${(i + 1) % 100}`);
     }
-    
-  },[])
-// console.log(academicyearlist);
+    setAcademicyearlist(years);
+  }, []);
 
   const value = [
     {
@@ -85,22 +83,22 @@ const PasswordGenPage = () => {
       setValue: setAsstype,
     },
     {
-      label: "number of student",
-      value: noOfstd,
-      setValue: setNoOfstd,
-      type: "number",
-    },
-    {
-      label: "from date",
+      label: "valid from",
       value: validfrom,
       setValue: setValidfrom,
       type: "date",
     },
     {
-      label: "to date",
+      label: "valid to",
       value: validto,
       setValue: setValidto,
       type: "date",
+    },
+    {
+      label: "number of student",
+      value: noOfstd,
+      setValue: setNoOfstd,
+      type: "number",
     },
     {
       label: "password",
@@ -113,7 +111,9 @@ const PasswordGenPage = () => {
   const genLoginId = async () => {
     const isAnyEmpty = value.some((item) => item.value == "" || 0);
     if (isAnyEmpty) {
-      alert("fill the details");
+      return setToast({ msg: "Fill All Fields !!", variant: "error" });
+    } else if (parseInt(noOfstd) <= 0) {
+      return setToast({ msg: "Enter Valid No. of Students", variant: "error" });
     } else {
       const { data } = await axios.post(
         `${import.meta.env.VITE_ENDPOINT}/generateLogin`,
@@ -132,14 +132,12 @@ const PasswordGenPage = () => {
         { withCredentials: true },
       );
 
-      // const headers = Object.keys(data[0])
-      // data.forEach(val=>(rows.push([val.id,val.validfrom,val.validto,val.dept,val.sem,val.section,val.username,val.password])))
       generateExcel({ data });
     }
   };
 
   return (
-    <main className="flex min-h-screen w-full flex-col items-center px-6 py-4">
+    <main className="flex min-h-[100vh-6rem] w-full flex-col items-center px-6 py-4">
       <section className="mx-auto w-full max-w-4xl p-3">
         <h1 className="text-2xl font-semibold">Generate User Credentials</h1>
         <div className="mt-2 flex flex-col gap-y-3  rounded-md border-2  border-black p-5 ">

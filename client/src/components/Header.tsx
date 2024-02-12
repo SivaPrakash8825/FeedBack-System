@@ -1,41 +1,42 @@
 import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import LOGO from "../assets/logo.jpg";
-import Button from "./Button";
 import useRole from "../store/useRole";
 import useUserDetails from "../store/useUserDetails";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import Button from "./Button";
 
-type Props = {};
-
-const Header = (props: Props) => {
+const Header = () => {
   const { role, setRole } = useRole();
   const navigate = useNavigate();
-  const { setUserDetails, userDetails: user } = useUserDetails();
+  const { userDetails: user } = useUserDetails();
+
   const logout = async () => {
-    const { data } = await axios.get(
-      `${import.meta.env.VITE_ENDPOINT}/logout`,
-      {
-        withCredentials: true,
-      },
-    );
-    console.log(data);
+    await axios.get(`${import.meta.env.VITE_ENDPOINT}/logout`, {
+      withCredentials: true,
+    });
     setRole(null);
     navigate("/");
   };
 
+  const redirectToHome =
+    role === "admin" ? "/admin" : `/feedback:${user?.username}`;
+
   return (
-    <header className="flex items-center justify-between border-b-2 border-gray-500 px-6 py-2">
+    <header className="flex h-24 items-center justify-between gap-2 border-b-2 border-gray-500 px-6 py-2">
       {/* LOGO */}
-      <img src={LOGO} alt="logo" className="h-16" />
+      <Link to={redirectToHome}>
+        <img src={LOGO} alt="logo" className="h-16" />
+      </Link>
       {/* Title */}
       {role == "admin" ? (
-        <h1>Admin Header</h1>
+        <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
       ) : (
-        <h1 className="text-2xl font-semibold">{`${user?.year} ${user?.dept} ${user?.section} Feedback Entry ${user?.academicyr}`}</h1>
+        <h1 className="text-xl font-semibold">{`${user?.year} ${user?.dept} ${user?.section} Feedback Entry ${user?.academicyr}`}</h1>
       )}
       <div className="flex items-center gap-4">
-        <Button title="Home" />
+        <Link to={redirectToHome}>
+          <Button title="Home" />
+        </Link>
         <Button onClick={logout} title="Logout" type="secondary" />
       </div>
     </header>

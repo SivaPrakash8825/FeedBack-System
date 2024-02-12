@@ -1,16 +1,13 @@
 import axios from "axios";
-import React, { useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useRole from "../store/useRole";
 
-type Props = {
-  username: string;
-};
-
 const ForAuth = () => {
-  const { role, setRole } = useRole();
+  const setRole = useRole((state) => state.setRole);
   const navigate = useNavigate();
 
+  // sets Role using session
   const adminChecker = async () => {
     try {
       const { data: session } = await axios.get(
@@ -19,23 +16,15 @@ const ForAuth = () => {
           withCredentials: true,
         },
       );
-      // console.log(roleType);
       if (session.role == "admin") {
-        // console.log("roletype", roleType);
-
         setRole("admin");
-        // alert("admin");
         navigate("/admin");
-        // <Navigate to={"/test"} />;
       } else if (session.role == "user") {
         setRole("user");
         navigate(`/feedback/${session.username}`);
-        // <Navigate to={`/feedback/forauth`} />;
       } else {
-        // alert("App alert .");
         setRole(null);
         navigate("/");
-        // <Navigate to={"/"} />;
       }
     } catch (error) {
       console.log(error.message);
@@ -45,7 +34,7 @@ const ForAuth = () => {
   useEffect(() => {
     adminChecker();
   }, []);
-  return <div></div>;
+  return <></>;
 };
 
 export default ForAuth;

@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import RadioField from "../components/RadioField";
 import Button from "../components/Button";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import useUserDetails from "../store/useUserDetails";
 
 const FeedbackPage = () => {
   const navigate = useNavigate();
@@ -17,9 +18,12 @@ const FeedbackPage = () => {
     }[]
   >([]);
   const [btnLock, setBtnLock] = useState(true);
+  const [subject, setSubject] = useState<{ coursecode: string }>();
+  const navigate = useNavigate();
+  const { userDetails } = useUserDetails();
+  const location = useLocation();
 
-  const { username, type, coursecode } = useParams<string>();
-  console.log(username, type, coursecode);
+  const { type } = useParams<string>();
 
   const getQuestions = async () => {
     const { data } = await axios.get(
@@ -76,24 +80,32 @@ const FeedbackPage = () => {
         const { data } = await axios.post(
           `${import.meta.env.VITE_ENDPOINT}/storeanswer`,
           {
-            username: username,
+            username: userDetails?.username,
             marks: values,
-            coursecode: coursecode,
-            comments: ref.current.value,
             type: type,
+            coursecode: subject?.coursecode,
+            comments: ref.current.value,
           },
           { withCredentials: true },
         );
         console.log(data.msg);
 
         if (data.msg) {
-          navigate(`/feedback/${username}`);
+          navigate(-1);
         }
       }
     }
   };
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const subjectString: string | null = searchParams.get("subject");
+    if (subjectString) {
+      const res: { coursecode: string } = JSON.parse(
+        decodeURIComponent(subjectString),
+      );
+      setSubject(res);
+    }
     getQuestions();
   }, []);
 

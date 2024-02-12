@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import autoTable, { UserOptions } from "jspdf-autotable";
+import autoTable, { UserOptions, RowInput } from "jspdf-autotable";
 import logoImage from "../assets/logo.jpg";
 import { DepartmentName } from "./Constants";
 

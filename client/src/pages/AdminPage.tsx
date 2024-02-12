@@ -1,25 +1,30 @@
-import axios from "axios";
-import React, { useEffect } from "react";
-import Button from "../components/Button";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-type Props = {};
-
-const AdminPage = (props: Props) => {
-  const navigate = useNavigate();
+const AdminPage = () => {
   return (
-    <div>
-      <Button
-        title="Password Generate Page"
-        onClick={() => navigate("/admin/generate")}
-      />
-      <Button
-        type="secondary"
-        title="Report Generate Page"
-        onClick={() => navigate("/admin/reportgenerate")}
-      />
-    </div>
+    <section className="mx-auto grid min-h-[calc(100vh-6rem)] w-max grid-cols-3 items-center justify-center gap-10 ">
+      <Card icon="📄" title="Report Generation" link="/admin/reportgenerate" />
+      <Card icon="🔐" title="Generate Login" link="/admin/generate" />
+      <Card icon="❓" title="Update Questions" link="" />
+    </section>
   );
 };
 
 export default AdminPage;
+
+const Card = ({
+  icon,
+  title,
+  link,
+}: {
+  icon: string;
+  title: string;
+  link: string;
+}) => (
+  <Link to={link}>
+    <div className="flex flex-col items-center justify-center gap-3 rounded-lg bg-black p-6 text-white transition-all hover:bg-black/70">
+      <p className="text-4xl">{icon}</p>
+      <h2 className="text-xl font-semibold">{title}</h2>
+    </div>
+  </Link>
+);
