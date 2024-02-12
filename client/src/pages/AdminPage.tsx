@@ -2,10 +2,11 @@ import { Link } from "react-router-dom";
 
 const AdminPage = () => {
   return (
-    <section className="mx-auto grid min-h-[calc(100vh-6rem)] w-max grid-cols-3 items-center justify-center gap-10 ">
+    <section className="mx-auto grid min-h-[calc(100vh-6rem)] w-max grid-cols-2 items-center justify-center gap-10 ">
       <Card icon="📄" title="Report Generation" link="/admin/reportgenerate" />
       <Card icon="🔐" title="Generate Login" link="/admin/generate" />
-      <Card icon="❓" title="Update Questions" link="" />
+      <Card icon="🗃️" title="Update Data" link="" />
+      <Card icon="🗑️" title="Delete Data" link="" />
     </section>
   );
 };
