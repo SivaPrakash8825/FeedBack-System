@@ -19,6 +19,82 @@ const ReportGenPage = () => {
   const [password, setPassword] = useState("");
   // const [subcodelist, setSubCodeList] = useState<string[]>([]);
 
+  const GenerateSubjectWisePdf = (
+    data: { [x: string]: any; subject_marks: any }[],
+  ) => {
+    // return;
+    // const header = [...Object.keys(data[0])];
+    // const rows = data.map((item) => Object.values(item));
+
+    function assessMark(markk: string) {
+      const mark = parseFloat(markk);
+      if (mark >= 0 && mark < 1) {
+        return "Normal";
+      } else if (mark >= 1 && mark < 2) {
+        return "Average";
+      } else if (mark >= 2 && mark < 3) {
+        return "Good";
+      } else if (mark >= 3 && mark < 4) {
+        return "Very Good";
+      } else if (mark >= 4 && mark <= 5) {
+        return "Excellent";
+      } else {
+        return "Invalid mark";
+      }
+    }
+    // console.log(rows);
+    function calculateAverageMarks(arr: number[]) {
+      // console.log(arr);
+
+      const sum = arr.reduce((acc, val) => acc + val, 0);
+      const avg = sum / arr.length; // Nan
+      return avg;
+
+      // return sum / marksArray.length;
+    }
+
+    // Calculate and add average marks to the data and remove subject_marks
+    const updatedData = data.map(
+      (student: { [x: string]: any; subject_marks: any }) => {
+        const marksArray = student.subject_marks
+          .split("-")
+          .map((subMarks: string) => JSON.parse(subMarks).answers);
+        // console.log(marksArray);
+
+        const averageMarks = marksArray.map((mark: number[]) => {
+          return calculateAverageMarks(mark);
+        });
+        // console.log(averageMarks);
+        const finalAvg = calculateAverageMarks(averageMarks).toFixed(2);
+        // console.log(finalAvg);
+        const assessment = assessMark(finalAvg);
+
+        const { subject_marks, ...rest } = student;
+        return { ...rest, finalAvg, assessment };
+      },
+    );
+
+    console.log("data : ", updatedData);
+    const header = [...Object.keys(updatedData[0])];
+    const rows = updatedData.map(
+      (item: { [s: string]: unknown } | ArrayLike<unknown>) =>
+        Object.values(item),
+    );
+    // console.log(header);
+    // console.log(rows);
+    console.log([rows, rows]);
+    generatePdf(
+      header,
+      rows,
+      reporttype,
+      department,
+      academicyr,
+      parseInt(semester),
+      subtype,
+      section,
+    );
+  };
+
   // const fetchCourseCode = async () => {
   //   const { data } = await axios.post(
   //     `${import.meta.env.VITE_ENDPOINT}/getcoursecode`,
@@ -140,13 +216,12 @@ const ReportGenPage = () => {
     },
   ];
 
-  const genLoginId = async () => {
-    const isAnyEmpty = value.some((item) => item.value == "" || 0);
-    if (isAnyEmpty) {
-      alert("fill the details");
-    } else {
+  const fetchData = async () => {
+    try {
+      const apiType =
+        reporttype == "MarkWise" ? "generateReport" : "generateReportSubject";
       const { data } = await axios.post(
-        `${import.meta.env.VITE_ENDPOINT}/generateReport`,
+        `${import.meta.env.VITE_ENDPOINT}/${apiType}`,
         {
           dept: department,
           degree: graduation,
@@ -160,59 +235,92 @@ const ReportGenPage = () => {
         },
         { withCredentials: true },
       );
-      const header = [];
-      const avgheader = [];
-      const rows: any[] = [];
-      const avgrows: any[] = [];
-      console.log(data);
+      return data;
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
-      header.push(...Object.keys(data[0]).filter((val) => val != "marks"));
+  const genLoginId = async () => {
+    const isAnyEmpty = value.some((item) => item.value == "" || 0);
+    if (isAnyEmpty) {
+      alert("fill the details");
+    } else {
+      const data = await fetchData();
+      // console.log(data);
 
-      JSON.parse(data[0].marks).answers.forEach((_: any, index: number) => {
-        header.push(`Q${index + 1}`);
-        avgheader.push(`Q${index + 1}`);
+      if (reporttype == "MarkWise") {
+        const header = [];
+        const avgheader = [];
+        const rows: any[] = [];
+        const avgrows: any[] = [];
+        console.log(data);
+
+        header.push(...Object.keys(data[0]).filter((val) => val != "marks"));
+
+        JSON.parse(data[0].marks).answers.forEach((val: any, index: number) => {
+          header.push(`Q${index + 1}`);
+          avgheader.push(`Q${index + 1}`);
+          avgrows.push(0);
+        });
+        header.push("Total");
+        avgheader.push("AVG");
         avgrows.push(0);
-      });
-      header.push("Total");
-      avgheader.push("AVG");
-      avgrows.push(0);
-      data.forEach((val: any, ind: number) => {
-        const row = [];
-        const value = Object.keys(data[0])
-          .filter((val) => val != "marks")
-          .map((key) => {
-            return val[key];
-          });
+        data.forEach(
+          (val: { [x: string]: any; marks: string }, ind: number) => {
+            const row = [];
+            const value = Object.keys(data[0])
+              .filter((val) => val != "marks")
+              .map((key) => {
+                return val[key];
+              });
 
-        row.push(...value);
-        if (val.marks) {
-          let total = 0;
-          JSON.parse(val.marks).answers.forEach(
-            (mark: number, index: number) => {
-              total += mark;
-              row.push(mark);
+            row.push(...value);
+            if (val.marks) {
+              let total = 0;
+              JSON.parse(val.marks).answers.forEach(
+                (mark: number, index: number) => {
+                  total += mark;
+                  row.push(mark);
+                  if (data.length - 1 == ind) {
+                    avgrows[index] = (avgrows[index] + mark) / data.length;
+                  } else {
+                    avgrows[index] += mark;
+                  }
+                },
+              );
+              //  console.log(total);
               if (data.length - 1 == ind) {
-                avgrows[index] = (avgrows[index] + mark) / data.length;
+                avgrows[avgrows.length - 1] =
+                  (avgrows[avgrows.length - 1] + total) / data.length;
               } else {
-                avgrows[index] += mark;
+                avgrows[avgrows.length - 1] += total;
               }
-            },
-          );
-          //  console.log(total);
-          if (data.length - 1 == ind) {
-            avgrows[avgrows.length - 1] =
-              (avgrows[avgrows.length - 1] + total) / data.length;
-          } else {
-            avgrows[avgrows.length - 1] += total;
-          }
 
-          row.push(total);
-        }
+              row.push(total);
+            }
 
-        rows.push(row);
-      });
+            rows.push(row);
+          },
+        );
 
-      generatePdf({ header, rows, avgheader, avgrows });
+        // console.log(rows);
+
+        generatePdf(
+          header,
+          rows,
+          reporttype,
+          department,
+          academicyr,
+          parseInt(semester),
+          subtype,
+          section,
+          avgheader,
+          avgrows,
+        );
+      } else {
+        GenerateSubjectWisePdf(data);
+      }
     }
   };
 
@@ -222,15 +330,7 @@ const ReportGenPage = () => {
         <h1 className="text-2xl font-semibold">Report Generation</h1>
         <div className="mt-2 flex flex-col gap-y-3  rounded-md border-2  border-black p-5 ">
           <div className="grid grid-cols-2 gap-3">
-            {value.map((data, index: number) => {
-              if (
-                subtype.toLowerCase() === "infra" &&
-                ["subject code", "report type", "section", "semester"].includes(
-                  data.label,
-                )
-              ) {
-                return null;
-              }
+            {value.map((data, index) => {
               return data.list ? (
                 <SelectTextField
                   list={data.list}
