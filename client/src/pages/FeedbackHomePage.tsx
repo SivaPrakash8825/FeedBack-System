@@ -27,7 +27,6 @@ const FeedbackHomePage = () => {
     }
 
     const result = Object.values(subjectsByType);
-    // console.log(result);
 
     setCourses(result);
     setIsLoading(false);
@@ -74,26 +73,32 @@ const FeedbackHomePage = () => {
                 // Box
                 <div
                   key={i}
-                  className="w-full overflow-hidden rounded-md border-2 border-black"
+                  className="w-full overflow-hidden rounded-md border-2 border-black/80 "
                 >
                   {/* head */}
-                  <div className="bg-black p-2 px-3 font-semibold text-white">
-                    <h1>{course.name}</h1>
+                  <div className="bg-black/80 p-3 py-2 text-lg font-semibold text-white">
+                    <h1 className="">{course.name}</h1>
                   </div>
 
                   {/*  */}
-                  <div className="flex flex-col gap-3 p-3 font-medium text-black">
+                  <div className="flex flex-col ">
                     {course.subjects.map((subject, ii) => {
                       return (
                         <NavLink
                           key={ii}
                           className={
-                            "hover:underline hover:underline-offset-[1px]"
+                            "cursor-pointer p-5 transition-all hover:bg-gray-100"
                           }
                           to={`/feedback/${userName}/${subject["Theory/Lab"]}?subject=${encodeURIComponent(JSON.stringify({ coursecode: subject["Sub Code"] }))}`}
                         >
-                          {subject["Sub Code"]} {subject["Sub Name"]} -{" "}
-                          {subject["Staff"]}
+                          <h1 className="text-lg   font-semibold">
+                            {subject["Sub Code"]}
+                            {" - "}
+                            {subject["Sub Name"]}{" "}
+                          </h1>
+                          <h1 className="text-sm font-medium">
+                            {subject["Staff"]}
+                          </h1>
                         </NavLink>
                       );
                     })}

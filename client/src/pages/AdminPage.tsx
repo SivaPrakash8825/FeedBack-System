@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const AdminPage = () => {
   return (
-    <section className="mx-auto flex min-h-[calc(100vh-6rem)] items-center justify-center gap-0 border border-red-500 ">
+    <section className="mx-auto flex min-h-[calc(100vh-6rem)] items-center justify-center gap-0 ">
       <div className="grid w-5/12 grid-cols-2 items-center justify-center gap-10">
         <Card
           icon="📄"
