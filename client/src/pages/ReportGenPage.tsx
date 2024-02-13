@@ -5,8 +5,11 @@ import InputTextField from "../components/InputTextField";
 import SelectTextField from "../components/SelectTextField";
 import generatePdf from "../utils/Generatepdf2";
 import generatePdf1 from "../utils/Generatepdf";
+import useToast from "../store/useToast";
+
 
 const ReportGenPage = () => {
+  const setToast = useToast((state) => state.setToast);
   const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
@@ -258,12 +261,13 @@ const ReportGenPage = () => {
 
       // console.log(data);
 
-      if (reporttype == "MarkWise") {
-        const header = [];
+      if (reporttype == "MarkWise" ) {
+        if (data.length) {
+          const header = [];
         const avgheader = [];
         // const rows: any[] = [];
         // const avgrows: any[] = [];
-        // console.log(data);
+        console.log(data);
 
         header.push(
           ...Object.keys(data[0]).filter(
@@ -275,6 +279,7 @@ const ReportGenPage = () => {
                 "academicyear",
                 "degreetype",
                 "comments",
+                "Sub Name"
               ].includes(val),
           ),
         );
@@ -363,35 +368,7 @@ const ReportGenPage = () => {
 
           data.avgrow = columnAverages;
         });
-        // console.log(newallfield);
-
-        // data.forEach(
-        //   (val: { [x: string]: any; marks: string }, ind: number) => {
-        //     const row = [];
-        //     const value = Object.keys(data[0])
-        //       .filter((val) => !["marks","Staff","coursecode" ,"academicyear" , "degreetype" , "comments"].includes(val))
-        //       .map((key) => {
-        //         return val[key];
-        //       });
-
-        //     row.push(...value);
-        //     if (val.marks) {
-
-        //       //  console.log(total);
-        //       if (data.length - 1 == ind) {
-        //         avgrows[avgrows.length - 1] =
-        //           ((avgrows[avgrows.length - 1] + total) / data.length).toFixed(2);
-        //       } else {
-        //         avgrows[avgrows.length - 1] += total;
-        //       }
-
-        //       row.push(total);
-        //     }
-
-        //     rows.push(row);
-        //   },
-        // );
-
+       
         generatePdf1(
           header,
           newallfield,
@@ -403,6 +380,10 @@ const ReportGenPage = () => {
           section,
           avgheader,
         );
+        } else {
+          setToast({
+            msg: "No Data!!",variant:"error"})
+        }
       } else {
         GenerateSubjectWisePdf(data);
       }
