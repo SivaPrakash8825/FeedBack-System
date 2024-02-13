@@ -4,8 +4,12 @@ import Button from "../components/Button";
 import InputTextField from "../components/InputTextField";
 import SelectTextField from "../components/SelectTextField";
 import generatePdf from "../utils/Generatepdf2";
+import generatePdf1 from "../utils/Generatepdf";
+import useToast from "../store/useToast";
+
 
 const ReportGenPage = () => {
+  const setToast = useToast((state) => state.setToast);
   const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
@@ -242,73 +246,132 @@ const ReportGenPage = () => {
   };
 
   const genLoginId = async () => {
+    const allfields: any = {};
+    //   [{
+    //   staffname: "hema",
+    //   coursecode: "adsf",
+
+    //
+    // }]
     const isAnyEmpty = value.some((item) => item.value == "" || 0);
     if (isAnyEmpty) {
       alert("fill the details");
     } else {
       const data = await fetchData();
+
       // console.log(data);
 
-      if (reporttype == "MarkWise") {
-        const header = [];
+      if (reporttype == "MarkWise" ) {
+        if (data.length) {
+          const header = [];
         const avgheader = [];
-        const rows: any[] = [];
-        const avgrows: any[] = [];
+        // const rows: any[] = [];
+        // const avgrows: any[] = [];
         console.log(data);
 
-        header.push(...Object.keys(data[0]).filter((val) => val != "marks"));
+        header.push(
+          ...Object.keys(data[0]).filter(
+            (val) =>
+              ![
+                "marks",
+                "Staff",
+                "coursecode",
+                "academicyear",
+                "degreetype",
+                "comments",
+                "Sub Name"
+              ].includes(val),
+          ),
+        );
 
         JSON.parse(data[0].marks).answers.forEach((val: any, index: number) => {
           header.push(`Q${index + 1}`);
           avgheader.push(`Q${index + 1}`);
-          avgrows.push(0);
+          // avgrows.push(0);
         });
         header.push("Total");
         avgheader.push("AVG");
-        avgrows.push(0);
-        data.forEach(
-          (val: { [x: string]: any; marks: string }, ind: number) => {
-            const row = [];
-            const value = Object.keys(data[0])
-              .filter((val) => val != "marks")
-              .map((key) => {
-                return val[key];
-              });
+        // avgrows.push(0);
 
-            row.push(...value);
-            if (val.marks) {
-              let total = 0;
-              JSON.parse(val.marks).answers.forEach(
-                (mark: number, index: number) => {
-                  total += mark;
-                  row.push(mark);
-                  if (data.length - 1 == ind) {
-                    avgrows[index] = (avgrows[index] + mark) / data.length;
-                  } else {
-                    avgrows[index] += mark;
-                  }
-                },
-              );
-              //  console.log(total);
-              if (data.length - 1 == ind) {
-                avgrows[avgrows.length - 1] =
-                  (avgrows[avgrows.length - 1] + total) / data.length;
-              } else {
-                avgrows[avgrows.length - 1] += total;
-              }
-
-              row.push(total);
+        const parseanswer = (val: any) => {
+          // console.log(JSON.parse(val.marks).answers);
+          const arr: any[] = [];
+          let total = 0;
+          JSON.parse(val.marks).answers.map((mark: number, index: number) => {
+            total += mark;
+            arr[index] = mark;
+            if (JSON.parse(val.marks).answers.length - 1 == index) {
+              arr[index + 1] = total;
             }
+            // row.push(mark);
+            // if (data.length - 1 == ind) {
+            //   (avgrows[index] = (avgrows[index] + mark) / data.length).toFixed(2);
+            // } else {
+            //   avgrows[index] += mark;
+            // }
+          });
+          return arr;
+          // console.log(arr);
+        };
+        //   {
+        //     "Staff": "Mrs.S.HEMASWATHI",
+        //     "coursecode": "AI2202",
+        //     "comments": [],
+        //     "marks": [],
+        //     "avgheader": [],
+        //     "avgrow": [],
+        //"username":[]
+        // },
 
-            rows.push(row);
-          },
-        );
+        data.forEach((val: any) => {
+          //  console.log(val);
 
-        // console.log(rows);
+          const key = val.coursecode;
+          if (!allfields[key]) {
+            allfields[key] = {
+              ...val,
+              marks: [[val.username, ...parseanswer(val)]],
+              usercomments: [[val.username, val.comments]],
+            };
+          } else {
+            const usercom = [val.username, val.comments];
+            // Merge comments, marks, avgheader, avgrow if object already exists for this key
+            // allfields[key].marks.push([val.username,...parseanswer(val)])
+            allfields[key].marks.push([val.username, ...parseanswer(val)]);
+            allfields[key].usercomments.push(usercom);
+          }
+        });
 
-        generatePdf(
+        const newallfield = Object.values(allfields);
+        const transpose = (matrix: any[]) => {
+          return matrix[0]
+            .map((_: any, colIndex: number) =>
+              matrix.map((row) => row[colIndex]),
+            )
+            .slice(1);
+        };
+
+        const calculateAverage = (column: any) => {
+          const sum = column.reduce((acc: any, value: any) => acc + value, 0);
+          return (sum / column.length).toFixed(2);
+        };
+        // const newallfield.
+        // console.log(newallfield);
+
+        newallfield.forEach((data: any) => {
+          const transposedData = transpose(data.marks);
+
+          // Calculate average for each column
+          const columnAverages = transposedData.map((column: any) =>
+            calculateAverage(column),
+          );
+
+          data.avgrow = columnAverages;
+        });
+       
+        generatePdf1(
           header,
-          rows,
+          newallfield,
           reporttype,
           department,
           academicyr,
@@ -316,8 +379,11 @@ const ReportGenPage = () => {
           subtype,
           section,
           avgheader,
-          avgrows,
         );
+        } else {
+          setToast({
+            msg: "No Data!!",variant:"error"})
+        }
       } else {
         GenerateSubjectWisePdf(data);
       }

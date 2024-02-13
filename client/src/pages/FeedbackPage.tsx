@@ -5,6 +5,7 @@ import axios from "axios";
 import { useLocation, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import useUserDetails from "../store/useUserDetails";
+import Spinner from "../components/Spinner";
 
 const FeedbackPage = () => {
   const navigate = useNavigate();
@@ -19,9 +20,9 @@ const FeedbackPage = () => {
   >([]);
   const [btnLock, setBtnLock] = useState(true);
   const [subject, setSubject] = useState<{ coursecode: string }>();
-  // const navigate = useNavigate();
   const { userDetails } = useUserDetails();
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
 
   const { type } = useParams<string>();
 
@@ -29,13 +30,13 @@ const FeedbackPage = () => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_ENDPOINT}/getQuestions/${type}`,
     );
-    let questionsarr: any = [];
+    let quesarr: any[] = [];
     for (const value of data) {
       const val = JSON.parse(
         value.question.slice(1, value.question.length - 1),
       );
-      questionsarr = [
-        ...questionsarr,
+      quesarr = [
+        ...quesarr,
         {
           mark: 0,
           option: null,
@@ -44,10 +45,7 @@ const FeedbackPage = () => {
         },
       ];
     }
-
-    // console.log(questionsarr);
-
-    setQuestion(questionsarr);
+    setQuestion(quesarr);
   };
 
   const setOption = (opt: string, index?: number) => {
@@ -89,9 +87,9 @@ const FeedbackPage = () => {
           },
           { withCredentials: true },
         );
-        console.log(data.msg);
+        console.log(data);
 
-        if (data.msg) {
+        if (data) {
           navigate(-1);
         }
       }
@@ -120,12 +118,12 @@ const FeedbackPage = () => {
     setOption: (opt: string, index?: number | undefined) => void;
   }) => {
     return (
-      <div className=" flex h-full   w-full flex-col gap-y-2   ">
+      <div className=" flex h-full  w-full flex-col gap-y-2 border-b border-gray-300 pb-4 ">
         <div className=" flex gap-x-2">
-          <p>{index}.</p>
+          <p className="font-medium">{index}.</p>
           <p className=" text-justify font-medium">{questions.question}</p>
         </div>
-        <div className=" ml-7">
+        <div className="ml-7">
           <RadioField
             setOption={setOption}
             index={index}
@@ -140,13 +138,13 @@ const FeedbackPage = () => {
 
   const TextArea = () => {
     return (
-      <div className=" ">
+      <div className="flex flex-col gap-3 font-semibold">
         <p>
-          Suggestion and Comments<span className=" text-red-700">*</span>
+          Suggestion and Comments<span className=" text-red-500"> *</span>
         </p>
         <textarea
           ref={ref}
-          className=" h-48 w-full resize-none rounded-md border-2 border-gray-600 p-3"
+          className=" h-48 w-full resize-none rounded-md border-2 border-gray-300 p-3 outline-gray-500"
         />
       </div>
     );
@@ -154,21 +152,25 @@ const FeedbackPage = () => {
 
   return (
     <div className=" flex min-h-screen w-full flex-col items-center justify-center  ">
-      <div className="my-3 flex w-2/3 flex-col gap-y-8 rounded-md border-2  border-black px-14 py-6">
-        {questions &&
-          questions.map((data, index) => {
-            return (
-              <Frame
-                key={index}
-                questions={data}
-                index={index + 1}
-                setOption={setOption}
-              />
-            );
-          })}
-        <TextArea />
-        <Button title="submit" disable={btnLock} onClick={submitFeedback} />
-      </div>
+      {!loading ? (
+        <div className=" flex w-2/3 flex-col gap-y-5 rounded-md  border-black p-10">
+          {questions &&
+            questions.map((data, index) => {
+              return (
+                <Frame
+                  key={index}
+                  questions={data}
+                  index={index + 1}
+                  setOption={setOption}
+                />
+              );
+            })}
+          <TextArea />
+          <Button title="Submit" disable={btnLock} onClick={submitFeedback} />
+        </div>
+      ) : (
+        <Spinner size="lg" />
+      )}
     </div>
   );
 };

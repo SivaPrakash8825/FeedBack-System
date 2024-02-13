@@ -88,7 +88,7 @@ createMasterLogin();
 const createMasterTable = () => {
   try {
     db.query(
-      "CREATE TABLE IF NOT EXISTS `mastertable` (`Academic yr` varchar(100) NOT NULL,`Dept` varchar(20) NOT NULL,`UG/PG` varchar(20) NOT NULL,`Theory/Lab` text,`Semester` int NOT NULL,`Section` varchar(30) NOT NULL,`Sub Code` varchar(100) NOT NULL,`Sub Name` varchar(230) NOT NULL,`Staff` text,`StaffParent Dept` text,`Open Elective/Regular/Core Elective` text,`Sub Grouping` text,PRIMARY KEY (`Academic yr`,`Dept`,`UG/PG`,`Semester`,`Sub Name`,`Sub Code`,`Section`));",
+      "CREATE TABLE IF NOT EXISTS `mastertable` (`Academic yr` varchar(100) NOT NULL,`Dept` varchar(20) NOT NULL,`UG/PG` varchar(20) NOT NULL,`Theory/Lab` VARCHAR(20),`Semester` int NOT NULL,`Section` varchar(30) NOT NULL,`Sub Code` varchar(100) NOT NULL,`Sub Name` varchar(230) NOT NULL,`Staff` text,`StaffParent Dept` text,`Open Elective/Regular/Core Elective` text,`Sub Grouping` text,PRIMARY KEY (`Academic yr`,`Dept`,`UG/PG`,`Semester`,`Sub Name`,`Sub Code`,`Section`,`Theory/Lab`));",
       (err, res) => {
         if (!err) {
           const values = masterTableData
