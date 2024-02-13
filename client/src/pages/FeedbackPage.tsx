@@ -56,7 +56,7 @@ const FeedbackPage = () => {
       {
         !isAnyNotSelect && btnLock && setBtnLock(isAnyNotSelect);
       }
-
+      const questions = [];
       setQuestion((prevState) => {
         return prevState.map((obj, ind) => {
           if (ind === index - 1) {

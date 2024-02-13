@@ -9,7 +9,7 @@ const { masterTableData, questions } = require("./constants");
 const createQuestions = () => {
   // Creates Table
   db.query(
-    "CREATE TABLE IF NOT EXISTS questions (`id` INT NOT NULL ,`question` VARCHAR(250) PRIMARY KEY NOT NULL,type TEXT);",
+    "CREATE TABLE IF NOT EXISTS `questions` (`id` int NOT NULL,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`question`,`type`));",
     (err, res) => {
       if (!err) {
         // Add Questions to table
@@ -150,6 +150,7 @@ const createTheorytable = () => {
     console.log(e);
   }
 };
+
 const createLabtable = () => {
   try {
     db.query(
@@ -166,5 +167,25 @@ const createLabtable = () => {
     console.log(e);
   }
 };
+
 createLabtable();
 createTheorytable();
+
+const createDepartmentTable = () => {
+  try {
+    db.query(
+      "CREATE TABLE IF NOT EXISTS `departments` (`id` int NOT NULL,`dept` varchar(10) NOT NULL,`deptname` varchar(45) NOT NULL,PRIMARY KEY (`dept`,`deptname`));",
+      (err, res) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Department table created");
+        }
+      }
+    );
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+createDepartmentTable();

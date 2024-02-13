@@ -13,6 +13,7 @@ import FeedbackHomePage from "./pages/FeedbackHomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ForAuth from "./components/ForAuth";
 import Toast from "./components/Toast";
+import UpdatePage from "./pages/UpdatePage";
 
 function App() {
   const role = useRole((state) => state.role);
@@ -75,6 +76,16 @@ function App() {
             element={
               <ProtectedRoute shouldBeAdmin>
                 <ReportGenPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Update DB Data page */}
+          <Route
+            path="/admin/update"
+            element={
+              <ProtectedRoute shouldBeAdmin>
+                <UpdatePage />
               </ProtectedRoute>
             }
           />
