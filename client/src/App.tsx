@@ -35,10 +35,7 @@ function App() {
           <Route
             element={
               <ProtectedRoute>
-                <FeedbackHomePage
-                  username={username}
-                  setUsername={setUsername}
-                />
+                <FeedbackHomePage />
               </ProtectedRoute>
             }
             path="/feedback/:username"
@@ -92,15 +89,6 @@ function App() {
             path="/dummy"
           />
 
-          {/* Report generate page */}
-          <Route
-            path="/admin/reportgenerate"
-            element={
-              <ProtectedRoute shouldBeAdmin>
-                <ReportGenPage />
-              </ProtectedRoute>
-            }
-          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Toast />

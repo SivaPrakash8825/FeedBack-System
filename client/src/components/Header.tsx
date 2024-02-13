@@ -19,7 +19,7 @@ const Header = () => {
   };
 
   const redirectToHome =
-    role === "admin" ? "/admin" : `/feedback:${user?.username}`;
+    role === "admin" ? "/admin" : `/feedback/${user?.username}`;
 
   return (
     <header className="flex h-24 items-center justify-between gap-2 border-b-2 border-gray-500 px-6 py-2">
@@ -31,7 +31,7 @@ const Header = () => {
       {role == "admin" ? (
         <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
       ) : (
-        <h1 className="text-xl font-semibold">{`${user?.year} ${user?.dept} ${user?.section} Feedback Entry ${user?.academicyr}`}</h1>
+        <h1 className="text-xl font-semibold">{`${user?.year || ""} ${user?.dept || ""} ${user?.section || ""} Feedback Entry ${user?.academicyr || ""}`}</h1>
       )}
       <div className="flex items-center gap-4">
         <Link to={redirectToHome}>
