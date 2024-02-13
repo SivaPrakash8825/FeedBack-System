@@ -29,24 +29,22 @@ const FeedbackPage = () => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_ENDPOINT}/getQuestions/${type}`,
     );
-    data.length > questions.length
-      ? data.forEach((value: { question: string }) => {
-          const val = JSON.parse(
-            value.question.slice(1, value.question.length - 1),
-          );
-          setQuestion((pre) => {
-            return [
-              ...pre,
-              {
-                mark: 0,
-                option: null,
-                options: val.options,
-                question: val.question,
-              },
-            ];
-          });
-        })
-      : null;
+    let quesarr: any[] = [];
+    for (const value of data) {
+      const val = JSON.parse(
+        value.question.slice(1, value.question.length - 1),
+      );
+      quesarr = [
+        ...quesarr,
+        {
+          mark: 0,
+          option: null,
+          options: val.options,
+          question: val.question,
+        },
+      ];
+    }
+    setQuestion(quesarr);
   };
 
   const setOption = (opt: string, index?: number) => {
@@ -88,9 +86,9 @@ const FeedbackPage = () => {
           },
           { withCredentials: true },
         );
-        console.log(data.msg);
+        console.log(data);
 
-        if (data.msg) {
+        if (data) {
           navigate(-1);
         }
       }

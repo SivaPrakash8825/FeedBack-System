@@ -50,7 +50,7 @@ function App() {
                 <FeedbackPage />
               </ProtectedRoute>
             }
-            path="/feedback/:username/:type/:coursecode"
+            path="/feedback/:username/:type"
           />
 
           {/* Admin Page */}
