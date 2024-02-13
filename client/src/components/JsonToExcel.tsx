@@ -6,29 +6,6 @@ import { QuestionDb } from "../../types";
 export const JsonToExcel = () => {
   const convertJsonToSheet = (data: QuestionDb[]) => {
     try {
-      // console.log(data);
-
-      // const data = [
-      //   {
-      //     id: 1,
-      //     question:
-      //       '{"question":"How much portion of the syllabus was covered by the teacher?","options":["75 to 84%","74 to 65%","Below 65%"]}',
-      //   },
-      //   {
-      //     id: 2,
-      //     question:
-      //       '{"question":"Has the teacher covered relevant topics beyond the syllabus?","options":["Usually","Sometimes","Rarely","Never"]}',
-      //     type: "theory",
-      //   },
-      //   {
-      //     id: 3,
-      //     question:
-      //       '{"question":"Did the teacher teach the subject with suitable illustrations, case studies and applications?","options":["Everytime","Usually","Sometimes","Rarely","Never"]}',
-      //     type: "theory",
-      //   },
-      // ];
-
-      // Determine the maximum number of options
       const maxOptions = Math.max(
         ...data.map(
           (entry) =>

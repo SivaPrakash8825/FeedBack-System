@@ -29,24 +29,25 @@ const FeedbackPage = () => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_ENDPOINT}/getQuestions/${type}`,
     );
-    data.length > questions.length
-      ? data.forEach((value: { question: string }) => {
-          const val = JSON.parse(
-            value.question.slice(1, value.question.length - 1),
-          );
-          setQuestion((pre) => {
-            return [
-              ...pre,
-              {
-                mark: 0,
-                option: null,
-                options: val.options,
-                question: val.question,
-              },
-            ];
-          });
-        })
-      : null;
+    let questionsarr: any = [];
+    for (const value of data) {
+      const val = JSON.parse(
+        value.question.slice(1, value.question.length - 1),
+      );
+      questionsarr = [
+        ...questionsarr,
+        {
+          mark: 0,
+          option: null,
+          options: val.options,
+          question: val.question,
+        },
+      ];
+    }
+
+    // console.log(questionsarr);
+
+    setQuestion(questionsarr);
   };
 
   const setOption = (opt: string, index?: number) => {
@@ -57,7 +58,7 @@ const FeedbackPage = () => {
       {
         !isAnyNotSelect && btnLock && setBtnLock(isAnyNotSelect);
       }
-
+      const questions = [];
       setQuestion((prevState) => {
         return prevState.map((obj, ind) => {
           if (ind === index - 1) {

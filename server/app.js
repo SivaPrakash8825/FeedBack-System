@@ -79,24 +79,27 @@ app.get("/getQuestions/:type", (req, res) => {
 });
 
 // set question data
-app.post("/setQuestions", async (req, res) => {
+app.post("/setQuestions/:typee", async (req, res) => {
+  const { typee } = req.params;
   const data = req.body.data;
   try {
     // console.log(data);
+    db.query(`DELETE FROM questions where type = ?;`, [typee]);
     db.query(
-      "CREATE TABLE IF NOT EXISTS `feedback`.`questions` (`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,`question` TEXT NULL,type TEXT);",
+      "CREATE TABLE IF NOT EXISTS `questions` (`id` int NOT NULL,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`question`,`type`));",
       async (err, ress) => {
         if (!err) {
-          // console.log("no err");
-          // Add Questions to table
-          // db.query("DELETE FROM questions");
           const values = data
+            .filter(({ type }) => type == typee)
             .map(
               ({ id, type, question }) =>
                 `(${id},'${type}','${JSON.stringify(question)}')`
             )
             .join(",");
-          const query = `REPLACE INTO questions (id,type, question) VALUES ${values}`;
+
+          // console.log(values);
+
+          const query = `REPLACE INTO questions (id,type, question) VALUES ${values};`;
 
           db.query(query, (error, results) => {
             if (error) {
@@ -105,6 +108,8 @@ app.post("/setQuestions", async (req, res) => {
               return res.status(200).send("Questions Inserted :)");
             }
           });
+        } else {
+          return res.status(400).send(err);
         }
       }
     );
@@ -265,7 +270,7 @@ app.post("/loginAuth", (req, res) => {
           return res.status(200).send("admin");
         } else {
           db.query(
-            "SELECT * FROM feedbackLogin WHERE username = ? and password = ?",
+            "SELECT * FROM feedbackLogin WHERE username = ? and password = ? and validfrom <= CURDATE() AND validto >= CURDATE();",
             [username, password],
             (err, result) => {
               if (err) {
@@ -531,6 +536,89 @@ app.post("/getcoursecode", (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(200).send(error.message);
+  }
+});
+
+// get department data
+app.get("/getDepartments", (req, res) => {
+  try {
+    db.query(`SELECT * FROM departments`, (err, ress) => {
+      if (err) {
+        return res.status(400).send(err.message);
+      }
+      return res.status(200).send(ress);
+    });
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
+// set department data
+app.post("/setDepartments", (req, res) => {
+  const { data } = req.body;
+  try {
+    const values = data
+      .map(({ id, dept, deptname }) => `(${id},'${dept}','${deptname}')`)
+      .join(",");
+
+    console.log(values);
+
+    const query = `REPLACE INTO departments (id,dept, deptname) VALUES ${values};`;
+
+    db.query(`TRUNCATE TABLE departments`);
+    db.query(query, (error, results) => {
+      if (error) {
+        return res.status(400).send(error.message);
+      } else {
+        return res.status(200).send("Department Inserted :)");
+      }
+    });
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
+// get master data
+app.get("/getMasterData", (req, res) => {
+  try {
+    db.query(`SELECT * FROM mastertable`, (err, ress) => {
+      if (err) {
+        return res.status(400).send(err.message);
+      }
+      return res.status(200).send(ress);
+    });
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
+// set master data
+app.post("/setMasterData", (req, res) => {
+  const { data } = req.body;
+  try {
+    const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``); // Extracting column names from the first object in the array
+    const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
+      ", "
+    )}) VALUES ?`;
+
+    // console.log(colomnNames);
+
+    // Extract values from the data object
+    const values = data.map((entry) => Object.values(entry));
+    // return res.status(200).send({ values });
+
+    // console.log(values);
+    db.query(`TRUNCATE TABLE mastertable`);
+    db.query(insertQuery, [values], (error, results) => {
+      if (error) {
+        return res.status(400).send(error.message);
+      } else {
+        return res.status(200).send("Master Data Inserted :)");
+      }
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(400).send(error.message);
   }
 });
 

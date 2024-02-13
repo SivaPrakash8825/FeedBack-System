@@ -24,7 +24,12 @@ const NotFoundPage = (props: Props) => {
   //   logout();
   // }, []);
 
-  return <div>NotFoundPage</div>;
+  return (
+    <div className=" flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center gap-2">
+      <h1 className="text-6xl font-bold">404</h1>
+      <h1 className="text-2xl font-bold">Page Not Found</h1>
+    </div>
+  );
 };
 
 export default NotFoundPage;

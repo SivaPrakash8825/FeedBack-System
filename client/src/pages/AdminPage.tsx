@@ -10,7 +10,7 @@ const AdminPage = () => {
           link="/admin/reportgenerate"
         />
         <Card icon="🔐" title="Generate Login" link="/admin/generate" />
-        <Card icon="🗃️" title="Update Data" link="" />
+        <Card icon="🗃️" title="Update Data" link="/admin/update" />
         <Card icon="🗑️" title="Delete Data" link="" />
       </div>
     </section>
@@ -31,7 +31,7 @@ const Card = ({
   <Link to={link}>
     <div className="flex flex-col items-center justify-center gap-3 rounded-lg bg-black p-6 text-white transition-all hover:bg-black/70">
       <p className="text-4xl">{icon}</p>
-      <h2 className="text-nowrap text-xl font-semibold">{title}</h2>
+      <h2 className="text-center text-xl font-semibold">{title}</h2>
     </div>
   </Link>
 );

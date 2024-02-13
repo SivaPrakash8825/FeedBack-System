@@ -34,7 +34,7 @@ const SelectTextField = ({ label, list, value, setValue }: Props) => {
       <div
         ref={selectRef}
         onClick={() => setShowDropdown((e) => !e)}
-        className={`relative w-full rounded-md border-2 ${showDropdown ? "border-gray-500 " : "border-gray-200"} cursor-pointer select-none p-2  transition-all`}
+        className={`relative w-full rounded-md border-2 ${showDropdown ? "border-gray-500 " : "border-gray-300"} cursor-pointer select-none p-2 transition-all`}
       >
         <p className={` ${value ? "uppercase" : "capitalize text-gray-400"}`}>
           {value || `Select ${label}`}
