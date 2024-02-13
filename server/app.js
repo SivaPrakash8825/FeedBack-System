@@ -482,7 +482,7 @@ app.post("/getCourses", (req, res) => {
     console.log(academicyr, dept, degree, sem, section, year);
 
     db.query(
-      "SELECT * FROM mastertable WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? and `Sub Code` not in (select coursecode from theory  where username=?) and `Sub Code` not in (select coursecode from lab  where username=?);",
+      "SELECT * FROM mastertable WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? AND (`Sub Code` not in (select coursecode from theory where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Theory') AND `Sub Code` not in (select coursecode from lab where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Lab'));",
       [academicyr, dept, degree, sem, section, username, username],
       (err, result) => {
         if (err) {

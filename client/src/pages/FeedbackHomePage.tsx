@@ -1,26 +1,13 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { NavLink, useLocation, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, useParams } from "react-router-dom";
+import { SubjectsByType, SubjectsWithName, UserDetails } from "../../types";
 import Spinner from "../components/Spinner";
-import {
-  Course,
-  SubjectsByType,
-  SubjectsWithName,
-  UserDetails,
-} from "../../types";
 import useUserDetails from "../store/useUserDetails";
 
-type Props = {
-  username: string;
-  setUsername: React.Dispatch<React.SetStateAction<string>>;
-};
-
-const FeedbackHomePage = ({ username }: Props) => {
-  // const { username, password } = useLocation().state;
+const FeedbackHomePage = () => {
   const { username: userName } = useParams();
-  // console.log("useParams : ", userName);
   const [isLoading, setIsLoading] = useState(true);
-  // const [userDetails, setUserDetails] = useState<UserDetails>();
   const { setUserDetails, userDetails } = useUserDetails();
   const [courses, setCourses] = useState<SubjectsWithName[]>([]);
 
@@ -55,18 +42,23 @@ const FeedbackHomePage = ({ username }: Props) => {
           username: userName,
         },
       );
-      // console.log(coursesData);
-      setUserDetails(coursesData);
+      console.log(coursesData);
+      setUserDetails(
+        typeof coursesData === "string"
+          ? ({ username: userName } as UserDetails)
+          : coursesData,
+      );
       convertData(coursesData);
-      // setIsLoading(false);
     } catch (error) {
       console.log(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     getCourses();
-  }, []);
+  }, [userName]);
 
   return (
     <div className="mt-5 flex items-center justify-center p-5">
@@ -76,38 +68,44 @@ const FeedbackHomePage = ({ username }: Props) => {
         </div>
       ) : (
         <div className="flex w-10/12 flex-col  items-center  justify-center gap-7 md:w-1/2">
-          {courses.map((course, i) => {
-            return (
-              // Box
-              <div
-                key={i}
-                className="w-full overflow-hidden rounded-md border-2 border-black"
-              >
-                {/* head */}
-                <div className="bg-black p-2 px-3 font-semibold text-white">
-                  <h1>{course.name}</h1>
-                </div>
+          {courses.length > 0 ? (
+            courses.map((course, i) => {
+              return (
+                // Box
+                <div
+                  key={i}
+                  className="w-full overflow-hidden rounded-md border-2 border-black"
+                >
+                  {/* head */}
+                  <div className="bg-black p-2 px-3 font-semibold text-white">
+                    <h1>{course.name}</h1>
+                  </div>
 
-                {/*  */}
-                <div className="flex flex-col gap-3 p-3 font-medium text-black">
-                  {course.subjects.map((subject, ii) => {
-                    return (
-                      <NavLink
-                        key={ii}
-                        className={
-                          "hover:underline hover:underline-offset-[1px]"
-                        }
-                        to={`/feedback/${userName}/${subject["Theory/Lab"]}?subject=${encodeURIComponent(JSON.stringify({ coursecode: subject["Sub Code"] }))}`}
-                      >
-                        {subject["Sub Code"]} {subject["Sub Name"]} -{" "}
-                        {subject["Staff"]}
-                      </NavLink>
-                    );
-                  })}
+                  {/*  */}
+                  <div className="flex flex-col gap-3 p-3 font-medium text-black">
+                    {course.subjects.map((subject, ii) => {
+                      return (
+                        <NavLink
+                          key={ii}
+                          className={
+                            "hover:underline hover:underline-offset-[1px]"
+                          }
+                          to={`/feedback/${userName}/${subject["Theory/Lab"]}?subject=${encodeURIComponent(JSON.stringify({ coursecode: subject["Sub Code"] }))}`}
+                        >
+                          {subject["Sub Code"]} {subject["Sub Name"]} -{" "}
+                          {subject["Staff"]}
+                        </NavLink>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            <div className="rounded-lg  bg-emerald-500 p-3 text-2xl font-semibold text-white">
+              All feedback submissions have been completed.
+            </div>
+          )}
         </div>
       )}
     </div>
