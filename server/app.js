@@ -331,7 +331,7 @@ app.post("/storeanswer", (req, res) => {
       (error, result) => {
         if (error) console.log(error);
         if (result) {
-          res.status(200).send({ msg: "submitted" });
+          res.status(200).send(result);
         }
         // console.log(error);
       }
@@ -355,11 +355,11 @@ app.post("/generateReport", (req, res) => {
   } = req.body;
   if (password == "Kcet@") {
     db.query(
-      `SELECT * FROM  ${subtype} WHERE academicyear=? AND section=? AND dept=? AND sem=? AND assessmenttype=? AND degreetype=? ;`,
+      `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.comments from mastertable as t1,${subtype} as t2 where t1.\`Sub Code\`=t2.coursecode AND t1.\`Theory/Lab\`='${subtype}'  AND t2.academicyear=? AND t2.section=? AND t2.dept=? AND t2.sem=? AND t2.assessmenttype=? AND t2.degreetype=? order by t2.coursecode,t2.username ASC;`,
       [academicyear, section, dept, sem, assessmenttype, degree],
       (error, result) => {
+        console.log(error);
         if (result) {
-          console.log(result);
           res.status(200).send(result);
         } else {
           res.status(400).send({ msg: error.message });
