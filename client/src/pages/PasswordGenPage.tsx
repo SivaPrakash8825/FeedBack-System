@@ -11,7 +11,7 @@ const PasswordGenPage = () => {
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
   const [department, setDepartment] = useState("");
-  const [departmentlist, setDepartmentList] = useState("");
+  const [departmentlist, setDepartmentList] = useState<string[]>([]);
   const [semester, setSemester] = useState("");
   const [section, setSection] = useState("");
   const [asstype, setAsstype] = useState("");

@@ -4,7 +4,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
 import useRole from "./store/useRole";
-import { ExcelToJson } from "./components/ExcelToJson";
 import { useState } from "react";
 import Header from "./components/Header";
 import PasswordGenPage from "./pages/PasswordGenPage";
