@@ -636,6 +636,45 @@ app.post("/setMasterData", (req, res) => {
     return res.status(400).send(error.message);
   }
 });
+app.get("/getdeletiondata/:type", (req, res) => {
+  const { type } = req.params;
+  try {
+    db.query(
+      `SELECT dept,sem,section,DATE_FORMAT(STR_TO_DATE(validfrom, '%Y-%m-%dT%H:%i:%s.%fZ'), '%Y-%m-%d')  as validfrom,DATE_FORMAT(STR_TO_DATE(validto, '%Y-%m-%dT%H:%i:%s.%fZ'), '%Y-%m-%d')  as validto , MIN(username) as username FROM ${type.toLowerCase()} GROUP BY dept, sem, validto,section,validfrom;`,
+      (error, result) => {
+        if (error) {
+          res.status(400).send(e);
+        }
+        res.status(200).send(result);
+      }
+    );
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+app.post("/deleterecords", (req, res) => {
+  const { data } = req.body;
+  const val = data.option.split("/");
+  const dept = val[2];
+  const sem = parseInt(val[3]);
+  const section = val[4];
+  try {
+    db.query(
+      `delete from ${data.table} where validto=? AND dept=? AND sem=? AND section=?;`,
+      [val[0], dept, sem, section],
+      (error, result) => {
+        if (error) {
+          console.log(error);
+          res.status(400).send(e);
+        }
+        res.status(200).send(result);
+      }
+    );
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
 
 app.listen(port, () => {
   console.log(`server start listening on ${port}`);

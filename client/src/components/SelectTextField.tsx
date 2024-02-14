@@ -6,7 +6,7 @@ type Props = {
   label?: string;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
-  value: string;
+  value: string ;
   list: string[];
 
   setValue: (val: string) => void;

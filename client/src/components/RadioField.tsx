@@ -4,6 +4,7 @@ type Props = {
   option: string | null;
   index?: number;
   array?: boolean;
+  invisible?: boolean;
 };
 
 const RadioField = ({
@@ -12,6 +13,7 @@ const RadioField = ({
   setOption,
   index,
   array = false,
+  invisible=false,
 }: Props) => {
   return (
     <div
@@ -25,10 +27,10 @@ const RadioField = ({
         >
           {/* Radio  */}
           <div
-            className={`h-4 w-4  rounded-full   ${opt === option ? "border-4  border-gray-700" : "border-2  border-gray-500"}  `}
+            className={`h-4 w-4  rounded-full    ${opt === option ? "border-4  border-gray-700" : "border-2  border-gray-500"}  `}
           />
           {/* Radio Label */}
-          <p className="capitalize">{opt}</p>
+          <p className={`capitalize ${invisible?"sr-only":null}`}>{opt}</p>
         </div>
       ))}
     </div>
