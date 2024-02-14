@@ -559,7 +559,7 @@ app.post("/setDepartments", (req, res) => {
   const { data } = req.body;
   try {
     const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``); // Extracting column names from the first object in the array
-    const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
+    const insertQuery = `REPLACE INTO departments (${columnNames.join(
       ", "
     )}) VALUES ?`;
 

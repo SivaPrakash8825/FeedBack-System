@@ -7,13 +7,13 @@ import generatePdf from "../utils/Generatepdf2";
 import generatePdf1 from "../utils/Generatepdf";
 import useToast from "../store/useToast";
 
-
 const ReportGenPage = () => {
   const setToast = useToast((state) => state.setToast);
   const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
   const [department, setDepartment] = useState("");
+  const [departmentlist, setDepartmentList] = useState<string[]>([]);
   const [semester, setSemester] = useState("");
   const [section, setSection] = useState("");
   const [asstype, setAsstype] = useState("");
@@ -117,13 +117,26 @@ const ReportGenPage = () => {
   //   });
   // };
 
+  const getDepartmentList = async () => {
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_ENDPOINT}/getDepartments`,
+    );
+    let list: string[] = [];
+    for (const val of data) {
+      list = [...list, val.deptsname];
+    }
+    setDepartmentList(list);
+  };
+
   useEffect(() => {
     const curYear = new Date().getFullYear();
     const years = [];
     for (let i = curYear - 5; i < curYear + 2; i++) {
       years.push(`${i}-${(i + 1) % 100}`);
     }
+
     setAcademicyearlist(years);
+    getDepartmentList();
   }, []);
 
   // useEffect(() => {
@@ -156,21 +169,7 @@ const ReportGenPage = () => {
       setValue: setSubtype,
     },
     {
-      list: [
-        "AD",
-        "CS",
-        "EE",
-        "EI",
-        "CI",
-        "BT",
-        "IT",
-        "ME",
-        "MT",
-        "EC",
-        "PT",
-        "PS",
-        "MB",
-      ],
+      list: departmentlist,
       label: "department",
       value: department,
       setValue: setDepartment,
@@ -261,128 +260,132 @@ const ReportGenPage = () => {
 
       // console.log(data);
 
-      if (reporttype == "MarkWise" ) {
+      if (reporttype == "MarkWise") {
         if (data.length) {
           const header = [];
-        const avgheader = [];
-        // const rows: any[] = [];
-        // const avgrows: any[] = [];
-        console.log(data);
+          const avgheader = [];
+          // const rows: any[] = [];
+          // const avgrows: any[] = [];
+          console.log(data);
 
-        header.push(
-          ...Object.keys(data[0]).filter(
-            (val) =>
-              ![
-                "marks",
-                "Staff",
-                "coursecode",
-                "academicyear",
-                "degreetype",
-                "comments",
-                "Sub Name"
-              ].includes(val),
-          ),
-        );
-
-        JSON.parse(data[0].marks).answers.forEach((val: any, index: number) => {
-          header.push(`Q${index + 1}`);
-          avgheader.push(`Q${index + 1}`);
-          // avgrows.push(0);
-        });
-        header.push("Total");
-        avgheader.push("AVG");
-        // avgrows.push(0);
-
-        const parseanswer = (val: any) => {
-          // console.log(JSON.parse(val.marks).answers);
-          const arr: any[] = [];
-          let total = 0;
-          JSON.parse(val.marks).answers.map((mark: number, index: number) => {
-            total += mark;
-            arr[index] = mark;
-            if (JSON.parse(val.marks).answers.length - 1 == index) {
-              arr[index + 1] = total;
-            }
-            // row.push(mark);
-            // if (data.length - 1 == ind) {
-            //   (avgrows[index] = (avgrows[index] + mark) / data.length).toFixed(2);
-            // } else {
-            //   avgrows[index] += mark;
-            // }
-          });
-          return arr;
-          // console.log(arr);
-        };
-        //   {
-        //     "Staff": "Mrs.S.HEMASWATHI",
-        //     "coursecode": "AI2202",
-        //     "comments": [],
-        //     "marks": [],
-        //     "avgheader": [],
-        //     "avgrow": [],
-        //"username":[]
-        // },
-
-        data.forEach((val: any) => {
-          //  console.log(val);
-
-          const key = val.coursecode;
-          if (!allfields[key]) {
-            allfields[key] = {
-              ...val,
-              marks: [[val.username, ...parseanswer(val)]],
-              usercomments: [[val.username, val.comments]],
-            };
-          } else {
-            const usercom = [val.username, val.comments];
-            // Merge comments, marks, avgheader, avgrow if object already exists for this key
-            // allfields[key].marks.push([val.username,...parseanswer(val)])
-            allfields[key].marks.push([val.username, ...parseanswer(val)]);
-            allfields[key].usercomments.push(usercom);
-          }
-        });
-
-        const newallfield = Object.values(allfields);
-        const transpose = (matrix: any[]) => {
-          return matrix[0]
-            .map((_: any, colIndex: number) =>
-              matrix.map((row) => row[colIndex]),
-            )
-            .slice(1);
-        };
-
-        const calculateAverage = (column: any) => {
-          const sum = column.reduce((acc: any, value: any) => acc + value, 0);
-          return (sum / column.length).toFixed(2);
-        };
-        // const newallfield.
-        // console.log(newallfield);
-
-        newallfield.forEach((data: any) => {
-          const transposedData = transpose(data.marks);
-
-          // Calculate average for each column
-          const columnAverages = transposedData.map((column: any) =>
-            calculateAverage(column),
+          header.push(
+            ...Object.keys(data[0]).filter(
+              (val) =>
+                ![
+                  "marks",
+                  "Staff",
+                  "coursecode",
+                  "academicyear",
+                  "degreetype",
+                  "comments",
+                  "Sub Name",
+                ].includes(val),
+            ),
           );
 
-          data.avgrow = columnAverages;
-        });
-       
-        generatePdf1(
-          header,
-          newallfield,
-          reporttype,
-          department,
-          academicyr,
-          parseInt(semester),
-          subtype,
-          section,
-          avgheader,
-        );
+          JSON.parse(data[0].marks).answers.forEach(
+            (val: any, index: number) => {
+              header.push(`Q${index + 1}`);
+              avgheader.push(`Q${index + 1}`);
+              // avgrows.push(0);
+            },
+          );
+          header.push("Total");
+          avgheader.push("AVG");
+          // avgrows.push(0);
+
+          const parseanswer = (val: any) => {
+            // console.log(JSON.parse(val.marks).answers);
+            const arr: any[] = [];
+            let total = 0;
+            JSON.parse(val.marks).answers.map((mark: number, index: number) => {
+              total += mark;
+              arr[index] = mark;
+              if (JSON.parse(val.marks).answers.length - 1 == index) {
+                arr[index + 1] = total;
+              }
+              // row.push(mark);
+              // if (data.length - 1 == ind) {
+              //   (avgrows[index] = (avgrows[index] + mark) / data.length).toFixed(2);
+              // } else {
+              //   avgrows[index] += mark;
+              // }
+            });
+            return arr;
+            // console.log(arr);
+          };
+          //   {
+          //     "Staff": "Mrs.S.HEMASWATHI",
+          //     "coursecode": "AI2202",
+          //     "comments": [],
+          //     "marks": [],
+          //     "avgheader": [],
+          //     "avgrow": [],
+          //"username":[]
+          // },
+
+          data.forEach((val: any) => {
+            //  console.log(val);
+
+            const key = val.coursecode;
+            if (!allfields[key]) {
+              allfields[key] = {
+                ...val,
+                marks: [[val.username, ...parseanswer(val)]],
+                usercomments: [[val.username, val.comments]],
+              };
+            } else {
+              const usercom = [val.username, val.comments];
+              // Merge comments, marks, avgheader, avgrow if object already exists for this key
+              // allfields[key].marks.push([val.username,...parseanswer(val)])
+              allfields[key].marks.push([val.username, ...parseanswer(val)]);
+              allfields[key].usercomments.push(usercom);
+            }
+          });
+
+          const newallfield = Object.values(allfields);
+          const transpose = (matrix: any[]) => {
+            return matrix[0]
+              .map((_: any, colIndex: number) =>
+                matrix.map((row) => row[colIndex]),
+              )
+              .slice(1);
+          };
+
+          const calculateAverage = (column: any) => {
+            const sum = column.reduce((acc: any, value: any) => acc + value, 0);
+            return (sum / column.length).toFixed(2);
+          };
+          // const newallfield.
+          // console.log(newallfield);
+
+          newallfield.forEach((data: any) => {
+            const transposedData = transpose(data.marks);
+
+            // Calculate average for each column
+            const columnAverages = transposedData.map((column: any) =>
+              calculateAverage(column),
+            );
+
+            data.avgrow = columnAverages;
+          });
+
+          generatePdf1(
+            header,
+            newallfield,
+            reporttype,
+            department,
+            academicyr,
+            parseInt(semester),
+            subtype,
+            section,
+            avgheader,
+          );
         } else {
           setToast({
-            msg: "No Data!!",variant:"error"})
+            msg: "No Data!!",
+            variant: "error",
+          });
         }
       } else {
         GenerateSubjectWisePdf(data);
