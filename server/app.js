@@ -492,6 +492,7 @@ app.post("/getCourses", (req, res) => {
       (err, result) => {
         if (err) {
           console.log(err);
+          // db.query("SELECT * FROM mastertable WHERE `Sub Code` not in (SELECT coursecode from infra where )");
           return res.status(400).send(err.message);
         }
         if (result.length != 0) {
@@ -557,16 +558,18 @@ app.get("/getDepartments", (req, res) => {
 app.post("/setDepartments", (req, res) => {
   const { data } = req.body;
   try {
-    const values = data
-      .map(({ id, dept, deptname }) => `(${id},'${dept}','${deptname}')`)
-      .join(",");
+    const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``); // Extracting column names from the first object in the array
+    const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
+      ", "
+    )}) VALUES ?`;
 
-    console.log(values);
+    // console.log(colomnNames);
 
-    const query = `REPLACE INTO departments (id,dept, deptname) VALUES ${values};`;
+    // Extract values from the data object
+    const values = data.map((entry) => Object.values(entry));
 
     db.query(`TRUNCATE TABLE departments`);
-    db.query(query, (error, results) => {
+    db.query(insertQuery, [values], (error, results) => {
       if (error) {
         return res.status(400).send(error.message);
       } else {
