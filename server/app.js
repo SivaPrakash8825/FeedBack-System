@@ -627,15 +627,27 @@ app.post("/setMasterData", (req, res) => {
 app.get("/getdeletiondata/:type", (req, res) => {
   const { type } = req.params;
   try {
-    db.query(
-      `SELECT dept,sem,section,DATE_FORMAT(STR_TO_DATE(validfrom, '%Y-%m-%dT%H:%i:%s.%fZ'), '%Y-%m-%d')  as validfrom,DATE_FORMAT(STR_TO_DATE(validto, '%Y-%m-%dT%H:%i:%s.%fZ'), '%Y-%m-%d')  as validto , MIN(username) as username FROM ${type.toLowerCase()} GROUP BY dept, sem, validto,section,validfrom;`,
-      (error, result) => {
-        if (error) {
-          res.status(400).send(e);
+    if (type == "Feedbacklogin") {
+      db.query(
+        `SELECT DISTINCT DATE_FORMAT(STR_TO_DATE(validto, '%Y-%m-%dT%H:%i:%s.%fZ'), '%Y-%m-%d')  as validto  FROM ${type.toLowerCase()} WHERE CURDATE()>DATE_FORMAT(STR_TO_DATE(validto, '%Y-%m-%dT%H:%i:%s.%fZ'), '%Y-%m-%d')`,
+        (error, result) => {
+          if (error) {
+            res.status(400).send(error);
+          }
+          res.status(200).send(result);
         }
-        res.status(200).send(result);
-      }
-    );
+      );
+    } else {
+      db.query(
+        `select assessmenttype,academicyear,dept,sem,section from ${type} group by dept,sem,section,academicyear,assessmenttype;`,
+        (error, result) => {
+          if (error) {
+            res.status(400).send(error);
+          }
+          res.status(200).send(result);
+        }
+      );
+    }
   } catch (e) {
     res.status(400).send(e);
   }
@@ -643,22 +655,37 @@ app.get("/getdeletiondata/:type", (req, res) => {
 
 app.post("/deleterecords", (req, res) => {
   const { data } = req.body;
-  const val = data.option.split("/");
-  const dept = val[2];
-  const sem = parseInt(val[3]);
-  const section = val[4];
+
   try {
-    db.query(
-      `delete from ${data.table} where validto=? AND dept=? AND sem=? AND section=?;`,
-      [val[0], dept, sem, section],
-      (error, result) => {
-        if (error) {
-          console.log(error);
-          res.status(400).send(e);
+    if (data.table == "Feedbacklogin") {
+      db.query(
+        `delete from ${data.table} where CURDATE()>validto`,
+        (error, result) => {
+          if (error) {
+            console.log(error);
+            res.status(400).send(e);
+          }
+          res.status(200).send(result);
         }
-        res.status(200).send(result);
-      }
-    );
+      );
+    } else {
+      const val = data.option.split("/");
+      const academicyear = val[1];
+      const dept = val[2];
+      const sem = parseInt(val[3]);
+      const section = val[4];
+      db.query(
+        `delete from ${data.table} where assessmenttype=? AND academicyear=? AND dept=? AND sem=? AND section=?;`,
+        [val[0], academicyear, dept, sem, section],
+        (error, result) => {
+          if (error) {
+            console.log(error);
+            res.status(400).send(e);
+          }
+          res.status(200).send(result);
+        }
+      );
+    }
   } catch (e) {
     res.status(400).send(e);
   }

@@ -44,10 +44,10 @@ const Generatepdf2 = (
     pdf.text(text1, pdfWidth / 2, 57, { align: "center" });
     pdf.setFontSize(13);
     pdf.text(text2, pdfWidth / 2, 66, { align: "center" });
-    pdf.setFontSize(8);
-    pdf.text(text3, 40, 76, { align: "center" });
+    pdf.setFontSize(10);
+    pdf.text(text3, 50, 76, { align: "center" });
     pdf.text(text4, pdfWidth / 2, 76, { align: "right" });
-    pdf.text(text5, pdfWidth - 30, 76, { align: "right" });
+    pdf.text(text5, pdfWidth - 20, 76, { align: "right" });
 
     // Set table properties
     const startY = 85;
@@ -79,7 +79,7 @@ const Generatepdf2 = (
     index != 0 ? pdf.addPage() : null;
     // const semType = semester % 2 == 0 ? "EVEN" : "ODD";
     pdf.setFont("helvetica", "normal");
-    console.log(data);
+    
 
     const pdfWidth = pdf.internal.pageSize.getWidth();
     // Set your image width
@@ -139,7 +139,7 @@ const Generatepdf2 = (
     createTable(["username", "comments"], data.usercomments,data.Staff,data[`Sub Name`],data.coursecode);
   }
   // Save the PDF with a specific filename
-  pdf.save("table.pdf");
+  pdf.save(`${department}_sem${semester}_sec${section}.pdf`);
 };
 
 export default Generatepdf2;

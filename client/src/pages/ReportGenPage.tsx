@@ -7,9 +7,9 @@ import generatePdf from "../utils/Generatepdf2";
 import generatePdf1 from "../utils/Generatepdf";
 import useToast from "../store/useToast";
 
-const ReportGenPage = () => {
+const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
   const setToast = useToast((state) => state.setToast);
-  const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
+  
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
   const [department, setDepartment] = useState("");
@@ -90,7 +90,7 @@ const ReportGenPage = () => {
     generatePdf(
       header,
       rows,
-      reporttype,
+      reporttype.replace(/\s+/g, ''),
       department,
       academicyr,
       parseInt(semester),
@@ -129,13 +129,7 @@ const ReportGenPage = () => {
   };
 
   useEffect(() => {
-    const curYear = new Date().getFullYear();
-    const years = [];
-    for (let i = curYear - 5; i < curYear + 2; i++) {
-      years.push(`${i}-${(i + 1) % 100}`);
-    }
-
-    setAcademicyearlist(years);
+    
     getDepartmentList();
   }, []);
 
@@ -196,7 +190,7 @@ const ReportGenPage = () => {
       label: "report type",
       value: reporttype,
       setValue: setReporttype,
-      list: ["MarkWise", "subjectwise"],
+      list: ["Mark wise", "subject wise"],
     },
     // {
     //   list: subcodelist,
@@ -222,7 +216,9 @@ const ReportGenPage = () => {
   const fetchData = async () => {
     try {
       const apiType =
-        reporttype == "MarkWise" ? "generateReport" : "generateReportSubject";
+        reporttype.replace(/\s+/g, '').toLowerCase().trim() == "markwise" ? "generateReport" : "generateReportSubject";
+      
+      
       const { data } = await axios.post(
         `${import.meta.env.VITE_ENDPOINT}/${apiType}`,
         {
@@ -260,7 +256,7 @@ const ReportGenPage = () => {
 
       // console.log(data);
 
-      if (reporttype == "MarkWise") {
+      if (reporttype.replace(/\s+/g, '').toLowerCase().trim() == "markwise") {
         if (data.length) {
           const header = [];
           const avgheader = [];
