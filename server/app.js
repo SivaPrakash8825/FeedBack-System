@@ -539,7 +539,6 @@ app.post("/getcoursecode", (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 // get department data
 app.get("/getDepartments", (req, res) => {
   try {
@@ -620,7 +619,8 @@ app.post("/setMasterData", (req, res) => {
   } catch (error) {
     console.log(error.message);
     return res.status(400).send(error.message);
-=======
+  }
+});
 app.get("/getdeletiondata/:type", (req, res) => {
   const { type } = req.params;
   try {
@@ -658,7 +658,6 @@ app.post("/deleterecords", (req, res) => {
     );
   } catch (e) {
     res.status(400).send(e);
->>>>>>> b498384fef10ec5c33a99ab2886817c642322e6f
   }
 });
 
