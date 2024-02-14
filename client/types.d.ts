@@ -11,18 +11,18 @@ export interface Question {
 }
 
 export interface Course {
-  "Academic yr": string;
-  Dept: string;
-  "UG/PG": string;
-  "Theory/Lab": string;
-  Semester: number;
-  Section: string;
+  "Academic yr"?: string;
+  Dept?: string;
+  "UG/PG"?: string;
+  "Theory/Lab"?: string;
+  Semester?: number;
+  Section?: string;
   "Sub Code": string;
   "Sub Name": string;
   Staff: string;
-  "StaffParent Dept": string;
-  "Open Elective/Regular/Core Elective": string;
-  "Sub Grouping": string;
+  "StaffParent Dept"?: string;
+  "Open Elective/Regular/Core Elective"?: string;
+  "Sub Grouping"?: string;
 }
 
 export interface UserDetails {
