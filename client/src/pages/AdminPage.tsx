@@ -10,8 +10,13 @@ const AdminPage = () => {
           link="/admin/reportgenerate"
         />
         <Card icon="🔐" title="Generate Login" link="/admin/generate" />
+<<<<<<< HEAD
         <Card icon="🗃️" title="Update Data" link="/admin/update" />
         <Card icon="🗑️" title="Delete Data" link="" />
+=======
+        <Card icon="🗃️" title="Update Data" link="" />
+        <Card icon="🗑️" title="Delete Data" link="/admin/delete" />
+>>>>>>> b498384fef10ec5c33a99ab2886817c642322e6f
       </div>
     </section>
   );

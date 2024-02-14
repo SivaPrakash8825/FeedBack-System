@@ -13,7 +13,11 @@ import FeedbackHomePage from "./pages/FeedbackHomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ForAuth from "./components/ForAuth";
 import Toast from "./components/Toast";
+<<<<<<< HEAD
 import UpdatePage from "./pages/UpdatePage";
+=======
+import DeletionPage from "./pages/DeletionPage";
+>>>>>>> b498384fef10ec5c33a99ab2886817c642322e6f
 
 function App() {
   const role = useRole((state) => state.role);
@@ -69,7 +73,15 @@ function App() {
             }
             path="/admin/generate"
           />
-
+          {/* Table data deletion page */}
+<Route
+            element={
+              <ProtectedRoute shouldBeAdmin>
+                <DeletionPage/>
+              </ProtectedRoute>
+            }
+            path="/admin/delete"
+          />
           {/* Report generate page */}
           <Route
             path="/admin/reportgenerate"
