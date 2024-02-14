@@ -359,18 +359,33 @@ app.post("/generateReport", (req, res) => {
     subtype,
   } = req.body;
   if (password == "Kcet@") {
-    db.query(
-      `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.comments from mastertable as t1,${subtype} as t2 where t1.\`Sub Code\`=t2.coursecode AND t1.\`Theory/Lab\`='${subtype}'  AND t2.academicyear=? AND t2.section=? AND t2.dept=? AND t2.sem=? AND t2.assessmenttype=? AND t2.degreetype=? order by t2.coursecode,t2.username ASC;`,
-      [academicyear, section, dept, sem, assessmenttype, degree],
-      (error, result) => {
-        console.log(error);
-        if (result) {
-          res.status(200).send(result);
-        } else {
-          res.status(400).send({ msg: error.message });
+    if (subtype == "infra") {
+      db.query(
+        `select * from infra`,
+        [academicyear, section, dept, sem, assessmenttype, degree],
+        (error, result) => {
+          console.log(error);
+          if (result) {
+            res.status(200).send(result);
+          } else {
+            res.status(400).send({ msg: error.message });
+          }
         }
-      }
-    );
+      );
+    } else {
+      db.query(
+        `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.comments from mastertable as t1,${subtype} as t2 where t1.\`Sub Code\`=t2.coursecode AND t1.\`Theory/Lab\`='${subtype}'  AND t2.academicyear=? AND t2.section=? AND t2.dept=? AND t2.sem=? AND t2.assessmenttype=? AND t2.degreetype=? order by t2.coursecode,t2.username ASC;`,
+        [academicyear, section, dept, sem, assessmenttype, degree],
+        (error, result) => {
+          console.log(error);
+          if (result) {
+            res.status(200).send(result);
+          } else {
+            res.status(400).send({ msg: error.message });
+          }
+        }
+      );
+    }
   } else {
     res.status(200).send({
       msg: "invalid password",

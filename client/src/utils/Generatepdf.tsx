@@ -5,7 +5,7 @@ import { DepartmentName } from "./Constants";
 
 const Generatepdf2 = (
   header: string[],
-  rows:Array<any> ,
+  rows: Array<any>,
   type: string,
   department: string,
   academicyr: string,
@@ -16,7 +16,13 @@ const Generatepdf2 = (
 ) => {
   const pdf = new jsPDF("landscape");
 
-  const createTable = (header:string[], marks:Array<any>, staffname:string,subname:string,coursecode:string) => {
+  const createTable = (
+    header: string[],
+    marks: Array<any>,
+    staffname: string,
+    subname: string,
+    coursecode: string,
+  ) => {
     const semType = semester % 2 == 0 ? "FINAL" : "MID";
     pdf.setFont("helvetica", "normal");
 
@@ -30,31 +36,36 @@ const Generatepdf2 = (
     const maxWidth = pdfWidth - 20; // Adjust the maximum width as needed
     const text = `Department of ${DepartmentName[department]}`;
     const text1 = `Academic Year : ${academicyr} ${semType} Semester`;
-    const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUBJECTS FOR SUB CODE - ${coursecode} SEM - ${semester} SECTION - ${section} `;
+    const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUBJECTS FOR SUB CODE - ${coursecode} SEM - ${semester} SECTION - ${section}`;
     const text3 = `Academic Year:${academicyr} ${semester % 2 == 0 ? "ODD" : "EVEN"}-SEM `;
     const text4 = `Faculty Name : ${staffname}`;
     const text5 = `Course Name : ${subname}`;
     // const text1 = "test";
-    const lines = pdf.splitTextToSize(text, maxWidth);
+    const lines1 = pdf.splitTextToSize(text1, maxWidth);
+    const lines2 = pdf.splitTextToSize(text2, maxWidth);
+    // const lines3 = pdf.splitTextToSize(text3, maxWidth);
 
     pdf.setFontSize(12);
-    pdf.text(lines, pdfWidth / 2, 50, { align: "center" });
+    pdf.text(text, pdfWidth / 2, 50, { align: "center" });
     // Define table headers
     pdf.setFontSize(13);
-    pdf.text(text1, pdfWidth / 2, 57, { align: "center" });
-    pdf.setFontSize(13);
-    pdf.text(text2, pdfWidth / 2, 66, { align: "center" });
+    pdf.text(text3, pdfWidth / 2, 59, { align: "center" });
+    pdf.setFontSize(14);
+    pdf.text(lines2, pdfWidth / 2, 66, { align: "center" });
     pdf.setFontSize(8);
-    pdf.text(text3, 40, 76, { align: "center" });
-    pdf.text(text4, pdfWidth / 2, 76, { align: "right" });
-    pdf.text(text5, pdfWidth - 30, 76, { align: "right" });
+    pdf.text(text3, 40, 79, { align: "center" });
+    pdf.text(text4, pdfWidth / 2, 79, { align: "right" });
+    pdf.text(text5, pdfWidth - 30, 79, { align: "right" });
 
     // Set table properties
     const startY = 85;
-    
-    const columnstyle:any=header.length == 2 ? ( {
-      0: { cellWidth: 50 }
-    }): {auto:{ cellWidth: 'auto' }};
+
+    const columnstyle: any =
+      header.length == 2
+        ? {
+            0: { cellWidth: 50 },
+          }
+        : { auto: { cellWidth: "auto" } };
     const tableProps: UserOptions = {
       startY,
       head: [header],
@@ -67,7 +78,7 @@ const Generatepdf2 = (
         valign: "middle",
         halign: "center",
       },
-      columnStyles:columnstyle,
+      columnStyles: columnstyle,
       headStyles: {
         fillColor: "black",
       },
@@ -91,9 +102,16 @@ const Generatepdf2 = (
     //   const rowss = [["Row 1, Cell 1", "Row 1, Cell 2", "Row 1, Cell 3"]];
 
     // Set font size and style
-    createTable(header, data.marks, data.Staff,data[`Sub Name`],data.coursecode);
+    createTable(
+      header,
+      data.marks,
+      data.Staff,
+      data[`Sub Name`],
+      data.coursecode,
+    );
 
     if (avgheader) {
+      // @ts-ignore
       const startYFirstTable = pdf.lastAutoTable.finalY + 20;
       //   const estimatedFirstTableHeight = (rows.length + 1) * 10; // Assuming each row height is 10
       if (startYFirstTable) {
@@ -128,6 +146,7 @@ const Generatepdf2 = (
         pdf.text(
           `HOD/${department}`,
           pdfWidth - 20,
+          // @ts-ignore
           pdf.lastAutoTable.finalY + 20,
           {
             align: "right",
@@ -136,7 +155,13 @@ const Generatepdf2 = (
       }
     }
     pdf.addPage();
-    createTable(["username", "comments"], data.usercomments,data.Staff,data[`Sub Name`],data.coursecode);
+    createTable(
+      ["username", "comments"],
+      data.usercomments,
+      data.Staff,
+      data[`Sub Name`],
+      data.coursecode,
+    );
   }
   // Save the PDF with a specific filename
   pdf.save("table.pdf");
