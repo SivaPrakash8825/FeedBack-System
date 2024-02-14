@@ -13,6 +13,7 @@ import FeedbackHomePage from "./pages/FeedbackHomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ForAuth from "./components/ForAuth";
 import Toast from "./components/Toast";
+import DeletionPage from "./pages/DeletionPage";
 import UpdatePage from "./pages/UpdatePage";
 
 function App() {
@@ -69,7 +70,15 @@ function App() {
             }
             path="/admin/generate"
           />
-
+          {/* Table data deletion page */}
+          <Route
+            element={
+              <ProtectedRoute shouldBeAdmin>
+                <DeletionPage />
+              </ProtectedRoute>
+            }
+            path="/admin/delete"
+          />
           {/* Report generate page */}
           <Route
             path="/admin/reportgenerate"
@@ -91,14 +100,14 @@ function App() {
           />
 
           {/* Dummy */}
-          <Route
+          {/* <Route
             element={
               <>
                 <ExcelToJson />
               </>
             }
             path="/dummy"
-          />
+          /> */}
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

@@ -174,7 +174,7 @@ createTheorytable();
 const createDepartmentTable = () => {
   try {
     db.query(
-      "CREATE TABLE IF NOT EXISTS `departments` (`id` int NOT NULL,`dept` varchar(10) NOT NULL,`deptname` varchar(45) NOT NULL,PRIMARY KEY (`dept`,`deptname`));",
+      "CREATE TABLE `departments` (`deptid` int NOT NULL,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptsname`,`deptname`))",
       (err, res) => {
         if (err) {
           console.log(err);

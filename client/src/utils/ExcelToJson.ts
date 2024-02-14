@@ -39,11 +39,13 @@ export const ExcelToJson = (
     const jsonResult = XLSX.utils.sheet_to_json(sheet, { header: 1 });
     // Assuming first row as header
     const headers = jsonResult[0];
-    const jsonData = jsonResult.slice(1).map((row: any[]) => {
+    const jsonData = jsonResult.slice(1).map((row) => {
       const obj: { [key: string]: any } = {};
       row.forEach((cellValue, index) => {
         const header = headers[index];
-        obj[header] = cellValue;
+        // Check if cellValue is undefined or null, then replace with empty space
+        obj[header] =
+          cellValue === undefined || cellValue === null ? "null" : cellValue;
       });
       return obj;
     });

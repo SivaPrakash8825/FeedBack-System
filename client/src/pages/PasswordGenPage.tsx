@@ -11,6 +11,7 @@ const PasswordGenPage = () => {
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
   const [department, setDepartment] = useState("");
+  const [departmentlist, setDepartmentList] = useState("");
   const [semester, setSemester] = useState("");
   const [section, setSection] = useState("");
   const [asstype, setAsstype] = useState("");
@@ -23,6 +24,17 @@ const PasswordGenPage = () => {
   const setToast = useToast((state) => state.setToast);
   const [loading, setLoading] = useState(false);
 
+  const getDepartmentList = async () => {
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_ENDPOINT}/getDepartments`,
+    );
+    let list: string[] = [];
+    for (const val of data) {
+      list = [...list, val.deptsname];
+    }
+    setDepartmentList(list);
+  };
+
   useEffect(() => {
     const curYear = new Date().getFullYear();
     const years = [];
@@ -30,6 +42,7 @@ const PasswordGenPage = () => {
       years.push(`${i}-${(i + 1) % 100}`);
     }
     setAcademicyearlist(years);
+    getDepartmentList();
   }, []);
 
   const value = [
@@ -46,21 +59,7 @@ const PasswordGenPage = () => {
       setValue: setGraduation,
     },
     {
-      list: [
-        "AD",
-        "CS",
-        "EE",
-        "EI",
-        "CI",
-        "BT",
-        "IT",
-        "ME",
-        "MT",
-        "EC",
-        "PT",
-        "PS",
-        "MB",
-      ],
+      list: departmentlist,
       label: "department",
       value: department,
       setValue: setDepartment,
