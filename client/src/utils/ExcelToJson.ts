@@ -51,7 +51,7 @@ export const ExcelToJson = (
     });
     //   setJsonData(jsonData);
     console.log(jsonData);
-    // setDataIntoDb(jsonData, apiType);
+    setDataIntoDb(jsonData, apiType);
     // }
   };
 

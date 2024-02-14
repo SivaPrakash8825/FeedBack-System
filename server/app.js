@@ -492,25 +492,37 @@ app.post("/getCourses", (req, res) => {
       (err, result) => {
         if (err) {
           console.log(err);
-          // db.query("SELECT * FROM mastertable WHERE `Sub Code` not in (SELECT coursecode from infra where )");
+
           return res.status(400).send(err.message);
         }
-        if (result.length != 0) {
-          // console.log(result);
-          return res.status(200).send({
-            courses: result,
-            academicyr,
-            dept,
-            degree,
-            sem,
-            section,
-            year,
-            username,
-          });
-        } else {
-          console.log("Data Not Found!");
-          return res.status(200).send("Data Not Found!");
-        }
+
+        db.query(
+          "SELECT * FROM mastertable WHERE `Theory/Lab` = 'Infra' and `Sub Code` not in (SELECT coursecode from infra where username = ?);",
+          [username],
+          (errr, ress) => {
+            if (errr) return res.status(400).send(err.message);
+            console.log(ress);
+            // ret  res.status(200).send(ress)
+            if (ress.length != 0 || result.length != 0) {
+              return res.status(200).send({
+                courses: [...result, ...ress],
+                academicyr,
+                dept,
+                degree,
+                sem,
+                section,
+                year,
+                username,
+              });
+            } else {
+              console.log("Data Not Found!");
+              return res.status(200).send("Data Not Found!");
+            }
+          }
+        );
+        // console.log(result);
+
+        // console.log("Data Not Found!");
       }
     );
   } catch (error) {
@@ -559,7 +571,7 @@ app.post("/setDepartments", (req, res) => {
   const { data } = req.body;
   try {
     const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``); // Extracting column names from the first object in the array
-    const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
+    const insertQuery = `REPLACE INTO departments (${columnNames.join(
       ", "
     )}) VALUES ?`;
 
