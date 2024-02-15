@@ -3,7 +3,7 @@ dotenv.config({
   path: "./.env",
 });
 const db = require("./db");
-const { masterTableData, questions } = require("./constants");
+const { masterTableData, questions, departments } = require("./constants");
 
 // Create Table questions & insert questions to it.
 const createQuestions = () => {
@@ -174,12 +174,27 @@ createTheorytable();
 const createDepartmentTable = () => {
   try {
     db.query(
-      "CREATE TABLE `departments` (`deptid` int NOT NULL,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptsname`,`deptname`))",
+      "CREATE TABLE IF NOT EXISTS `departments` (`deptid` int NOT NULL,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptsname`,`deptname`))",
       (err, res) => {
-        if (err) {
-          console.log(err);
+        if (!err) {
+          // Add Questions to table
+          const values = departments
+            .map(
+              ({ deptid, deptsname, deptname, deptfullname }) =>
+                `(${deptid},'${deptsname}','${deptname}','${deptfullname}')`
+            )
+            .join(",");
+          const query = `REPLACE INTO departments (deptid, deptsname, deptname, deptfullname) VALUES ${values}`;
+
+          db.query(query, (error, results) => {
+            if (error) {
+              console.log(error.message);
+            } else {
+              console.log("Departments Table Created & Departments Added");
+            }
+          });
         } else {
-          console.log("Department table created");
+          console.log(err.message);
         }
       }
     );
@@ -189,3 +204,22 @@ const createDepartmentTable = () => {
 };
 
 createDepartmentTable();
+
+const createInfratable = () => {
+  try {
+    db.query(
+      "CREATE TABLE IF NOT EXISTS `feedback`.`infra` (`username` VARCHAR(30) NOT NULL,`coursecode` VARCHAR(45) NOT NULL,`academicyear` VARCHAR(10) NULL,`section` VARCHAR(45) NOT NULL,`dept` VARCHAR(45) NOT NULL,`sem` INT NOT NULL,`assessmenttype` varchar(10) NOT NULL,`degreetype` VARCHAR(5) NULL,`marks` TEXT NULL,`comments` VARCHAR(400) NULL, PRIMARY KEY (`username`, `coursecode`, `section`, `dept`, `sem`));",
+      (err, res) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Infra table created");
+        }
+      }
+    );
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+createInfratable();

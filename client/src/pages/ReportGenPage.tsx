@@ -7,9 +7,13 @@ import generatePdf from "../utils/Generatepdf2";
 import generatePdf1 from "../utils/Generatepdf";
 import useToast from "../store/useToast";
 
-const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
+const ReportGenPage = ({
+  academicyearlist,
+}: {
+  academicyearlist: string[];
+}) => {
   const setToast = useToast((state) => state.setToast);
-  
+
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
   const [department, setDepartment] = useState("");
@@ -79,22 +83,30 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
     );
 
     console.log("data : ", updatedData);
+    if (updatedData.length == 0)
+      return setToast({
+        msg: "No Data!!",
+        variant: "error",
+      });
     const header = [...Object.keys(updatedData[0])];
     const rows = updatedData.map(
       (item: { [s: string]: unknown } | ArrayLike<unknown>) =>
         Object.values(item),
     );
-   
-    generatePdf(
+    // console.log(header);
+    // console.log(rows);
+    console.log([rows, rows]);
+    const status = generatePdf(
       header,
       rows,
-      reporttype.replace(/\s+/g, ''),
+      reporttype.replace(/\s+/g, ""),
       department,
       academicyr,
       parseInt(semester),
       subtype,
       section,
     );
+    return setToast(status);
   };
 
   // const fetchCourseCode = async () => {
@@ -127,7 +139,6 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
   };
 
   useEffect(() => {
-    
     getDepartmentList();
   }, []);
 
@@ -214,9 +225,10 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
   const fetchData = async () => {
     try {
       const apiType =
-        reporttype.replace(/\s+/g, '').toLowerCase().trim() == "markwise" ? "generateReport" : "generateReportSubject";
-      
-      
+        reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise"
+          ? "generateReport"
+          : "generateReportSubject";
+
       const { data } = await axios.post(
         `${import.meta.env.VITE_ENDPOINT}/${apiType}`,
         {
@@ -246,11 +258,18 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
 
     //
     // }]
-    const isAnyEmpty = subtype != "infra" ? value.some((item) => item.value == "" || 0) : academicyr != "" ? false : true;
+    const isAnyEmpty =
+      subtype != "infra"
+        ? value.some((item) => item.value == "" || 0)
+        : academicyr != ""
+          ? false
+          : true;
     if (subtype == "infra") {
-      setReporttype("markwise")
+      console.log("infra");
+
+      setReporttype("markwise");
     }
-    
+
     if (isAnyEmpty) {
       alert("fill the details");
     } else {
@@ -258,15 +277,16 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
 
       // console.log(data);
 
-      if (reporttype.replace(/\s+/g, '').toLowerCase().trim() == "markwise") {
+      if (reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise") {
         if (data.length) {
           const header = [];
           const avgheader = [];
           // const rows: any[] = [];
           // const avgrows: any[] = [];
-          console.log(data);
 
-          if (subtype == "infra") {
+          if (subtype.toLowerCase() == "infra") {
+            console.log("adsffasd");
+
             header.push(
               ...Object.keys(data[0]).filter(
                 (val) =>
@@ -279,7 +299,9 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
                     "comments",
                     "Sub Name",
                     "dept",
-
+                    "section",
+                    "sem",
+                    "assessmenttype",
                   ].includes(val),
               ),
             );
@@ -295,13 +317,11 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
                     "degreetype",
                     "comments",
                     "Sub Name",
-                    "dept"
+                    "dept",
                   ].includes(val),
               ),
             );
           }
-
-          
 
           JSON.parse(data[0].marks).answers.forEach(
             (val: any, index: number) => {
@@ -320,15 +340,11 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
               if (JSON.parse(val.marks).answers.length - 1 == index) {
                 arr[index + 1] = total;
               }
-
             });
             return arr;
-            
           };
           data.forEach((val: any) => {
-           
-
-            const key = subtype=="infra"?val.dept:val.coursecode ;
+            const key = subtype == "infra" ? val.dept : val.coursecode;
             if (!allfields[key]) {
               allfields[key] = {
                 ...val,
@@ -370,7 +386,7 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
             data.avgrow = columnAverages;
           });
 
-          generatePdf1(
+          const status = generatePdf1(
             header,
             newallfield,
             reporttype,
@@ -381,6 +397,7 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
             section,
             avgheader,
           );
+          setToast(status);
         } else {
           setToast({
             msg: "No Data!!",
@@ -401,13 +418,17 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
           <div className="grid grid-cols-2 gap-3">
             {value.map((data, index) => {
               return data.list ? (
-                <div className={`${subtype=="infra" && index>1?"opacity-[0.5] pointer-events-none":null}`}><SelectTextField
-                list={data.list}
-                value={data.value}
-                setValue={data.setValue}
-                label={data.label}
-                key={index}
-              /></div>
+                <div
+                  className={`${subtype == "infra" && index > 1 ? "pointer-events-none opacity-[0.5]" : null}`}
+                >
+                  <SelectTextField
+                    list={data.list}
+                    value={data.value}
+                    setValue={data.setValue}
+                    label={data.label}
+                    key={index}
+                  />
+                </div>
               ) : (
                 <InputTextField
                   key={index}

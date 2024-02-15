@@ -42,7 +42,9 @@ export const JsonToExcelQuestions = (data: QuestionDb[], filename: string) => {
 
     // Generate Excel file and trigger download
     XLSX.writeFile(wb, filename);
+    return { msg: "Questions Sheet Downloaded :)", variant: "success" };
   } catch (error) {
     console.log("convertJsonToSheet Error : ", error.message);
+    return { msg: error.message as string, variant: "error" };
   }
 };

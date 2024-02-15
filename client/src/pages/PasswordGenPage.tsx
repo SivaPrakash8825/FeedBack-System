@@ -138,7 +138,8 @@ const PasswordGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
 
         const fileName = `${getYear[Math.ceil(parseInt(semester) / 2) as 1 | 2 | 3 | 4]}yr_${department}-${section}_feedback.xlsx`;
 
-        generateExcel({ data, fileName });
+        const status = generateExcel({ data, fileName });
+        return setToast(status);
       } catch (err) {
         console.log(err);
       } finally {
