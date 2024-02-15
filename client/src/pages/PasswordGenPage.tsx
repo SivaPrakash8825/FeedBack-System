@@ -6,12 +6,12 @@ import axios from "axios";
 import generateExcel from "../utils/JsonToExcel";
 import useToast from "../store/useToast";
 
-const PasswordGenPage = () => {
-  const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
+const PasswordGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
+  
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
   const [department, setDepartment] = useState("");
-  const [departmentlist, setDepartmentList] = useState("");
+  const [departmentlist, setDepartmentList] = useState<string[]>([]);
   const [semester, setSemester] = useState("");
   const [section, setSection] = useState("");
   const [asstype, setAsstype] = useState("");
@@ -36,12 +36,7 @@ const PasswordGenPage = () => {
   };
 
   useEffect(() => {
-    const curYear = new Date().getFullYear();
-    const years = [];
-    for (let i = curYear - 5; i < curYear + 2; i++) {
-      years.push(`${i}-${(i + 1) % 100}`);
-    }
-    setAcademicyearlist(years);
+    
     getDepartmentList();
   }, []);
 
@@ -77,7 +72,7 @@ const PasswordGenPage = () => {
       setValue: setSection,
     },
     {
-      list: ["pre", "post", "msmg-pre", "msmg-post"],
+      list: ["pre", "post"],
       label: "assignment type",
       value: asstype,
       setValue: setAsstype,

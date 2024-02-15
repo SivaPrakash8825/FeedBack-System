@@ -4,8 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
 import useRole from "./store/useRole";
-import { ExcelToJson } from "./components/ExcelToJson";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import PasswordGenPage from "./pages/PasswordGenPage";
 import ReportGenPage from "./pages/ReportGenPage";
@@ -19,6 +18,17 @@ import UpdatePage from "./pages/UpdatePage";
 function App() {
   const role = useRole((state) => state.role);
   const [username, setUsername] = useState<string>("");
+  const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
+  useEffect(() => {
+    const curYear = new Date().getFullYear();
+    const years = [];
+    for (let i = curYear - 5; i < curYear + 2; i++) {
+      years.push(`${i}-${(i + 1) % 100}`);
+    }
+
+    setAcademicyearlist(years);
+    
+  }, []);
 
   return (
     <>
@@ -65,7 +75,7 @@ function App() {
           <Route
             element={
               <ProtectedRoute shouldBeAdmin>
-                <PasswordGenPage />
+                <PasswordGenPage academicyearlist={academicyearlist} />
               </ProtectedRoute>
             }
             path="/admin/generate"
@@ -74,7 +84,7 @@ function App() {
           <Route
             element={
               <ProtectedRoute shouldBeAdmin>
-                <DeletionPage />
+                <DeletionPage academicyearlist={academicyearlist}/>
               </ProtectedRoute>
             }
             path="/admin/delete"
@@ -84,7 +94,7 @@ function App() {
             path="/admin/reportgenerate"
             element={
               <ProtectedRoute shouldBeAdmin>
-                <ReportGenPage />
+                <ReportGenPage academicyearlist={academicyearlist} />
               </ProtectedRoute>
             }
           />
