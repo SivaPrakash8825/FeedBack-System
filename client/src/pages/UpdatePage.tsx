@@ -3,17 +3,19 @@ import Button from "../components/Button";
 // import JsonToExcel from "../utils/JsonToExcel";
 import { QuestionDb } from "../../types";
 import axios from "axios";
-import { JsonToExcelQuestions } from "../utils/JsonToExcelQuestion";
+// import { JsonToExcelQuestions } from "../utils/JsonToExcelQuestion";
 import SelectTextField from "../components/SelectTextField";
-import { ExcelToJsonQuestions } from "../utils/ExcelToJsonQuestions";
 import JsonToExcel from "../utils/JsonToExcel";
-import { ExcelToJson } from "../utils/ExcelToJson";
 import useToast from "../store/useToast";
+import useExcelToJson from "../hooks/useExcelToJson";
+import useJsonToExcel from "../hooks/useJsonToExcel";
 
 type Props = {};
 
 const UpdatePage = (props: Props) => {
-  const setToast = useToast((state) => state.setToast);
+  const { ExcelToJson, ExcelToJsonQuestions } = useExcelToJson();
+  const { JsonToExcel, JsonToExcelQuestions } = useJsonToExcel();
+  // const setToast = useToast((state) => state.setToast);
   const deptmentFileRef = useRef<HTMLInputElement>(null);
   const questionFileRef = useRef<HTMLInputElement>(null);
   const masterFileRef = useRef<HTMLInputElement>(null);
@@ -26,11 +28,7 @@ const UpdatePage = (props: Props) => {
         `${import.meta.env.VITE_ENDPOINT}/getQuestions/${subType}`,
       );
       console.log(data);
-      const status = JsonToExcelQuestions(
-        data,
-        `${subType.toUpperCase()}_QUESTIONS.xlsx`,
-      );
-      setToast(status);
+      JsonToExcelQuestions(data, `${subType.toUpperCase()}_QUESTIONS.xlsx`);
     } catch (error) {
       console.log(error.message);
     }
@@ -42,8 +40,7 @@ const UpdatePage = (props: Props) => {
         `${import.meta.env.VITE_ENDPOINT}/getDepartments`,
       );
       console.log(data);
-      const status = JsonToExcel({ data, fileName: "Departments.xlsx" });
-      setToast(status);
+      JsonToExcel({ data, fileName: "Departments.xlsx" });
     } catch (error) {
       console.log(error.message);
     }
@@ -55,8 +52,7 @@ const UpdatePage = (props: Props) => {
         `${import.meta.env.VITE_ENDPOINT}/getMasterData`,
       );
       console.log(data);
-      const status = JsonToExcel({ data, fileName: "MasterTable.xlsx" });
-      setToast(status);
+      JsonToExcel({ data, fileName: "MasterTable.xlsx" });
     } catch (error) {
       console.log(error.message);
     }
@@ -119,8 +115,7 @@ const UpdatePage = (props: Props) => {
             type="file"
             ref={deptmentFileRef}
             onChange={(e) => {
-              const status = ExcelToJson(e, "setDepartments");
-              // setToast(status);
+              ExcelToJson(e, "setDepartments");
             }}
           />
           <Button

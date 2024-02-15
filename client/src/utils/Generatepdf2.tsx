@@ -2,6 +2,7 @@ import { jsPDF } from "jspdf";
 import autoTable, { UserOptions, RowInput } from "jspdf-autotable";
 import logoImage from "../assets/logo.jpg";
 import { DepartmentName } from "./Constants";
+import { ToastProp } from "../store/useToast";
 
 const Generatepdf2 = (
   header: string[],
@@ -14,7 +15,7 @@ const Generatepdf2 = (
   section: string,
   avgheader?: string[],
   avgrows?: RowInput[],
-) => {
+): ToastProp => {
   try {
     console.log(type);
     const semType = semester % 2 == 0 ? "EVEN" : "ODD";

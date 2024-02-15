@@ -91,15 +91,15 @@ app.post("/setQuestions/:typee", async (req, res) => {
         if (!err) {
           const values = data
             .filter(({ type }) => type == typee)
-            .map(
-              ({ id, type, question }) =>
-                `(${id},'${type}','${JSON.stringify(question)}')`
-            )
-            .join(",");
+            .map(({ id, type, question }) => [
+              id,
+              type,
+              JSON.stringify(question),
+            ]);
 
           // console.log(values);
 
-          const query = `REPLACE INTO questions (id,type,question) VALUES ?;`;
+          const query = `REPLACE INTO questions (id,type,question) VALUES ?`;
           // console.log(query);
           transactionProcess(
             `questions where type = '${typee}'`,
@@ -654,14 +654,15 @@ app.post("/setMasterData", (req, res) => {
     // return res.status(200).send({ values });
 
     // console.log(values);
-    db.query(`TRUNCATE TABLE mastertable`);
-    db.query(insertQuery, [values], (error, results) => {
-      if (error) {
-        return res.status(400).send(error.message);
-      } else {
-        return res.status(200).send("Master Data Inserted :)");
-      }
-    });
+    // db.query(`TRUNCATE TABLE mastertable`);
+    transactionProcess("mastertable", insertQuery, values, res);
+    // db.query(insertQuery, [values], (error, results) => {
+    //   if (error) {
+    //     return res.status(400).send(error.message);
+    //   } else {
+    //     return res.status(200).send("Master Data Inserted :)");
+    //   }
+    // });
   } catch (error) {
     console.log(error.message);
     return res.status(400).send(error.message);
@@ -712,7 +713,7 @@ const transactionProcess = (tablename, insertQuery, insertData, res) => {
     db.beginTransaction((err) => {
       if (err) {
         console.log(err.message);
-        res.status(200).send(err.message);
+        res.status(400).send(err.message);
       }
 
       console.log(`DELETE FROM ${tablename};`);
@@ -721,7 +722,7 @@ const transactionProcess = (tablename, insertQuery, insertData, res) => {
         if (error) {
           return db.rollback(() => {
             console.log(error.message);
-            res.status(200).send(error.message);
+            res.status(400).send(error.message);
           });
         }
 
@@ -732,7 +733,7 @@ const transactionProcess = (tablename, insertQuery, insertData, res) => {
           if (error) {
             return db.rollback(() => {
               console.log(error.message);
-              res.status(200).send(error.message);
+              res.status(400).send(error.message.split(":")[1]);
             });
           }
 
@@ -741,7 +742,7 @@ const transactionProcess = (tablename, insertQuery, insertData, res) => {
             if (err) {
               return db.rollback(() => {
                 console.log(err.message);
-                res.status(200).send(err.message);
+                res.status(400).send(err.message);
               });
             }
             console.log("Transaction successfully completed.");
@@ -751,7 +752,7 @@ const transactionProcess = (tablename, insertQuery, insertData, res) => {
       });
     });
   } catch (error) {
-    console.log(error.message);
+    console.log(error.message.split(":")[1]);
   }
 };
 
