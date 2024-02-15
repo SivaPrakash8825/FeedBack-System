@@ -264,34 +264,52 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
           // const avgrows: any[] = [];
           console.log(data);
 
-          header.push(
-            ...Object.keys(data[0]).filter(
-              (val) =>
-                ![
-                  "marks",
-                  "Staff",
-                  "coursecode",
-                  "academicyear",
-                  "degreetype",
-                  "comments",
-                  "Sub Name",
-                ].includes(val),
-            ),
-          );
+          if (subtype == "infra") {
+            header.push(
+              ...Object.keys(data[0]).filter(
+                (val) =>
+                  ![
+                    "marks",
+                    "Staff",
+                    "coursecode",
+                    "academicyear",
+                    "degreetype",
+                    "comments",
+                    "Sub Name",
+                    "dept",
+
+                  ].includes(val),
+              ),
+            );
+          } else {
+            header.push(
+              ...Object.keys(data[0]).filter(
+                (val) =>
+                  ![
+                    "marks",
+                    "Staff",
+                    "coursecode",
+                    "academicyear",
+                    "degreetype",
+                    "comments",
+                    "Sub Name",
+                    "dept"
+                  ].includes(val),
+              ),
+            );
+          }
+
+          
 
           JSON.parse(data[0].marks).answers.forEach(
             (val: any, index: number) => {
               header.push(`Q${index + 1}`);
               avgheader.push(`Q${index + 1}`);
-              // avgrows.push(0);
             },
           );
           header.push("Total");
           avgheader.push("AVG");
-          // avgrows.push(0);
-
           const parseanswer = (val: any) => {
-            // console.log(JSON.parse(val.marks).answers);
             const arr: any[] = [];
             let total = 0;
             JSON.parse(val.marks).answers.map((mark: number, index: number) => {
@@ -300,30 +318,15 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
               if (JSON.parse(val.marks).answers.length - 1 == index) {
                 arr[index + 1] = total;
               }
-              // row.push(mark);
-              // if (data.length - 1 == ind) {
-              //   (avgrows[index] = (avgrows[index] + mark) / data.length).toFixed(2);
-              // } else {
-              //   avgrows[index] += mark;
-              // }
+
             });
             return arr;
-            // console.log(arr);
+            
           };
-          //   {
-          //     "Staff": "Mrs.S.HEMASWATHI",
-          //     "coursecode": "AI2202",
-          //     "comments": [],
-          //     "marks": [],
-          //     "avgheader": [],
-          //     "avgrow": [],
-          //"username":[]
-          // },
-
           data.forEach((val: any) => {
-            //  console.log(val);
+           
 
-            const key = val.coursecode;
+            const key = subtype=="infra"?val.dept:val.coursecode ;
             if (!allfields[key]) {
               allfields[key] = {
                 ...val,
@@ -332,8 +335,7 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
               };
             } else {
               const usercom = [val.username, val.comments];
-              // Merge comments, marks, avgheader, avgrow if object already exists for this key
-              // allfields[key].marks.push([val.username,...parseanswer(val)])
+
               allfields[key].marks.push([val.username, ...parseanswer(val)]);
               allfields[key].usercomments.push(usercom);
             }
