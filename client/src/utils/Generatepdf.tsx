@@ -28,7 +28,8 @@ const Generatepdf2 = (
     pdf.addImage(logoImage, "JPEG", xCoordinate, 10, imageWidth, 32); // Change the coordinates and dimensions as needed
 
     const maxWidth = pdfWidth - 20; // Adjust the maximum width as needed
-    const text = `Department of ${DepartmentName[department]}`;
+    if (subtype != "infra") {
+      const text = `Department of ${DepartmentName[department]}`;
     const text1 = `Academic Year : ${academicyr} ${semType} Semester`;
     const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUBJECTS FOR SUB CODE - ${coursecode} SEM - ${semester} SECTION - ${section} `;
     const text3 = `Academic Year:${academicyr} ${semester % 2 == 0 ? "ODD" : "EVEN"}-SEM `;
@@ -48,6 +49,11 @@ const Generatepdf2 = (
     pdf.text(text3, 50, 76, { align: "center" });
     pdf.text(text4, pdfWidth / 2, 76, { align: "right" });
     pdf.text(text5, pdfWidth - 20, 76, { align: "right" });
+    } else {
+      const text2 = `${academicyr} INFRASTRUCTURE  ANALYSIS REPORT  FOR  ${DepartmentName[department]}- DEPT  `;
+      pdf.setFontSize(13);
+    pdf.text(text2, pdfWidth / 2, 66, { align: "center" });
+    }
 
     // Set table properties
     const startY = 85;

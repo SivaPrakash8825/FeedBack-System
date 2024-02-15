@@ -84,9 +84,7 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
       (item: { [s: string]: unknown } | ArrayLike<unknown>) =>
         Object.values(item),
     );
-    // console.log(header);
-    // console.log(rows);
-    console.log([rows, rows]);
+   
     generatePdf(
       header,
       rows,
