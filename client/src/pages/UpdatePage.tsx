@@ -8,10 +8,12 @@ import SelectTextField from "../components/SelectTextField";
 import { ExcelToJsonQuestions } from "../utils/ExcelToJsonQuestions";
 import JsonToExcel from "../utils/JsonToExcel";
 import { ExcelToJson } from "../utils/ExcelToJson";
+import useToast from "../store/useToast";
 
 type Props = {};
 
 const UpdatePage = (props: Props) => {
+  const setToast = useToast((state) => state.setToast);
   const deptmentFileRef = useRef<HTMLInputElement>(null);
   const questionFileRef = useRef<HTMLInputElement>(null);
   const masterFileRef = useRef<HTMLInputElement>(null);
@@ -24,7 +26,11 @@ const UpdatePage = (props: Props) => {
         `${import.meta.env.VITE_ENDPOINT}/getQuestions/${subType}`,
       );
       console.log(data);
-      JsonToExcelQuestions(data, `${subType.toUpperCase()}_QUESTIONS.xlsx`);
+      const status = JsonToExcelQuestions(
+        data,
+        `${subType.toUpperCase()}_QUESTIONS.xlsx`,
+      );
+      setToast(status);
     } catch (error) {
       console.log(error.message);
     }
@@ -36,7 +42,8 @@ const UpdatePage = (props: Props) => {
         `${import.meta.env.VITE_ENDPOINT}/getDepartments`,
       );
       console.log(data);
-      JsonToExcel({ data, fileName: "Departments.xlsx" });
+      const status = JsonToExcel({ data, fileName: "Departments.xlsx" });
+      setToast(status);
     } catch (error) {
       console.log(error.message);
     }
@@ -48,7 +55,8 @@ const UpdatePage = (props: Props) => {
         `${import.meta.env.VITE_ENDPOINT}/getMasterData`,
       );
       console.log(data);
-      JsonToExcel({ data, fileName: "MasterTable.xlsx" });
+      const status = JsonToExcel({ data, fileName: "MasterTable.xlsx" });
+      setToast(status);
     } catch (error) {
       console.log(error.message);
     }
@@ -110,7 +118,10 @@ const UpdatePage = (props: Props) => {
             className="hidden"
             type="file"
             ref={deptmentFileRef}
-            onChange={(e) => ExcelToJson(e, "setDepartments")}
+            onChange={(e) => {
+              const status = ExcelToJson(e, "setDepartments");
+              // setToast(status);
+            }}
           />
           <Button
             title="Upload"

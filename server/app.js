@@ -84,7 +84,7 @@ app.post("/setQuestions/:typee", async (req, res) => {
   const data = req.body.data;
   try {
     // console.log(data);
-    db.query(`DELETE FROM questions where type = ?;`, [typee]);
+    // db.query(`DELETE FROM questions where type = ?;`, [typee]);
     db.query(
       "CREATE TABLE IF NOT EXISTS `questions` (`id` int NOT NULL,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`question`,`type`));",
       async (err, ress) => {
@@ -99,15 +99,21 @@ app.post("/setQuestions/:typee", async (req, res) => {
 
           // console.log(values);
 
-          const query = `REPLACE INTO questions (id,type, question) VALUES ${values};`;
-
-          db.query(query, (error, results) => {
-            if (error) {
-              return res.status(400).send(error.message);
-            } else {
-              return res.status(200).send("Questions Inserted :)");
-            }
-          });
+          const query = `REPLACE INTO questions (id,type,question) VALUES ?;`;
+          // console.log(query);
+          transactionProcess(
+            `questions where type = '${typee}'`,
+            query,
+            values,
+            res
+          );
+          // db.query(query, (error, results) => {
+          //   if (error) {
+          //     return res.status(400).send(error.message);
+          //   } else {
+          //     return res.status(200).send("Questions Inserted :)");
+          //   }
+          // });
         } else {
           return res.status(400).send(err);
         }
@@ -507,7 +513,6 @@ app.post("/getCourses", (req, res) => {
       (err, result) => {
         if (err) {
           console.log(err);
-
           return res.status(400).send(err.message);
         }
 
@@ -515,7 +520,7 @@ app.post("/getCourses", (req, res) => {
           "SELECT * FROM mastertable WHERE `Theory/Lab` = 'Infra' and `Sub Code` not in (SELECT coursecode from infra where username = ?);",
           [username],
           (errr, ress) => {
-            if (errr) return res.status(400).send(err.message);
+            if (errr) return res.status(400).send(errr.message);
             console.log(ress);
             // ret  res.status(200).send(ress)
             if (ress.length != 0 || result.length != 0) {
@@ -585,24 +590,35 @@ app.get("/getDepartments", (req, res) => {
 app.post("/setDepartments", (req, res) => {
   const { data } = req.body;
   try {
-    const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``); // Extracting column names from the first object in the array
-    const insertQuery = `REPLACE INTO departments (${columnNames.join(
-      ", "
-    )}) VALUES ?`;
+    db.query(
+      "CREATE TABLE IF NOT EXISTS `departments` (`deptid` int NOT NULL,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptsname`,`deptname`))",
+      (err, ress) => {
+        if (!err) {
+          const columnNames = Object.keys(data[0]).map(
+            (column) => `\`${column}\``
+          ); // Extracting column names from the first object in the array
+          const insertQuery = `REPLACE INTO departments (${columnNames.join(
+            ", "
+          )}) VALUES ?`;
 
-    // console.log(colomnNames);
+          // console.log(colomnNames);
 
-    // Extract values from the data object
-    const values = data.map((entry) => Object.values(entry));
-
-    db.query(`TRUNCATE TABLE departments`);
-    db.query(insertQuery, [values], (error, results) => {
-      if (error) {
-        return res.status(400).send(error.message);
-      } else {
-        return res.status(200).send("Department Inserted :)");
+          // Extract values from the data object
+          const values = data.map((entry) => Object.values(entry));
+          transactionProcess("departments", insertQuery, values, res);
+          // db.query(`TRUNCATE TABLE departments`);
+          // db.query(insertQuery, [values], (error, results) => {
+          //   if (error) {
+          //     return res.status(400).send(error.message);
+          //   } else {
+          //     return res.status(200).send("Department Inserted :)");
+          //   }
+          // });
+        } else {
+          res.status(200).send(err.message);
+        }
       }
-    });
+    );
   } catch (error) {
     return res.status(400).send(error.message);
   }
@@ -690,6 +706,54 @@ app.post("/deleterecords", (req, res) => {
     res.status(400).send(e);
   }
 });
+
+const transactionProcess = (tablename, insertQuery, insertData, res) => {
+  try {
+    db.beginTransaction((err) => {
+      if (err) {
+        console.log(err.message);
+        res.status(200).send(err.message);
+      }
+
+      console.log(`DELETE FROM ${tablename};`);
+      // Delete existing data
+      db.query(`DELETE FROM ${tablename};`, (error, results) => {
+        if (error) {
+          return db.rollback(() => {
+            console.log(error.message);
+            res.status(200).send(error.message);
+          });
+        }
+
+        console.log("Table Deleted");
+        console.log(insertQuery, insertData);
+        // Insert new data
+        db.query(insertQuery, [insertData], (error, results) => {
+          if (error) {
+            return db.rollback(() => {
+              console.log(error.message);
+              res.status(200).send(error.message);
+            });
+          }
+
+          // Commit transaction
+          db.commit((err) => {
+            if (err) {
+              return db.rollback(() => {
+                console.log(err.message);
+                res.status(200).send(err.message);
+              });
+            }
+            console.log("Transaction successfully completed.");
+            res.send("Data Inserted :)");
+          });
+        });
+      });
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
 app.listen(port, () => {
   console.log(`server start listening on ${port}`);
