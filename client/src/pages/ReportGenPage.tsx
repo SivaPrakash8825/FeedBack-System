@@ -109,24 +109,6 @@ const ReportGenPage = ({
     return setToast(status);
   };
 
-  // const fetchCourseCode = async () => {
-  //   const { data } = await axios.post(
-  //     `${import.meta.env.VITE_ENDPOINT}/getcoursecode`,
-  //     {
-  //       dept: department,
-  //       degree: graduation,
-  //       sem: parseInt(semester),
-  //       section: section,
-
-  //       academicyear: academicyr,
-  //     },
-  //   );
-
-  //   data.forEach((val: any) => {
-  //     setSubCodeList((pre) => [...pre, val["Sub Code"]]);
-  //   });
-  // };
-
   const getDepartmentList = async () => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_ENDPOINT}/getDepartments`,
@@ -141,22 +123,6 @@ const ReportGenPage = ({
   useEffect(() => {
     getDepartmentList();
   }, []);
-
-  // useEffect(() => {
-  //   if (
-  //     academicyr &&
-  //     graduation &&
-  //     department &&
-  //     semester &&
-  //     section &&
-  //     reporttype.toLowerCase() == "markwise"
-  //   ) {
-  //     fetchCourseCode();
-  //   } else if (reporttype.toLowerCase() == "markwise") {
-  //     setReporttype("");
-  //     alert("fill the above details");
-  //   }
-  // }, [reporttype]);
 
   const value = [
     {
@@ -285,8 +251,6 @@ const ReportGenPage = ({
           // const avgrows: any[] = [];
 
           if (subtype.toLowerCase() == "infra") {
-            console.log("adsffasd");
-
             header.push(
               ...Object.keys(data[0]).filter(
                 (val) =>
@@ -348,6 +312,7 @@ const ReportGenPage = ({
             if (!allfields[key]) {
               allfields[key] = {
                 ...val,
+                dept: val.dept,
                 marks: [[val.username, ...parseanswer(val)]],
                 usercomments: [[val.username, val.comments]],
               };
@@ -385,6 +350,7 @@ const ReportGenPage = ({
 
             data.avgrow = columnAverages;
           });
+          console.log(newallfield);
 
           const status = generatePdf1(
             header,

@@ -17,7 +17,7 @@ const Generatepdf2 = (
 ): ToastProp => {
   try {
     const pdf = new jsPDF("landscape");
-    const a = typeof DepartmentName;
+    
 
     const createTable = (
       header: string[],
@@ -152,7 +152,7 @@ const Generatepdf2 = (
           autoTable(pdf, tableProps2);
 
           pdf.text(
-            `HOD/${DepartmentName[data.dept]}`,
+            `HOD/${data.dept}`,
             pdfWidth - 20,
             // @ts-ignore
             pdf.lastAutoTable.finalY + 20,
