@@ -722,4 +722,127 @@ const masterTableData = [
   },
 ];
 
-module.exports = { questions, masterTableData };
+const departments = [
+  {
+    deptid: 0,
+    deptsname: "AL",
+    deptname: "ALL",
+    deptfullname: "COLLEGE",
+  },
+  {
+    deptid: 1,
+    deptsname: "CS",
+    deptname: "CSE",
+    deptfullname: "COMPUTER  SCIENCE AND ENGINEERING",
+  },
+  {
+    deptid: 2,
+    deptsname: "EE",
+    deptname: "EEE",
+    deptfullname: "ELECTRICAL &ELECTRONICS ENGINEERING",
+  },
+  {
+    deptid: 3,
+    deptsname: "EI",
+    deptname: "EIE",
+    deptfullname: "ELECTRONICS AND INSTRUMENATION ENGG",
+  },
+  {
+    deptid: 4,
+    deptsname: "CI",
+    deptname: "CIV",
+    deptfullname: "CIVIL ENGINEERING",
+  },
+  {
+    deptid: 5,
+    deptsname: "BT",
+    deptname: "BTE",
+    deptfullname: "BIOTECHNOLOGY",
+  },
+  {
+    deptid: 6,
+    deptsname: "IT",
+    deptname: "IT",
+    deptfullname: "INFORMATION TECHNOLOGY",
+  },
+  {
+    deptid: 7,
+    deptsname: "ME",
+    deptname: "MEC",
+    deptfullname: "MECHANICAL",
+  },
+  {
+    deptid: 8,
+    deptsname: "MT",
+    deptname: "MTR",
+    deptfullname: "MECHATRONICS",
+  },
+  {
+    deptid: 9,
+    deptsname: "EC",
+    deptname: "ECE",
+    deptfullname: "ELECTRONICS AND COMMUNICATION  ENGG",
+  },
+  {
+    deptid: 10,
+    deptsname: "PT",
+    deptname: "PTE",
+    deptfullname: "POLYMER TECHNOLOGY",
+  },
+  {
+    deptid: 11,
+    deptsname: "SS",
+    deptname: "SSS",
+    deptfullname: "M.Sc SOFTWARE SYSTEM",
+  },
+  {
+    deptid: 12,
+    deptsname: "PE",
+    deptname: "PEE",
+    deptfullname: "EEE -PG -POWERSYSTEM",
+  },
+  {
+    deptid: 13,
+    deptsname: "AD",
+    deptname: "ADS",
+    deptfullname: "ARTIFICIALINTELLIGENCE &DATASCIENCE",
+  },
+  {
+    deptid: 14,
+    deptsname: "PS",
+    deptname: "PGS",
+    deptfullname: "PG-CIVIL-STRUCTURAL ENGINEERING",
+  },
+  {
+    deptid: 15,
+    deptsname: "MB",
+    deptname: "BTE",
+    deptfullname: "PG BIOTECHNOLOGY",
+  },
+  {
+    deptid: 16,
+    deptsname: "PC",
+    deptname: "PGC",
+    deptfullname: "PG MECH CAD CAM",
+  },
+  {
+    deptid: 17,
+    deptsname: "MP",
+    deptname: "MPT",
+    deptfullname: "MTECH-POLYMER TECHNOLGY",
+  },
+  {
+    deptid: 18,
+    deptsname: "PN",
+    deptname: "PCN",
+    deptfullname: "PG-COMUNICATION & NETWORKING",
+  },
+  {
+    deptid: 19,
+    deptsname: "MC",
+    deptname: "MCS",
+    deptfullname: "PG-Computer  Science and Engineerin",
+  },
+];
+
+module.exports = { questions, masterTableData, departments };

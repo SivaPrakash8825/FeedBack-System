@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface ToastProp {
+export interface ToastProp {
   msg: string;
   variant: "error" | "success";
 }

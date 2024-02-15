@@ -13,8 +13,10 @@ const JsonToExcel = ({ data, fileName }: { data: any; fileName: string }) => {
 
     // Save the workbook to an Excel file
     XLSX.writeFile(workbook, fileName);
+    return { msg: "Sheet Downloaded :)", variant: "success" };
   } catch (error) {
     console.log("convertJsonToSheet Error : ", error.message);
+    return { msg: error.message as string, variant: "error" };
   }
 };
 

@@ -3,15 +3,19 @@ import Button from "../components/Button";
 // import JsonToExcel from "../utils/JsonToExcel";
 import { QuestionDb } from "../../types";
 import axios from "axios";
-import { JsonToExcelQuestions } from "../utils/JsonToExcelQuestion";
+// import { JsonToExcelQuestions } from "../utils/JsonToExcelQuestion";
 import SelectTextField from "../components/SelectTextField";
-import { ExcelToJsonQuestions } from "../utils/ExcelToJsonQuestions";
 import JsonToExcel from "../utils/JsonToExcel";
-import { ExcelToJson } from "../utils/ExcelToJson";
+import useToast from "../store/useToast";
+import useExcelToJson from "../hooks/useExcelToJson";
+import useJsonToExcel from "../hooks/useJsonToExcel";
 
 type Props = {};
 
 const UpdatePage = (props: Props) => {
+  const { ExcelToJson, ExcelToJsonQuestions } = useExcelToJson();
+  const { JsonToExcel, JsonToExcelQuestions } = useJsonToExcel();
+  // const setToast = useToast((state) => state.setToast);
   const deptmentFileRef = useRef<HTMLInputElement>(null);
   const questionFileRef = useRef<HTMLInputElement>(null);
   const masterFileRef = useRef<HTMLInputElement>(null);
@@ -110,7 +114,9 @@ const UpdatePage = (props: Props) => {
             className="hidden"
             type="file"
             ref={deptmentFileRef}
-            onChange={(e) => ExcelToJson(e, "setDepartments")}
+            onChange={(e) => {
+              ExcelToJson(e, "setDepartments");
+            }}
           />
           <Button
             title="Upload"

@@ -79,6 +79,11 @@ const ReportGenPage = () => {
     );
 
     console.log("data : ", updatedData);
+    if (updatedData.length == 0)
+      return setToast({
+        msg: "No Data!!",
+        variant: "error",
+      });
     const header = [...Object.keys(updatedData[0])];
     const rows = updatedData.map(
       (item: { [s: string]: unknown } | ArrayLike<unknown>) =>
@@ -87,7 +92,7 @@ const ReportGenPage = () => {
     // console.log(header);
     // console.log(rows);
     console.log([rows, rows]);
-    generatePdf(
+    const status = generatePdf(
       header,
       rows,
       reporttype,
@@ -97,6 +102,7 @@ const ReportGenPage = () => {
       subtype,
       section,
     );
+    return setToast(status);
   };
 
   // const fetchCourseCode = async () => {
@@ -370,7 +376,7 @@ const ReportGenPage = () => {
             data.avgrow = columnAverages;
           });
 
-          generatePdf1(
+          const status = generatePdf1(
             header,
             newallfield,
             reporttype,
@@ -381,6 +387,7 @@ const ReportGenPage = () => {
             section,
             avgheader,
           );
+          setToast(status);
         } else {
           setToast({
             msg: "No Data!!",
