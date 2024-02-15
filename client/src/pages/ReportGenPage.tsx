@@ -246,7 +246,11 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
 
     //
     // }]
-    const isAnyEmpty = value.some((item) => item.value == "" || 0);
+    const isAnyEmpty = subtype != "infra" ? value.some((item) => item.value == "" || 0) : academicyr != "" ? false : true;
+    if (subtype == "infra") {
+      setReporttype("markwise")
+    }
+    
     if (isAnyEmpty) {
       alert("fill the details");
     } else {
@@ -397,13 +401,13 @@ const ReportGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
           <div className="grid grid-cols-2 gap-3">
             {value.map((data, index) => {
               return data.list ? (
-                <SelectTextField
-                  list={data.list}
-                  value={data.value}
-                  setValue={data.setValue}
-                  label={data.label}
-                  key={index}
-                />
+                <div className={`${subtype=="infra" && index>1?"opacity-[0.5] pointer-events-none":null}`}><SelectTextField
+                list={data.list}
+                value={data.value}
+                setValue={data.setValue}
+                label={data.label}
+                key={index}
+              /></div>
               ) : (
                 <InputTextField
                   key={index}
