@@ -15,6 +15,7 @@ import ForAuth from "./components/ForAuth";
 import Toast from "./components/Toast";
 import DeletionPage from "./pages/DeletionPage";
 import UpdatePage from "./pages/UpdatePage";
+import DeleteEmptyCells from "./components/DeleteRows";
 
 function App() {
   const role = useRole((state) => state.role);
@@ -100,14 +101,14 @@ function App() {
           />
 
           {/* Dummy */}
-          {/* <Route
+          <Route
             element={
               <>
-                <ExcelToJson />
+                <DeleteEmptyCells />
               </>
             }
-            path="/dummy"
-          /> */}
+            path="/admin/dummy"
+          />
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

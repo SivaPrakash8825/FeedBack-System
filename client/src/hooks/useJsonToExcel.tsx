@@ -8,13 +8,23 @@ type Props = {};
 const useJsonToExcel = () => {
   const setToast = useToast((state) => state.setToast);
 
-  const JsonToExcel = ({ data, fileName }: { data: any; fileName: string }) => {
+  const JsonToExcel = ({
+    data,
+    fileName,
+    type,
+  }: {
+    data: any;
+    fileName: string;
+    type?: string;
+  }) => {
     try {
       // Create a new workbook
       const workbook = XLSX.utils.book_new();
+      console.log(data);
 
       // Convert JSON data to a worksheet
       const worksheet = XLSX.utils.json_to_sheet(data);
+      // console.log(worksheet);
 
       // Add the worksheet to the workbook
       XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -31,12 +41,10 @@ const useJsonToExcel = () => {
   const JsonToExcelQuestions = (data: QuestionDb[], filename: string) => {
     try {
       const maxOptions = Math.max(
-        ...data.map(
-          (entry) =>
-            JSON.parse(entry.question.slice(1, entry.question.length - 1))
-              .options.length,
-        ),
+        ...data.map((entry) => JSON.parse(entry.question).options.length),
       );
+
+      console.log(JSON.parse(data[0].question));
 
       // Create the header row dynamically
       const headers = ["ID", "Question"];
@@ -55,9 +63,7 @@ const useJsonToExcel = () => {
         // console.log(entry);
 
         const { id, question } = entry;
-        const parsedQuestion = JSON.parse(
-          question.slice(1, question.length - 1),
-        );
+        const parsedQuestion = JSON.parse(question);
         const { question: q, options } = parsedQuestion;
         const row = [id, q];
         for (let i = 0; i < maxOptions; i++) {

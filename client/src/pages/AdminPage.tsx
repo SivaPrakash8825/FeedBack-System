@@ -12,6 +12,7 @@ const AdminPage = () => {
         <Card icon="🔐" title="Generate Login" link="/admin/generate" />
         <Card icon="🗃️" title="Update Data" link="/admin/update" />
         <Card icon="🗑️" title="Delete Data" link="/admin/delete" />
+        <Card icon="🗑️" title="Delete Excel" link="/admin/dummy" />
       </div>
     </section>
   );
@@ -28,8 +29,8 @@ const Card = ({
   title: string;
   link: string;
 }) => (
-  <Link to={link}>
-    <div className="flex flex-col items-center justify-center gap-3 rounded-lg bg-black p-6 text-white transition-all hover:bg-black/70">
+  <Link to={link} className="group">
+    <div className="flex flex-col items-center justify-center gap-3 rounded-lg bg-black p-6 text-white transition-all hover:bg-black/70 group-focus:bg-black/70">
       <p className="text-4xl">{icon}</p>
       <h2 className="text-center text-xl font-semibold">{title}</h2>
     </div>

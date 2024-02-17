@@ -29,6 +29,7 @@ const useExcelToJson = () => {
   const ExcelToJson = async (
     e: React.ChangeEvent<HTMLInputElement>,
     apiType: string,
+    type?: string,
   ) => {
     try {
       // let status = {};
@@ -51,23 +52,49 @@ const useExcelToJson = () => {
         const sheet = workbook.Sheets[sheetName];
         const jsonResult = XLSX.utils.sheet_to_json(sheet, { header: 1 });
         // Assuming first row as header
-        const headers = jsonResult[0];
-        const jsonData = jsonResult.slice(1).map((row) => {
-          const obj: { [key: string]: any } = {};
-          row.forEach((cellValue, index) => {
-            const header = headers[index];
-            // Check if cellValue is undefined or null, then replace with empty space
-            obj[header] =
-              cellValue === undefined || cellValue === null
-                ? "null"
-                : cellValue;
+        console.log(type && type != "all dept");
+
+        const headers =
+          type && type != "all dept"
+            ? [...jsonResult[0], "Dept"]
+            : jsonResult[0];
+        // console.log(headers);
+        console.log(jsonResult);
+        const maxLen =
+          type && type != "all dept" ? headers.length - 1 : headers.length;
+        console.log(headers);
+
+        const jsonData = jsonResult
+          .slice(1)
+          // .filter((r) => r.length == maxLen)
+          .map((row) => {
+            const obj: { [key: string]: any } = {};
+            // console.log(row);
+            // console.log(row.length);
+
+            row.forEach((cellValue, index) => {
+              const header = headers[index];
+              // console.log(
+              //   cellValue,
+              //   (obj[header] = cellValue.toString().trim() == ""),
+              // );
+
+              obj[header] = cellValue.toString().trim() == "" ? " " : cellValue;
+            });
+            // const jsonLen = Object.keys(obj).length;
+
+            // console.log(obj);
+
+            const ans =
+              type && type != "all dept" ? { ...obj, Dept: type } : { ...obj };
+            // console.log(ans);
+
+            return ans;
           });
-          return obj;
-        });
-        //   setJsonData(jsonData);
+        // setJsonData(jsonData);
         console.log(jsonData);
 
-        setDataIntoDb(jsonData, apiType);
+        // setDataIntoDb(jsonData, apiType);
 
         // }
       };
