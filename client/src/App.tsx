@@ -4,7 +4,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
 import useRole from "./store/useRole";
-import { ExcelToJson } from "./components/ExcelToJson";
 import { useState } from "react";
 import Header from "./components/Header";
 import PasswordGenPage from "./pages/PasswordGenPage";
@@ -15,7 +14,6 @@ import ForAuth from "./components/ForAuth";
 import Toast from "./components/Toast";
 import DeletionPage from "./pages/DeletionPage";
 import UpdatePage from "./pages/UpdatePage";
-import DeleteEmptyCells from "./components/DeleteRows";
 
 function App() {
   const role = useRole((state) => state.role);
@@ -101,14 +99,14 @@ function App() {
           />
 
           {/* Dummy */}
-          <Route
+          {/* <Route
             element={
               <>
                 <DeleteEmptyCells />
               </>
             }
             path="/admin/dummy"
-          />
+          /> */}
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

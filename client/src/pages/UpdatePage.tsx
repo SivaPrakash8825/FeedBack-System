@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { RefAttributes, RefObject, useEffect, useRef, useState } from "react";
 import Button from "../components/Button";
 // import JsonToExcel from "../utils/JsonToExcel";
 import { QuestionDb } from "../../types";
@@ -24,97 +24,97 @@ const UpdatePage = () => {
   const [departments, setDepartments] = useState<Array<string>>([]);
   const [dept, setDept] = useState("all dept");
   //   const type = "lab";
-  const getQuestions = async () => {
-    try {
-      const { data } = await axios.get<QuestionDb[]>(
-        `${import.meta.env.VITE_ENDPOINT}/getQuestions/${subType}`,
-      );
-      console.log(data);
-      if (data.length == 0) {
-        setToast({ msg: "No data", variant: "error" });
-        return;
-      }
-      JsonToExcelQuestions(data, `${subType.toUpperCase()}_QUESTIONS.xlsx`);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
 
-  const getDepartments = async () => {
-    try {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_ENDPOINT}/getDepartments`,
-      );
-      console.log(data);
-      if (data.length == 0) {
-        setToast({ msg: "No data", variant: "error" });
-        return;
-      }
-      JsonToExcel({ data, fileName: "Departments.xlsx" });
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const getMasterLoginData = async () => {
-    try {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_ENDPOINT}/getMasterLogin`,
-      );
-      console.log(data);
-      if (data.length == 0) {
-        setToast({ msg: "No data", variant: "error" });
-        return;
-      }
-      JsonToExcel({ data, fileName: "MasterLogin.xlsx" });
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const getMasterData = async () => {
-    try {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_ENDPOINT}/getMasterData/${dept}`,
-      );
-      console.log(data);
-      if (data.length == 0) {
-        setToast({ msg: "No data", variant: "error" });
-        return;
-      }
-      JsonToExcel({
-        data,
-        fileName: dept
+  const updatePageData = [
+    {
+      title: "Questions",
+      select: {
+        list: ["lab", "theory", "infra", "others"],
+        value: subType,
+        setValue: setSubType,
+        placeholder: "Type",
+      },
+      ref: questionFileRef,
+      upload: {
+        type: "question",
+        param1: subType,
+      },
+      download: {
+        api: `getQuestions/${subType}`,
+        filename: `${subType.toUpperCase()}_QUESTIONS.xlsx`,
+        type: "question",
+      },
+    },
+    {
+      title: "Master Table",
+      select: {
+        placeholder: "Department",
+        list: departments,
+        value: dept,
+        setValue: setDept,
+      },
+      ref: masterFileRef,
+      upload: {
+        api: `setMasterData/${dept}`,
+        dept: dept,
+      },
+      download: {
+        api: `getMasterData/${dept}`,
+        filename: dept
           ? `${dept.toUpperCase()}_MasterTable.xlsx`
           : "MasterTable.xlsx",
         type: "masterlogin",
-      });
+      },
+    },
+    {
+      title: "Departments",
+      ref: deptmentFileRef,
+      upload: {
+        api: "setDepartments",
+      },
+      download: {
+        api: "getDepartments",
+        filename: "Departments.xlsx",
+      },
+    },
+    {
+      title: "Master Login",
+      ref: masterLoginFileRef,
+      upload: {
+        api: `setMasterLogin`,
+      },
+      download: {
+        api: "getMasterLogin",
+        filename: "MasterLogin.xlsx",
+      },
+    },
+  ];
+
+  const fetchDataAndDownload = async (
+    api: string,
+    filename: string,
+    type?: string,
+  ) => {
+    try {
+      const { data } = await axios.get<QuestionDb[]>(
+        `${import.meta.env.VITE_ENDPOINT}/${api}`,
+      );
+      console.log(data);
+      if (data.length == 0) {
+        setToast({ msg: "No data", variant: "error" });
+        return;
+      }
+      type == "question"
+        ? JsonToExcelQuestions(data, filename)
+        : JsonToExcel(data, filename);
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  const triggerDepartmentFileUpload = () => {
-    if (deptmentFileRef.current) {
-      deptmentFileRef.current.click(); // Simulate a click event on the input
-    }
-  };
-
-  const triggerQuestionFileUpload = () => {
-    if (questionFileRef.current) {
-      questionFileRef.current.click(); // Simulate a click event on the input
-    }
-  };
-
-  const triggerMasterFileUpload = () => {
-    if (masterFileRef.current) {
-      masterFileRef.current.click(); // Simulate a click event on the input
-    }
-  };
-
-  const triggerMasterLoginFileUpload = () => {
-    if (masterLoginFileRef.current) {
-      masterLoginFileRef.current.click(); // Simulate a click event on the input
+  const triggerFileUpload = (currRef: RefObject<HTMLInputElement>) => {
+    if (currRef.current) {
+      currRef.current.click(); // Simulate a click event on the input
     }
   };
 
@@ -124,7 +124,10 @@ const UpdatePage = () => {
         const { data } = await axios.get(
           `${import.meta.env.VITE_ENDPOINT}/getDepartments`,
         );
-        setDepartments(["all dept", ...data.map((d) => d.deptsname)]);
+        setDepartments([
+          "all dept",
+          ...data.map((d: { deptsname: string }) => d.deptsname),
+        ]);
         // setDept(data[0]?.deptsname);
       } catch (error) {
         console.log(error.message);
@@ -135,8 +138,62 @@ const UpdatePage = () => {
 
   return (
     <div className="borde mx-auto grid min-h-[calc(100vh-6rem)] w-2/3 grid-cols-1 flex-col flex-wrap place-items-center border-black p-5 *:w-1/2 md:grid-cols-2">
-      {/* Questions */}
-      <div className="flex flex-col gap-5">
+      {updatePageData.map((data, i) => {
+        return (
+          <div key={i} className="flex flex-col gap-5">
+            <h1 className="text-center text-2xl font-bold">{data.title}</h1>
+            <div className="flex flex-col gap-4">
+              {data.select && (
+                <div className="">
+                  <SelectTextField
+                    list={data.select.list}
+                    value={data.select.value}
+                    setValue={data.select.setValue}
+                    placeholder={data.select.placeholder}
+                  />
+                </div>
+              )}
+              <div className="flex gap-6">
+                <input
+                  className="hidden"
+                  type="file"
+                  ref={data.ref}
+                  onChange={(e) => {
+                    if (data.upload.type == "question") {
+                      ExcelToJsonQuestions(e, data.upload.param1);
+                    } else {
+                      ExcelToJson(
+                        e,
+                        data.upload.api as string,
+                        data.upload.dept && data.upload.dept,
+                      );
+                    }
+                    e.target.value = "";
+                  }}
+                />
+                <Button
+                  title="Upload"
+                  type="secondary"
+                  onClick={() => triggerFileUpload(data.ref)}
+                />
+                <Button
+                  title="Download"
+                  type="primary"
+                  onClick={() =>
+                    fetchDataAndDownload(
+                      data.download.api,
+                      data.download.filename,
+                      data.download.type,
+                    )
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* <div className="flex flex-col gap-5">
         <h1 className="text-center text-2xl font-bold">Questions</h1>
         <div className="flex flex-col gap-4">
           <div className="">
@@ -160,13 +217,22 @@ const UpdatePage = () => {
             <Button
               title="Upload"
               type="secondary"
-              onClick={triggerQuestionFileUpload}
+              onClick={() => triggerFileUpload(questionFileRef)}
             />
-            <Button title="Download" type="primary" onClick={getQuestions} />
+            <Button
+              title="Download"
+              type="primary"
+              onClick={() =>
+                fetchDataAndDownload(
+                  `getQuestions/${subType}`,
+                  `${subType.toUpperCase()}_QUESTIONS.xlsx`,
+                )
+              }
+            />
           </div>
         </div>
       </div>
-      {/* Master Table */}
+      
       <div className="flex flex-col gap-5">
         <h1 className="text-center text-2xl font-bold">Master Table</h1>
 
@@ -189,12 +255,12 @@ const UpdatePage = () => {
           <Button
             title="Upload"
             type="secondary"
-            onClick={triggerMasterFileUpload}
+            onClick={() => triggerFileUpload(masterFileRef)}
           />
           <Button title="Download" type="primary" onClick={getMasterData} />
         </div>
       </div>
-      {/* Department Table */}
+    
       <div className="flex flex-col gap-5">
         <h1 className="text-center text-2xl font-bold">Departments</h1>
         <div className="flex gap-6">
@@ -210,12 +276,12 @@ const UpdatePage = () => {
           <Button
             title="Upload"
             type="secondary"
-            onClick={triggerDepartmentFileUpload}
+            onClick={() => triggerFileUpload(deptmentFileRef)}
           />
           <Button title="Download" type="primary" onClick={getDepartments} />
         </div>
       </div>
-      {/* Master Login */}
+     
       <div className="flex flex-col gap-5">
         <h1 className="text-center text-2xl font-bold">Master Login</h1>
 
@@ -232,7 +298,7 @@ const UpdatePage = () => {
           <Button
             title="Upload"
             type="secondary"
-            onClick={triggerMasterLoginFileUpload}
+            onClick={() => triggerFileUpload(masterLoginFileRef)}
           />
           <Button
             title="Download"
@@ -240,7 +306,7 @@ const UpdatePage = () => {
             onClick={getMasterLoginData}
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

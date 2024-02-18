@@ -12,7 +12,6 @@ const AdminPage = () => {
         <Card icon="🔐" title="Generate Login" link="/admin/generate" />
         <Card icon="🗃️" title="Update Data" link="/admin/update" />
         <Card icon="🗑️" title="Delete Data" link="/admin/delete" />
-        <Card icon="🗑️" title="Delete Excel" link="/admin/dummy" />
       </div>
     </section>
   );

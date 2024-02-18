@@ -3,14 +3,12 @@ import React from "react";
 import * as XLSX from "xlsx";
 import useToast from "../store/useToast";
 
-type Props = {
-  e: React.ChangeEvent<HTMLInputElement>;
-  apiType: string;
-};
-
 const useExcelToJson = () => {
   const setToast = useToast((state) => state.setToast);
-  const setDataIntoDb = async (originalData: any, apiType: string) => {
+  const setDataIntoDb = async (
+    originalData: Array<object>,
+    apiType: string,
+  ) => {
     try {
       const resData = await axios.post(
         `${import.meta.env.VITE_ENDPOINT}/${apiType}`,
@@ -48,9 +46,15 @@ const useExcelToJson = () => {
         // console.log("inn");
 
         const workbook = XLSX.read(data, { type: "binary" });
-        const sheetName = workbook.SheetNames[0]; // Assuming first sheet
+        const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-        const jsonResult = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const jsonResult: Array<Array<string>> = XLSX.utils.sheet_to_json(
+          sheet,
+          {
+            header: 1,
+            defval: " ",
+          },
+        );
         // Assuming first row as header
         console.log(type && type != "all dept");
 
@@ -60,15 +64,15 @@ const useExcelToJson = () => {
             : jsonResult[0];
         // console.log(headers);
         console.log(jsonResult);
-        const maxLen =
-          type && type != "all dept" ? headers.length - 1 : headers.length;
         console.log(headers);
 
         const jsonData = jsonResult
           .slice(1)
-          // .filter((r) => r.length == maxLen)
+          .filter((subArray) => {
+            return !subArray.every((value) => value.toString().trim() === "");
+          })
           .map((row) => {
-            const obj: { [key: string]: any } = {};
+            const obj: { [key: string]: string } = {};
             // console.log(row);
             // console.log(row.length);
 
@@ -79,7 +83,8 @@ const useExcelToJson = () => {
               //   (obj[header] = cellValue.toString().trim() == ""),
               // );
 
-              obj[header] = cellValue.toString().trim() == "" ? " " : cellValue;
+              obj[header] =
+                cellValue.toString().trim() === "" ? " " : cellValue;
             });
             // const jsonLen = Object.keys(obj).length;
 
@@ -94,7 +99,7 @@ const useExcelToJson = () => {
         // setJsonData(jsonData);
         console.log(jsonData);
 
-        // setDataIntoDb(jsonData, apiType);
+        setDataIntoDb(jsonData, apiType);
 
         // }
       };
@@ -109,7 +114,10 @@ const useExcelToJson = () => {
     }
   };
 
-  const setQuestionsIntoDb = async (originalData: any, typee: string) => {
+  const setQuestionsIntoDb = async (
+    originalData: Array<object>,
+    typee: string,
+  ) => {
     try {
       console.log("in");
 
@@ -144,11 +152,16 @@ const useExcelToJson = () => {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
 
-      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      const rows: Array<Array<string | number>> = XLSX.utils.sheet_to_json(
+        sheet,
+        { header: 1 },
+      );
+      console.log(rows);
+
       const headers = rows.shift() as string[];
       console.log(headers);
 
-      const jsonData = rows.map((row: any) => {
+      const jsonData = rows.map((row) => {
         const text = headers.reduce(
           (acc: any, header: string, index: number) => {
             const value = row[index] !== undefined ? row[index] : null;

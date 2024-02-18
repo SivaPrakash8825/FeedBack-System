@@ -1,22 +1,11 @@
-import React from "react";
 import * as XLSX from "xlsx";
 import useToast from "../store/useToast";
 import { QuestionDb } from "../../types";
 
-type Props = {};
-
 const useJsonToExcel = () => {
   const setToast = useToast((state) => state.setToast);
 
-  const JsonToExcel = ({
-    data,
-    fileName,
-    type,
-  }: {
-    data: any;
-    fileName: string;
-    type?: string;
-  }) => {
+  const JsonToExcel = (data: Array<object>, fileName: string) => {
     try {
       // Create a new workbook
       const workbook = XLSX.utils.book_new();
