@@ -12,16 +12,15 @@ const createQuestions = () => {
     "CREATE TABLE IF NOT EXISTS `questions` (`id` int NOT NULL,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`question`,`type`));",
     (err, res) => {
       if (!err) {
-        // Add Questions to table
-        const values = questions
-          .map(
-            ({ id, type, question }) =>
-              `(${id},'${type}','${JSON.stringify(question)}')`
-          )
-          .join(",");
-        const query = `REPLACE INTO questions (id,type, question) VALUES ${values}`;
+        const values = questions.map(({ id, type, question }) => [
+          id,
+          type,
+          question,
+        ]);
 
-        db.query(query, (error, results) => {
+        const query = `REPLACE INTO questions (id,type,question) VALUES ?`;
+
+        db.query(query, [values], (error, results) => {
           if (error) {
             console.log(error.message);
           } else {
@@ -88,7 +87,7 @@ createMasterLogin();
 const createMasterTable = () => {
   try {
     db.query(
-      "CREATE TABLE IF NOT EXISTS `mastertable` (`Academic yr` varchar(100) NOT NULL,`Dept` varchar(20) NOT NULL,`UG/PG` varchar(20) NOT NULL,`Theory/Lab` VARCHAR(20),`Semester` int NOT NULL,`Section` varchar(30) NOT NULL,`Sub Code` varchar(100) NOT NULL,`Sub Name` varchar(230) NOT NULL,`Staff` text,`StaffParent Dept` text,`Open Elective/Regular/Core Elective` text,`Sub Grouping` text,PRIMARY KEY (`Academic yr`,`Dept`,`UG/PG`,`Semester`,`Sub Name`,`Sub Code`,`Section`,`Theory/Lab`));",
+      "CREATE TABLE IF NOT EXISTS `mastertable` (`Academic yr` varchar(100) NOT NULL,`Dept` varchar(20) NOT NULL,`UG/PG` varchar(20) NOT NULL,`Theory/Lab` VARCHAR(20),`Semester` varchar(10) NOT NULL,`Section` varchar(30) NOT NULL,`Sub Code` varchar(100) NOT NULL,`Sub Name` varchar(230) NOT NULL,`Staff` text,`StaffParent Dept` text,`Open Elective/Regular/Core Elective` text,`Sub Grouping` text,PRIMARY KEY (`Academic yr`,`Dept`,`UG/PG`,`Semester`,`Sub Name`,`Sub Code`,`Section`,`Theory/Lab`));",
       (err, res) => {
         if (!err) {
           const values = masterTableData
@@ -107,7 +106,7 @@ const createMasterTable = () => {
                 "Open Elective/Regular/Core Elective": electiveType,
                 "Sub Grouping": subGrouping,
               }) =>
-                `('${academicYear}', '${Dept}', '${ugpg}', '${theoryLab}', ${Semester}, '${Section}', '${subCode}', '${subName}', '${Staff}', '${staffParentDept}', '${electiveType}', '${subGrouping}')`
+                `('${academicYear}', '${Dept}', '${ugpg}', '${theoryLab}', '${Semester}', '${Section}', '${subCode}', '${subName}', '${Staff}', '${staffParentDept}', '${electiveType}', '${subGrouping}')`
             )
             .join(",");
 

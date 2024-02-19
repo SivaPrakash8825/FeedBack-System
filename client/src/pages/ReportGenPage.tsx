@@ -190,7 +190,7 @@ const ReportGenPage = ({
       setValue: setSemester,
     },
     {
-      list: ["A", "B", "C"],
+      list: ["A", "B", "C", "D", "E"],
       label: "section",
       value: section,
       setValue: setSection,

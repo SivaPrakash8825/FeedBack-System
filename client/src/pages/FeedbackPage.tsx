@@ -32,9 +32,9 @@ const FeedbackPage = () => {
     );
     let quesarr: any[] = [];
     for (const value of data) {
-      const val = JSON.parse(
-        value.question.slice(1, value.question.length - 1),
-      );
+      const val = JSON.parse(value.question);
+      console.log(val);
+
       quesarr = [
         ...quesarr,
         {

@@ -13,6 +13,8 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 
 app.use(cookieParser());
+app.use(express.json({ limit: "5mb" }));
+// console.log("Limit file size: " + limit);
 
 // app.use(bodyparser.urlencoded({ extended: true }));
 
@@ -46,6 +48,8 @@ const FindUserDetails = (username) => {
     1: "A",
     2: "B",
     3: "C",
+    4: "D",
+    5: "E",
   };
   const degree = {
     U: "UG",
@@ -90,12 +94,8 @@ app.post("/setQuestions/:typee", async (req, res) => {
       async (err, ress) => {
         if (!err) {
           const values = data
-            .filter(({ type }) => type == typee)
-            .map(({ id, type, question }) => [
-              id,
-              type,
-              JSON.stringify(question),
-            ]);
+            .filter(({ type }) => type === typee)
+            .map(({ id, type, question }) => [id, type, question]);
 
           // console.log(values);
 
@@ -618,10 +618,67 @@ app.post("/setDepartments", (req, res) => {
   }
 });
 
-// get master data
-app.get("/getMasterData", (req, res) => {
+// get maseter login data
+app.get("/getMasterLogin", (req, res) => {
   try {
-    db.query(`SELECT * FROM mastertable`, (err, ress) => {
+    db.query(`SELECT * FROM masterlogin`, (err, ress) => {
+      if (err) {
+        return res.status(400).send(err.message);
+      }
+      return res.status(200).send(ress);
+    });
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
+// set master login data
+app.post("/setMasterLogin", (req, res) => {
+  const { data } = req.body;
+  try {
+    db.query(
+      "CREATE TABLE IF NOT EXISTS masterLogin (id INT NOT NULL,dept VARCHAR(20),username VARCHAR(30),password VARCHAR(30),PRIMARY KEY (dept,username));",
+      (err, ress) => {
+        if (!err) {
+          const insertQuery = `REPLACE INTO masterlogin (id,dept,username,password) VALUES ?`;
+
+          // console.log(colomnNames);
+
+          // Extract values from the data object
+          const values = data.map(({ id, dept, username, password }) => [
+            id,
+            dept,
+            username,
+            password,
+          ]);
+          transactionProcess("masterlogin", insertQuery, values, res);
+          // db.query(`TRUNCATE TABLE departments`);
+          // db.query(insertQuery, [values], (error, results) => {
+          //   if (error) {
+          //     return res.status(400).send(error.message);
+          //   } else {
+          //     return res.status(200).send("Department Inserted :)");
+          //   }
+          // });
+        } else {
+          res.status(200).send(err.message);
+        }
+      }
+    );
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
+// get master data
+app.get("/getMasterData/:type", (req, res) => {
+  const { type } = req.params;
+  try {
+    const query =
+      type == "all dept"
+        ? "Select * from mastertable;"
+        : `SELECT \`Academic yr\`,\`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\` FROM mastertable where Dept = ?`;
+    db.query(query, [type], (err, ress) => {
       if (err) {
         return res.status(400).send(err.message);
       }
@@ -633,30 +690,64 @@ app.get("/getMasterData", (req, res) => {
 });
 
 // set master data
-app.post("/setMasterData", (req, res) => {
+app.post("/setMasterData/:typee", (req, res) => {
+  const { typee } = req.params;
   const { data } = req.body;
+  const isAll = typee == "all dept";
+  console.log(isAll);
   try {
-    const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``); // Extracting column names from the first object in the array
-    const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
-      ", "
-    )}) VALUES ?`;
+    // const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``);
+    // const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
+    //   ", "
+    // )}) VALUES ?`;
 
     // console.log(colomnNames);
 
     // Extract values from the data object
-    const values = data.map((entry) => Object.values(entry));
+    // const values = data.map((entry) => Object.values(entry));
     // return res.status(200).send({ values });
 
-    // console.log(values);
-    // db.query(`TRUNCATE TABLE mastertable`);
-    transactionProcess("mastertable", insertQuery, values, res);
-    // db.query(insertQuery, [values], (error, results) => {
-    //   if (error) {
-    //     return res.status(400).send(error.message);
-    //   } else {
-    //     return res.status(200).send("Master Data Inserted :)");
-    //   }
-    // });
+    const values = data
+      .filter(({ Dept }) => (isAll ? true : Dept === typee))
+      .map(
+        ({
+          "Academic yr": academicYear,
+          Dept,
+          "UG/PG": ugpg,
+          "Theory/Lab": theoryLab,
+          Semester,
+          Section,
+          "Sub Code": subCode,
+          "Sub Name": subName,
+          Staff,
+          "StaffParent Dept": staffParentDept,
+          "Open Elective/Regular/Core Elective": electiveType,
+          "Sub Grouping": subGrouping,
+        }) => [
+          academicYear,
+          Dept,
+          ugpg,
+          theoryLab,
+          Semester,
+          Section,
+          subCode,
+          subName,
+          Staff,
+          staffParentDept,
+          electiveType,
+          subGrouping,
+        ]
+      );
+
+    // Construct the REPLACE INTO query
+    const query = `REPLACE INTO mastertable (\`Academic yr\`, Dept, \`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\`) VALUES ?`;
+
+    transactionProcess(
+      isAll ? `mastertable` : `mastertable where Dept = '${typee}'`,
+      query,
+      values,
+      res
+    );
   } catch (error) {
     console.log(error.message);
     return res.status(400).send(error.message);
