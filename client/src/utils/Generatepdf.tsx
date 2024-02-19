@@ -2,7 +2,7 @@ import { jsPDF } from "jspdf";
 import autoTable, { UserOptions } from "jspdf-autotable";
 import logoImage from "../assets/logo.jpg";
 import { DepartmentName } from "./Constants";
-import useToast from "../store/useToast";
+import { ToastProp } from "../store/useToast";
 
 const Generatepdf2 = (
   header: string[],
@@ -14,9 +14,10 @@ const Generatepdf2 = (
   subtype: string,
   section: string,
   avgheader: string[],
-) => {
+): ToastProp => {
   try {
     const pdf = new jsPDF("landscape");
+    const a = typeof DepartmentName;
 
     const createTable = (
       header: string[],
@@ -24,6 +25,7 @@ const Generatepdf2 = (
       staffname: string,
       subname: string,
       coursecode: string,
+      dept: string,
     ) => {
       const semType = semester % 2 == 0 ? "FINAL" : "MID";
       pdf.setFont("helvetica", "normal");
@@ -36,28 +38,32 @@ const Generatepdf2 = (
       pdf.addImage(logoImage, "JPEG", xCoordinate, 10, imageWidth, 32); // Change the coordinates and dimensions as needed
 
       const maxWidth = pdfWidth - 20; // Adjust the maximum width as needed
-      const text = `Department of ${DepartmentName[department]}`;
-      const text1 = `Academic Year : ${academicyr} ${semType} Semester`;
-      const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUBJECTS FOR SUB CODE - ${coursecode} SEM - ${semester} SECTION - ${section}`;
-      const text3 = `Academic Year:${academicyr} ${semester % 2 == 0 ? "ODD" : "EVEN"}-SEM `;
-      const text4 = `Faculty Name : ${staffname}`;
-      const text5 = `Course Name : ${subname}`;
-      // const text1 = "test";
-      const lines1 = pdf.splitTextToSize(text1, maxWidth);
-      const lines2 = pdf.splitTextToSize(text2, maxWidth);
-      // const lines3 = pdf.splitTextToSize(text3, maxWidth);
+      if (subtype != "infra") {
+        const text = `Department of ${DepartmentName[dept]}`;
+        const text1 = `Academic Year : ${academicyr} ${semType} Semester`;
+        const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUBJECTS FOR SUB CODE - ${coursecode} SEM - ${semester} SECTION - ${section} `;
+        const text3 = `Academic Year:${academicyr} ${semester % 2 == 0 ? "ODD" : "EVEN"}-SEM `;
+        const text4 = `Faculty Name : ${staffname}`;
+        const text5 = `Course Name : ${subname}`;
+        // const text1 = "test";
+        const lines = pdf.splitTextToSize(text, maxWidth);
 
-      pdf.setFontSize(12);
-      pdf.text(text, pdfWidth / 2, 50, { align: "center" });
-      // Define table headers
-      pdf.setFontSize(13);
-      pdf.text(text3, pdfWidth / 2, 59, { align: "center" });
-      pdf.setFontSize(14);
-      pdf.text(lines2, pdfWidth / 2, 66, { align: "center" });
-      pdf.setFontSize(8);
-      pdf.text(text3, 40, 79, { align: "center" });
-      pdf.text(text4, pdfWidth / 2, 79, { align: "right" });
-      pdf.text(text5, pdfWidth - 30, 79, { align: "right" });
+        pdf.setFontSize(12);
+        pdf.text(lines, pdfWidth / 2, 50, { align: "center" });
+        // Define table headers
+        pdf.setFontSize(13);
+        pdf.text(text1, pdfWidth / 2, 57, { align: "center" });
+        pdf.setFontSize(13);
+        pdf.text(text2, pdfWidth / 2, 66, { align: "center" });
+        pdf.setFontSize(10);
+        pdf.text(text3, 50, 76, { align: "center" });
+        pdf.text(text4, pdfWidth / 2, 76, { align: "right" });
+        pdf.text(text5, pdfWidth - 20, 76, { align: "right" });
+      } else {
+        const text2 = `${academicyr} INFRASTRUCTURE  ANALYSIS REPORT  FOR  ${DepartmentName[dept]}- DEPT  `;
+        pdf.setFontSize(13);
+        pdf.text(text2, pdfWidth / 2, 66, { align: "center" });
+      }
 
       // Set table properties
       const startY = 85;
@@ -92,7 +98,6 @@ const Generatepdf2 = (
       index != 0 ? pdf.addPage() : null;
       // const semType = semester % 2 == 0 ? "EVEN" : "ODD";
       pdf.setFont("helvetica", "normal");
-      console.log(data);
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
       // Set your image width
@@ -110,6 +115,7 @@ const Generatepdf2 = (
         data.Staff,
         data[`Sub Name`],
         data.coursecode,
+        data.dept,
       );
 
       if (avgheader) {
@@ -118,7 +124,7 @@ const Generatepdf2 = (
         //   const estimatedFirstTableHeight = (rows.length + 1) * 10; // Assuming each row height is 10
         if (startYFirstTable) {
           const lines = pdf.splitTextToSize(
-            `${DepartmentName[department]} Question Wise Average `,
+            `${DepartmentName[data.dept]} Question Wise Average `,
             maxWidth,
           );
 
@@ -146,7 +152,7 @@ const Generatepdf2 = (
           autoTable(pdf, tableProps2);
 
           pdf.text(
-            `HOD/${department}`,
+            `HOD/${DepartmentName[data.dept]}`,
             pdfWidth - 20,
             // @ts-ignore
             pdf.lastAutoTable.finalY + 20,
@@ -165,15 +171,22 @@ const Generatepdf2 = (
         data.coursecode,
       );
     }
+
     // Save the PDF with a specific filename
-    pdf.save("table.pdf");
+    console.log(department);
+
+    department && subtype != "infra"
+      ? pdf.save(`${department}_sem${semester}_sec${section}.pdf`)
+      : pdf.save(`infra_${academicyr}.pdf`);
     return {
-      msg: "Report Generated :)",
+      msg: "created successfully",
       variant: "success",
     };
-  } catch (error) {
-    console.log(error.message);
-    return { msg: error.message as string, variant: "error" };
+  } catch (e) {
+    return {
+      msg: e.response.data,
+      variant: "error",
+    };
   }
 };
 

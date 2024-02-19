@@ -364,38 +364,33 @@ app.post("/generateReport", (req, res) => {
     password,
     subtype,
   } = req.body;
-  if (password == "Kcet@") {
-    if (subtype == "infra") {
-      db.query(
-        `select * from infra`,
-        [academicyear, section, dept, sem, assessmenttype, degree],
-        (error, result) => {
-          console.log(error);
-          if (result) {
-            res.status(200).send(result);
-          } else {
-            res.status(400).send({ msg: error.message });
-          }
+
+  if (subtype == "infra") {
+    db.query(
+      `select * from infra`,
+      [academicyear, section, dept, sem, assessmenttype, degree],
+      (error, result) => {
+        console.log(error);
+        if (result) {
+          res.status(200).send(result);
+        } else {
+          res.status(400).send({ msg: error.message });
         }
-      );
-    } else {
-      db.query(
-        `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.comments from mastertable as t1,${subtype} as t2 where t1.\`Sub Code\`=t2.coursecode AND t1.\`Theory/Lab\`='${subtype}'  AND t2.academicyear=? AND t2.section=? AND t2.dept=? AND t2.sem=? AND t2.assessmenttype=? AND t2.degreetype=? order by t2.coursecode,t2.username ASC;`,
-        [academicyear, section, dept, sem, assessmenttype, degree],
-        (error, result) => {
-          console.log(error);
-          if (result) {
-            res.status(200).send(result);
-          } else {
-            res.status(400).send({ msg: error.message });
-          }
-        }
-      );
-    }
+      }
+    );
   } else {
-    res.status(200).send({
-      msg: "invalid password",
-    });
+    db.query(
+      `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.comments from mastertable as t1,${subtype} as t2 where t1.\`Sub Code\`=t2.coursecode AND t1.\`Theory/Lab\`='${subtype}'  AND t2.academicyear=? AND t2.section=? AND t2.dept=? AND t2.sem=? AND t2.assessmenttype=? AND t2.degreetype=? order by t2.coursecode,t2.username ASC;`,
+      [academicyear, section, dept, sem, assessmenttype, degree],
+      (error, result) => {
+        console.log(error);
+        if (result) {
+          res.status(200).send(result);
+        } else {
+          res.status(400).send({ msg: error.message });
+        }
+      }
+    );
   }
 });
 
@@ -535,7 +530,6 @@ app.post("/getCourses", (req, res) => {
                 username,
               });
             } else {
-              console.log("Data Not Found!");
               return res.status(200).send("Data Not Found!");
             }
           }
@@ -762,15 +756,27 @@ app.post("/setMasterData/:typee", (req, res) => {
 app.get("/getdeletiondata/:type", (req, res) => {
   const { type } = req.params;
   try {
-    db.query(
-      `SELECT dept,sem,section,DATE_FORMAT(STR_TO_DATE(validfrom, '%Y-%m-%dT%H:%i:%s.%fZ'), '%Y-%m-%d')  as validfrom,DATE_FORMAT(STR_TO_DATE(validto, '%Y-%m-%dT%H:%i:%s.%fZ'), '%Y-%m-%d')  as validto , MIN(username) as username FROM ${type.toLowerCase()} GROUP BY dept, sem, validto,section,validfrom;`,
-      (error, result) => {
-        if (error) {
-          res.status(400).send(e);
+    if (type == "Feedbacklogin") {
+      db.query(
+        `SELECT DISTINCT DATE_FORMAT(STR_TO_DATE(validto, '%Y-%m-%dT%H:%i:%s.%fZ'), '%Y-%m-%d')  as validto  FROM ${type.toLowerCase()} WHERE CURDATE()>DATE_FORMAT(STR_TO_DATE(validto, '%Y-%m-%dT%H:%i:%s.%fZ'), '%Y-%m-%d')`,
+        (error, result) => {
+          if (error) {
+            res.status(400).send(error);
+          }
+          res.status(200).send(result);
         }
-        res.status(200).send(result);
-      }
-    );
+      );
+    } else {
+      db.query(
+        `select assessmenttype,academicyear,dept,sem,section from ${type} group by dept,sem,section,academicyear,assessmenttype;`,
+        (error, result) => {
+          if (error) {
+            res.status(400).send(error);
+          }
+          res.status(200).send(result);
+        }
+      );
+    }
   } catch (e) {
     res.status(400).send(e);
   }
@@ -778,22 +784,37 @@ app.get("/getdeletiondata/:type", (req, res) => {
 
 app.post("/deleterecords", (req, res) => {
   const { data } = req.body;
-  const val = data.option.split("/");
-  const dept = val[2];
-  const sem = parseInt(val[3]);
-  const section = val[4];
+
   try {
-    db.query(
-      `delete from ${data.table} where validto=? AND dept=? AND sem=? AND section=?;`,
-      [val[0], dept, sem, section],
-      (error, result) => {
-        if (error) {
-          console.log(error);
-          res.status(400).send(e);
+    if (data.table == "Feedbacklogin") {
+      db.query(
+        `delete from ${data.table} where CURDATE()>validto`,
+        (error, result) => {
+          if (error) {
+            console.log(error);
+            res.status(400).send(e);
+          }
+          res.status(200).send(result);
         }
-        res.status(200).send(result);
-      }
-    );
+      );
+    } else {
+      const val = data.option.split("/");
+      const academicyear = val[1];
+      const dept = val[2];
+      const sem = parseInt(val[3]);
+      const section = val[4];
+      db.query(
+        `delete from ${data.table} where assessmenttype=? AND academicyear=? AND dept=? AND sem=? AND section=?;`,
+        [val[0], academicyear, dept, sem, section],
+        (error, result) => {
+          if (error) {
+            console.log(error);
+            res.status(400).send(e);
+          }
+          res.status(200).send(result);
+        }
+      );
+    }
   } catch (e) {
     res.status(400).send(e);
   }

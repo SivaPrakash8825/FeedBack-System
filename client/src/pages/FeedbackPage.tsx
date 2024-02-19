@@ -86,6 +86,7 @@ const FeedbackPage = () => {
           },
           { withCredentials: true },
         );
+        
         console.log(data);
 
         if (data) {

@@ -7,9 +7,13 @@ import generatePdf from "../utils/Generatepdf2";
 import generatePdf1 from "../utils/Generatepdf";
 import useToast from "../store/useToast";
 
-const ReportGenPage = () => {
+const ReportGenPage = ({
+  academicyearlist,
+}: {
+  academicyearlist: string[];
+}) => {
   const setToast = useToast((state) => state.setToast);
-  const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
+
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
   const [department, setDepartment] = useState("");
@@ -95,7 +99,7 @@ const ReportGenPage = () => {
     const status = generatePdf(
       header,
       rows,
-      reporttype,
+      reporttype.replace(/\s+/g, ""),
       department,
       academicyr,
       parseInt(semester),
@@ -135,13 +139,6 @@ const ReportGenPage = () => {
   };
 
   useEffect(() => {
-    const curYear = new Date().getFullYear();
-    const years = [];
-    for (let i = curYear - 5; i < curYear + 2; i++) {
-      years.push(`${i}-${(i + 1) % 100}`);
-    }
-
-    setAcademicyearlist(years);
     getDepartmentList();
   }, []);
 
@@ -202,7 +199,7 @@ const ReportGenPage = () => {
       label: "report type",
       value: reporttype,
       setValue: setReporttype,
-      list: ["MarkWise", "subjectwise"],
+      list: ["Mark wise", "subject wise"],
     },
     // {
     //   list: subcodelist,
@@ -228,7 +225,10 @@ const ReportGenPage = () => {
   const fetchData = async () => {
     try {
       const apiType =
-        reporttype == "MarkWise" ? "generateReport" : "generateReportSubject";
+        reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise"
+          ? "generateReport"
+          : "generateReportSubject";
+
       const { data } = await axios.post(
         `${import.meta.env.VITE_ENDPOINT}/${apiType}`,
         {
@@ -258,7 +258,18 @@ const ReportGenPage = () => {
 
     //
     // }]
-    const isAnyEmpty = value.some((item) => item.value == "" || 0);
+    const isAnyEmpty =
+      subtype != "infra"
+        ? value.some((item) => item.value == "" || 0)
+        : academicyr != ""
+          ? false
+          : true;
+    if (subtype == "infra") {
+      console.log("infra");
+
+      setReporttype("markwise");
+    }
+
     if (isAnyEmpty) {
       alert("fill the details");
     } else {
@@ -266,42 +277,61 @@ const ReportGenPage = () => {
 
       // console.log(data);
 
-      if (reporttype == "MarkWise") {
+      if (reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise") {
         if (data.length) {
           const header = [];
           const avgheader = [];
           // const rows: any[] = [];
           // const avgrows: any[] = [];
-          console.log(data);
 
-          header.push(
-            ...Object.keys(data[0]).filter(
-              (val) =>
-                ![
-                  "marks",
-                  "Staff",
-                  "coursecode",
-                  "academicyear",
-                  "degreetype",
-                  "comments",
-                  "Sub Name",
-                ].includes(val),
-            ),
-          );
+          if (subtype.toLowerCase() == "infra") {
+            console.log("adsffasd");
+
+            header.push(
+              ...Object.keys(data[0]).filter(
+                (val) =>
+                  ![
+                    "marks",
+                    "Staff",
+                    "coursecode",
+                    "academicyear",
+                    "degreetype",
+                    "comments",
+                    "Sub Name",
+                    "dept",
+                    "section",
+                    "sem",
+                    "assessmenttype",
+                  ].includes(val),
+              ),
+            );
+          } else {
+            header.push(
+              ...Object.keys(data[0]).filter(
+                (val) =>
+                  ![
+                    "marks",
+                    "Staff",
+                    "coursecode",
+                    "academicyear",
+                    "degreetype",
+                    "comments",
+                    "Sub Name",
+                    "dept",
+                  ].includes(val),
+              ),
+            );
+          }
 
           JSON.parse(data[0].marks).answers.forEach(
             (val: any, index: number) => {
               header.push(`Q${index + 1}`);
               avgheader.push(`Q${index + 1}`);
-              // avgrows.push(0);
             },
           );
           header.push("Total");
           avgheader.push("AVG");
-          // avgrows.push(0);
-
           const parseanswer = (val: any) => {
-            // console.log(JSON.parse(val.marks).answers);
             const arr: any[] = [];
             let total = 0;
             JSON.parse(val.marks).answers.map((mark: number, index: number) => {
@@ -310,30 +340,11 @@ const ReportGenPage = () => {
               if (JSON.parse(val.marks).answers.length - 1 == index) {
                 arr[index + 1] = total;
               }
-              // row.push(mark);
-              // if (data.length - 1 == ind) {
-              //   (avgrows[index] = (avgrows[index] + mark) / data.length).toFixed(2);
-              // } else {
-              //   avgrows[index] += mark;
-              // }
             });
             return arr;
-            // console.log(arr);
           };
-          //   {
-          //     "Staff": "Mrs.S.HEMASWATHI",
-          //     "coursecode": "AI2202",
-          //     "comments": [],
-          //     "marks": [],
-          //     "avgheader": [],
-          //     "avgrow": [],
-          //"username":[]
-          // },
-
           data.forEach((val: any) => {
-            //  console.log(val);
-
-            const key = val.coursecode;
+            const key = subtype == "infra" ? val.dept : val.coursecode;
             if (!allfields[key]) {
               allfields[key] = {
                 ...val,
@@ -342,8 +353,7 @@ const ReportGenPage = () => {
               };
             } else {
               const usercom = [val.username, val.comments];
-              // Merge comments, marks, avgheader, avgrow if object already exists for this key
-              // allfields[key].marks.push([val.username,...parseanswer(val)])
+
               allfields[key].marks.push([val.username, ...parseanswer(val)]);
               allfields[key].usercomments.push(usercom);
             }
@@ -408,13 +418,17 @@ const ReportGenPage = () => {
           <div className="grid grid-cols-2 gap-3">
             {value.map((data, index) => {
               return data.list ? (
-                <SelectTextField
-                  list={data.list}
-                  value={data.value}
-                  setValue={data.setValue}
-                  label={data.label}
-                  key={index}
-                />
+                <div
+                  className={`${subtype == "infra" && index > 1 ? "pointer-events-none opacity-[0.5]" : null}`}
+                >
+                  <SelectTextField
+                    list={data.list}
+                    value={data.value}
+                    setValue={data.setValue}
+                    label={data.label}
+                    key={index}
+                  />
+                </div>
               ) : (
                 <InputTextField
                   key={index}
