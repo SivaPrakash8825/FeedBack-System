@@ -19,7 +19,7 @@ const FeedbackPage = () => {
     }[]
   >([]);
   const [btnLock, setBtnLock] = useState(true);
-  const [subject, setSubject] = useState<{ coursecode: string }>();
+  const [subject, setSubject] = useState<{ coursecode: string,subgrouping:string }>();
   const { userDetails } = useUserDetails();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
@@ -69,6 +69,8 @@ const FeedbackPage = () => {
   };
 
   const submitFeedback = async () => {
+    console.log(userDetails?.stdType);
+    
     if (ref.current) {
       if (!ref.current.value) {
         ref.current.focus();
@@ -80,15 +82,15 @@ const FeedbackPage = () => {
           {
             username: userDetails?.username,
             marks: values,
+            stdtype: userDetails?.stdType,
             type: type,
             coursecode: subject?.coursecode,
             comments: ref.current.value,
+            subgroup:subject?.subgrouping,
           },
           { withCredentials: true },
         );
-        
-        console.log(data);
-
+      
         if (data) {
           navigate(-1);
         }
@@ -100,7 +102,7 @@ const FeedbackPage = () => {
     const searchParams = new URLSearchParams(location.search);
     const subjectString: string | null = searchParams.get("subject");
     if (subjectString) {
-      const res: { coursecode: string } = JSON.parse(
+      const res: { coursecode: string ,subgrouping:string} = JSON.parse(
         decodeURIComponent(subjectString),
       );
       setSubject(res);

@@ -34,6 +34,7 @@ export interface UserDetails {
   sem: number;
   section: string;
   year: string;
+  stdType: string;
 }
 
 interface SubjectsWithName {

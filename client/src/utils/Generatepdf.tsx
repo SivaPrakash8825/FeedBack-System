@@ -169,11 +169,11 @@ const Generatepdf2 = (
         data.Staff,
         data[`Sub Name`],
         data.coursecode,
+        data.dept
       );
     }
 
-    // Save the PDF with a specific filename
-    console.log(department);
+    
 
     department && subtype != "infra"
       ? pdf.save(`${department}_sem${semester}_sec${section}.pdf`)

@@ -227,7 +227,6 @@ app.post("/generateLogin", (req, res) => {
       parameters = [
         ...parameters,
         i + 1,
-
         validfrom,
         validto,
         dept,
@@ -321,32 +320,61 @@ app.get("/me", (req, res) => {
 
 // store user feedback answer
 app.post("/storeanswer", (req, res) => {
-  const { username, marks, coursecode, type, comments } = req.body;
-  console.log(type);
+  const { username, marks, coursecode, type, comments, stdtype, subgroup } =
+    req.body;
+
   const detials = FindUserDetails(username);
   try {
-    db.query(
-      `REPLACE INTO ${type}(username,coursecode,academicyear,section,dept,sem,assessmenttype,degreetype,marks,comments) VALUES(?,?,?,?,?,?,?,?,?,?)`,
-      [
-        username,
-        coursecode,
-        detials.academicyear,
-        detials.section,
-        detials.dept,
-        detials.sem,
-        detials.assessmenttype,
-        detials.degreetype,
-        marks,
-        comments,
-      ],
-      (error, result) => {
-        if (error) console.log(error);
-        if (result) {
-          res.status(200).send(result);
+    if (type.toLowerCase() == "infra") {
+      db.query(
+        `REPLACE INTO ${type}(username,stdtype,coursecode,academicyear,section,dept,sem,assessmenttype,degreetype,marks,comments) VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
+        [
+          username,
+          stdtype,
+          coursecode,
+          detials.academicyear,
+          detials.section,
+          detials.dept,
+          detials.sem,
+          detials.assessmenttype,
+          detials.degreetype,
+          marks,
+          comments,
+        ],
+        (error, result) => {
+          if (error) console.log(error);
+          if (result) {
+            res.status(200).send(result);
+          }
+          // console.log(error);
         }
-        // console.log(error);
-      }
-    );
+      );
+    } else {
+      db.query(
+        `REPLACE INTO ${type}(username,stdtype,coursecode,academicyear,section,dept,sem,assessmenttype,degreetype,marks,comments,subgroup) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [
+          username,
+          stdtype,
+          coursecode,
+          detials.academicyear,
+          detials.section,
+          detials.dept,
+          detials.sem,
+          detials.assessmenttype,
+          detials.degreetype,
+          marks,
+          comments,
+          subgroup,
+        ],
+        (error, result) => {
+          if (error) console.log(error);
+          if (result) {
+            res.status(200).send(result);
+          }
+          // console.log(error);
+        }
+      );
+    }
   } catch (e) {
     console.log(e);
     res.status(400).send(e.message);
@@ -364,14 +392,13 @@ app.post("/generateReport", (req, res) => {
     password,
     subtype,
   } = req.body;
-
   if (subtype == "infra") {
     db.query(
-      `select * from infra`,
-      [academicyear, section, dept, sem, assessmenttype, degree],
+      `select * from infra WHERE academicyear=?`,
+      [academicyear],
       (error, result) => {
-        console.log(error);
         if (result) {
+          console.log(result);
           res.status(200).send(result);
         } else {
           res.status(400).send({ msg: error.message });
@@ -380,7 +407,7 @@ app.post("/generateReport", (req, res) => {
     );
   } else {
     db.query(
-      `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.comments,t2.dept from mastertable as t1,${subtype} as t2 where t1.\`Sub Code\`=t2.coursecode AND t1.\`Theory/Lab\`='${subtype}'  AND t2.academicyear=? AND t2.section=? AND t2.dept=? AND t2.sem=? AND t2.assessmenttype=? AND t2.degreetype=? order by t2.coursecode,t2.username ASC;`,
+      `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.stdtype as Board,t2.comments,t2.dept from submaster as t1,${subtype} as t2 where t1.\`Sub Code\`=t2.coursecode AND t1.\`Theory/Lab\`='${subtype}'  AND t1.\`Academic yr\`=? AND t2.section=? AND t2.dept=? AND t2.sem=? AND t2.assessmenttype=? AND t2.degreetype=? order by t2.coursecode,t2.username ASC;`,
       [academicyear, section, dept, sem, assessmenttype, degree],
       (error, result) => {
         console.log(error);
@@ -408,33 +435,15 @@ app.post("/generateReportSubject", (req, res) => {
     subcode,
     subtype,
   } = req.body;
+
   const acyr = academicyear.slice(0, 5) + academicyear.slice(-2);
-  // console.log(
-  //   dept,
-  //   degree,
-  //   sem,
-  //   section,
-  //   assessmenttype,
-  //   acyr,
-  //   password,
-  //   subcode,
-  //   type
-  // );
   if (password == "Kcet@") {
     db.query(
-      "SELECT a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.`Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept;",
+      `SELECT a.\`Sub Code\`, a.\`Sub Name\`, a.Staff, c.dept, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.\`Sub Code\` = c.coursecode AND c.academicyear = a.\`Academic yr\` WHERE a.\`Sub Code\` IN (SELECT coursecode FROM ${subtype} WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.\`Sub Code\`, a.\`Sub Name\`, a.Staff, c.dept;`,
       [acyr, dept, degree, sem, section, assessmenttype],
       (error, result) => {
         if (result) {
-          // const averages = result.map((r, i) => {
-          //   const { answers: a } = JSON.parse(r.marks);
-          //   const sum = a.reduce((acc, val) => acc + val, 0);
-          //   const outOf = 50;
-          //   const avg = sum / a.length;
-          //   return (avg / 5) * 50;
-          //   // return a;
-          // });
-          // console.log(result);
+          console.log(result);
           res.status(200).send(result);
         } else {
           res.status(400).send({ msg: error });
@@ -503,8 +512,18 @@ app.post("/getCourses", (req, res) => {
     console.log(academicyr, dept, degree, sem, section, year);
 
     db.query(
-      "SELECT * FROM mastertable WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? AND (`Sub Code` not in (select coursecode from theory where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Theory') AND `Sub Code` not in (select coursecode from lab where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Lab'));",
-      [academicyr, dept, degree, sem, section, username, username],
+      "SELECT * FROM submaster WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? AND (`Sub Code` not in (select coursecode from theory where username=? and coursecode=`Sub Code` and submaster.`Theory/Lab`='Theory') AND `Sub Code` not in (select coursecode from lab where username=? and coursecode=`Sub Code` and submaster.`Theory/Lab`='Lab')) AND (`Sub Grouping` not in (select subgroup from theory where username=? and subgroup=`Sub Grouping` and submaster.`Theory/Lab`='Theory') AND `Sub Grouping` not in (select subgroup from lab where username=? and subgroup=`Sub Grouping` and submaster.`Theory/Lab`='Lab'));",
+      [
+        academicyr,
+        dept,
+        degree,
+        sem,
+        section,
+        username,
+        username,
+        username,
+        username,
+      ],
       (err, result) => {
         if (err) {
           console.log(err);
@@ -516,7 +535,7 @@ app.post("/getCourses", (req, res) => {
           [username],
           (errr, ress) => {
             if (errr) return res.status(400).send(errr.message);
-            console.log(ress);
+
             // ret  res.status(200).send(ress)
             if (ress.length != 0 || result.length != 0) {
               return res.status(200).send({
@@ -693,17 +712,28 @@ app.get("/getdeletiondata/:type", (req, res) => {
 
 app.post("/deleterecords", (req, res) => {
   const { data } = req.body;
+  console.log(data);
 
   try {
     if (data.table == "Feedbacklogin") {
       db.query(
-        `delete from ${data.table} where CURDATE()>validto`,
+        `select username from feedbacklogin where CURDATE()>validto`,
         (error, result) => {
           if (error) {
             console.log(error);
             res.status(400).send(e);
           }
-          res.status(200).send(result);
+          const rows = result.map((key) => key.username);
+          db.query(
+            `delete from feedbacklogin where username in (?)`,
+            [rows],
+            (err, ress) => {
+              if (err) {
+                res.status(400).send(err);
+              }
+              return res.status(200).send(ress);
+            }
+          );
         }
       );
     } else {
@@ -712,15 +742,27 @@ app.post("/deleterecords", (req, res) => {
       const dept = val[2];
       const sem = parseInt(val[3]);
       const section = val[4];
+      console.log(data.table, val[0], academicyear, dept, sem, section);
       db.query(
-        `delete from ${data.table} where assessmenttype=? AND academicyear=? AND dept=? AND sem=? AND section=?;`,
-        [val[0], academicyear, dept, sem, section],
+        `select username from ${data.table} where assessmenttype=? AND academicyear=? AND dept=? AND sem=? AND section=?;`,
+        [val[0].trim(), academicyear.trim(), dept.trim(), sem, section.trim()],
         (error, result) => {
           if (error) {
             console.log(error);
             res.status(400).send(e);
           }
-          res.status(200).send(result);
+          const row = result.map((key) => key.username);
+          db.query(
+            `DELETE FROM ${data.table} where username in (?)`,
+            [row],
+            (errr, ress) => {
+              if (errr) {
+                console.log(errr);
+                res.status(400).send(errr);
+              }
+              res.status(200).send(ress);
+            }
+          );
         }
       );
     }
