@@ -6,6 +6,7 @@ import SelectTextField from "../components/SelectTextField";
 import generatePdf from "../utils/Generatepdf2";
 import generatePdf1 from "../utils/Generatepdf";
 import useToast from "../store/useToast";
+import useReportGenerator from "../hooks/useReportGenerator";
 
 const ReportGenPage = ({
   academicyearlist,
@@ -13,6 +14,7 @@ const ReportGenPage = ({
   academicyearlist: string[];
 }) => {
   const setToast = useToast((state) => state.setToast);
+ const {ForTheoryAndLab,ForInfra}= useReportGenerator()
 
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
@@ -109,24 +111,6 @@ const ReportGenPage = ({
     return setToast(status);
   };
 
-  // const fetchCourseCode = async () => {
-  //   const { data } = await axios.post(
-  //     `${import.meta.env.VITE_ENDPOINT}/getcoursecode`,
-  //     {
-  //       dept: department,
-  //       degree: graduation,
-  //       sem: parseInt(semester),
-  //       section: section,
-
-  //       academicyear: academicyr,
-  //     },
-  //   );
-
-  //   data.forEach((val: any) => {
-  //     setSubCodeList((pre) => [...pre, val["Sub Code"]]);
-  //   });
-  // };
-
   const getDepartmentList = async () => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_ENDPOINT}/getDepartments`,
@@ -141,22 +125,6 @@ const ReportGenPage = ({
   useEffect(() => {
     getDepartmentList();
   }, []);
-
-  // useEffect(() => {
-  //   if (
-  //     academicyr &&
-  //     graduation &&
-  //     department &&
-  //     semester &&
-  //     section &&
-  //     reporttype.toLowerCase() == "markwise"
-  //   ) {
-  //     fetchCourseCode();
-  //   } else if (reporttype.toLowerCase() == "markwise") {
-  //     setReporttype("");
-  //     alert("fill the above details");
-  //   }
-  // }, [reporttype]);
 
   const value = [
     {
@@ -225,7 +193,7 @@ const ReportGenPage = ({
   const fetchData = async () => {
     try {
       const apiType =
-        reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise"
+        reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise" || subtype=="infra"
           ? "generateReport"
           : "generateReportSubject";
 
@@ -251,22 +219,15 @@ const ReportGenPage = ({
   };
 
   const genLoginId = async () => {
-    const allfields: any = {};
-    //   [{
-    //   staffname: "hema",
-    //   coursecode: "adsf",
-
-    //
-    // }]
+    
+    
     const isAnyEmpty =
       subtype != "infra"
         ? value.some((item) => item.value == "" || 0)
         : academicyr != ""
           ? false
           : true;
-    if (subtype == "infra") {
-      console.log("infra");
-
+    if (subtype.trim() == "infra") {
       setReporttype("markwise");
     }
 
@@ -276,136 +237,56 @@ const ReportGenPage = ({
       const data = await fetchData();
 
       // console.log(data);
+       
+       
+      
+      if (data.length) {
+        if (reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise" || subtype=="infra") {
 
-      if (reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise") {
-        if (data.length) {
-          const header = [];
-          const avgheader = [];
-          // const rows: any[] = [];
-          // const avgrows: any[] = [];
 
-          if (subtype.toLowerCase() == "infra") {
-            console.log("adsffasd");
-
-            header.push(
-              ...Object.keys(data[0]).filter(
-                (val) =>
-                  ![
-                    "marks",
-                    "Staff",
-                    "coursecode",
-                    "academicyear",
-                    "degreetype",
-                    "comments",
-                    "Sub Name",
-                    "dept",
-                    "section",
-                    "sem",
-                    "assessmenttype",
-                  ].includes(val),
-              ),
+          if (subtype.trim() != "infra") {
+            
+            console.log(data);
+            
+            const {header,
+              newallfield,
+              avgheader,
+          }=ForTheoryAndLab(data);
+            generatePdf1(
+              header,newallfield,
+              reporttype,
+              department,
+              academicyr,
+              parseInt(semester),
+              subtype,
+              section,
+              avgheader
             );
           } else {
-            header.push(
-              ...Object.keys(data[0]).filter(
-                (val) =>
-                  ![
-                    "marks",
-                    "Staff",
-                    "coursecode",
-                    "academicyear",
-                    "degreetype",
-                    "comments",
-                    "Sub Name",
-                    "dept",
-                  ].includes(val),
-              ),
+            const {header,
+              newallfield,
+              avgheader,
+          }=ForInfra(data);
+            generatePdf1(
+              header,newallfield,
+              reporttype,
+              department,
+              academicyr,
+              parseInt(semester),
+              subtype,
+              section,
+              avgheader
             );
           }
-
-          JSON.parse(data[0].marks).answers.forEach(
-            (val: any, index: number) => {
-              header.push(`Q${index + 1}`);
-              avgheader.push(`Q${index + 1}`);
-            },
-          );
-          header.push("Total");
-          avgheader.push("AVG");
-          const parseanswer = (val: any) => {
-            const arr: any[] = [];
-            let total = 0;
-            JSON.parse(val.marks).answers.map((mark: number, index: number) => {
-              total += mark;
-              arr[index] = mark;
-              if (JSON.parse(val.marks).answers.length - 1 == index) {
-                arr[index + 1] = total;
-              }
-            });
-            return arr;
-          };
-          data.forEach((val: any) => {
-            const key = subtype == "infra" ? val.dept : val.coursecode;
-            if (!allfields[key]) {
-              allfields[key] = {
-                ...val,
-                marks: [[val.username, ...parseanswer(val)]],
-                usercomments: [[val.username, val.comments]],
-              };
-            } else {
-              const usercom = [val.username, val.comments];
-
-              allfields[key].marks.push([val.username, ...parseanswer(val)]);
-              allfields[key].usercomments.push(usercom);
-            }
-          });
-
-          const newallfield = Object.values(allfields);
-          const transpose = (matrix: any[]) => {
-            return matrix[0]
-              .map((_: any, colIndex: number) =>
-                matrix.map((row) => row[colIndex]),
-              )
-              .slice(1);
-          };
-
-          const calculateAverage = (column: any) => {
-            const sum = column.reduce((acc: any, value: any) => acc + value, 0);
-            return (sum / column.length).toFixed(2);
-          };
-          // const newallfield.
-          // console.log(newallfield);
-
-          newallfield.forEach((data: any) => {
-            const transposedData = transpose(data.marks);
-
-            // Calculate average for each column
-            const columnAverages = transposedData.map((column: any) =>
-              calculateAverage(column),
-            );
-
-            data.avgrow = columnAverages;
-          });
-
-          const status = generatePdf1(
-            header,
-            newallfield,
-            reporttype,
-            department,
-            academicyr,
-            parseInt(semester),
-            subtype,
-            section,
-            avgheader,
-          );
-          setToast(status);
         } else {
-          setToast({
-            msg: "No Data!!",
-            variant: "error",
-          });
+          GenerateSubjectWisePdf(data);
         }
       } else {
-        GenerateSubjectWisePdf(data);
+        setToast({
+          msg: "No Data!!",
+          variant: "error",
+        });
+        
       }
     }
   };
@@ -419,6 +300,7 @@ const ReportGenPage = ({
             {value.map((data, index) => {
               return data.list ? (
                 <div
+                  key={index}
                   className={`${subtype == "infra" && index > 1 ? "pointer-events-none opacity-[0.5]" : null}`}
                 >
                   <SelectTextField
@@ -426,7 +308,7 @@ const ReportGenPage = ({
                     value={data.value}
                     setValue={data.setValue}
                     label={data.label}
-                    key={index}
+                    
                   />
                 </div>
               ) : (
