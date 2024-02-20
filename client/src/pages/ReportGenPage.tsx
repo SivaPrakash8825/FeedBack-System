@@ -419,6 +419,7 @@ const ReportGenPage = ({
             {value.map((data, index) => {
               return data.list ? (
                 <div
+                  key={index}
                   className={`${subtype == "infra" && index > 1 ? "pointer-events-none opacity-[0.5]" : null}`}
                 >
                   <SelectTextField
