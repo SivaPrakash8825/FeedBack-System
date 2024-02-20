@@ -13,8 +13,6 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 
 app.use(cookieParser());
-app.use(express.json({ limit: "5mb" }));
-// console.log("Limit file size: " + limit);
 
 // app.use(bodyparser.urlencoded({ extended: true }));
 
@@ -48,8 +46,6 @@ const FindUserDetails = (username) => {
     1: "A",
     2: "B",
     3: "C",
-    4: "D",
-    5: "E",
   };
   const degree = {
     U: "UG",
@@ -94,8 +90,12 @@ app.post("/setQuestions/:typee", async (req, res) => {
       async (err, ress) => {
         if (!err) {
           const values = data
-            .filter(({ type }) => type === typee)
-            .map(({ id, type, question }) => [id, type, question]);
+            .filter(({ type }) => type == typee)
+            .map(({ id, type, question }) => [
+              id,
+              type,
+              JSON.stringify(question),
+            ]);
 
           // console.log(values);
 
@@ -407,8 +407,11 @@ app.post("/generateReport", (req, res) => {
     );
   } else {
     db.query(
-      `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.stdtype as Board,t2.comments,t2.dept from submaster as t1,${subtype} as t2 where t1.\`Sub Code\`=t2.coursecode AND t1.\`Theory/Lab\`='${subtype}'  AND t1.\`Academic yr\`=? AND t2.section=? AND t2.dept=? AND t2.sem=? AND t2.assessmenttype=? AND t2.degreetype=? order by t2.coursecode,t2.username ASC;`,
-      [academicyear, section, dept, sem, assessmenttype, degree],
+      `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.stdtype as Board,t2.comments,t2.dept from mastertable as t1,${subtype} as t2 
+      where t1.\`Academic yr\`=t2.academicyear AND t2.section=t1.Section AND t1.Semester=t2.sem And t1.\`Sub Code\` = t2.coursecode
+      And t1.Dept=t2.dept AND t2.academicyear=? AND t2.dept=? AND t2.sem=? AND t2.section=? AND
+      t2.assessmenttype=? AND t2.degreetype=?; `,
+      [academicyear, dept, sem, section, assessmenttype, degree],
       (error, result) => {
         console.log(error);
         if (result) {
@@ -435,15 +438,13 @@ app.post("/generateReportSubject", (req, res) => {
     subcode,
     subtype,
   } = req.body;
-
   const acyr = academicyear.slice(0, 5) + academicyear.slice(-2);
   if (password == "Kcet@") {
     db.query(
-      `SELECT a.\`Sub Code\`, a.\`Sub Name\`, a.Staff, c.dept, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.\`Sub Code\` = c.coursecode AND c.academicyear = a.\`Academic yr\` WHERE a.\`Sub Code\` IN (SELECT coursecode FROM ${subtype} WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.\`Sub Code\`, a.\`Sub Name\`, a.Staff, c.dept;`,
+      "SELECT a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.`Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept;",
       [acyr, dept, degree, sem, section, assessmenttype],
       (error, result) => {
         if (result) {
-          console.log(result);
           res.status(200).send(result);
         } else {
           res.status(400).send({ msg: error });
@@ -512,7 +513,7 @@ app.post("/getCourses", (req, res) => {
     console.log(academicyr, dept, degree, sem, section, year);
 
     db.query(
-      "SELECT * FROM submaster WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? AND (`Sub Code` not in (select coursecode from theory where username=? and coursecode=`Sub Code` and submaster.`Theory/Lab`='Theory') AND `Sub Code` not in (select coursecode from lab where username=? and coursecode=`Sub Code` and submaster.`Theory/Lab`='Lab')) AND (`Sub Grouping` not in (select subgroup from theory where username=? and subgroup=`Sub Grouping` and submaster.`Theory/Lab`='Theory') AND `Sub Grouping` not in (select subgroup from lab where username=? and subgroup=`Sub Grouping` and submaster.`Theory/Lab`='Lab'));",
+      "SELECT * FROM mastertable WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? AND (`Sub Code` not in (select coursecode from theory where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Theory') AND `Sub Code` not in (select coursecode from lab where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Lab')) AND (`Sub Grouping` not in (select subgroup from theory where username=? and subgroup=`Sub Grouping` and mastertable.`Theory/Lab`='Theory') AND `Sub Grouping` not in (select subgroup from lab where username=? and subgroup=`Sub Grouping` and mastertable.`Theory/Lab`='Lab'));",
       [
         academicyr,
         dept,
@@ -637,67 +638,10 @@ app.post("/setDepartments", (req, res) => {
   }
 });
 
-// get maseter login data
-app.get("/getMasterLogin", (req, res) => {
-  try {
-    db.query(`SELECT * FROM masterlogin`, (err, ress) => {
-      if (err) {
-        return res.status(400).send(err.message);
-      }
-      return res.status(200).send(ress);
-    });
-  } catch (error) {
-    return res.status(400).send(error.message);
-  }
-});
-
-// set master login data
-app.post("/setMasterLogin", (req, res) => {
-  const { data } = req.body;
-  try {
-    db.query(
-      "CREATE TABLE IF NOT EXISTS masterLogin (id INT NOT NULL,dept VARCHAR(20),username VARCHAR(30),password VARCHAR(30),PRIMARY KEY (dept,username));",
-      (err, ress) => {
-        if (!err) {
-          const insertQuery = `REPLACE INTO masterlogin (id,dept,username,password) VALUES ?`;
-
-          // console.log(colomnNames);
-
-          // Extract values from the data object
-          const values = data.map(({ id, dept, username, password }) => [
-            id,
-            dept,
-            username,
-            password,
-          ]);
-          transactionProcess("masterlogin", insertQuery, values, res);
-          // db.query(`TRUNCATE TABLE departments`);
-          // db.query(insertQuery, [values], (error, results) => {
-          //   if (error) {
-          //     return res.status(400).send(error.message);
-          //   } else {
-          //     return res.status(200).send("Department Inserted :)");
-          //   }
-          // });
-        } else {
-          res.status(200).send(err.message);
-        }
-      }
-    );
-  } catch (error) {
-    return res.status(400).send(error.message);
-  }
-});
-
 // get master data
-app.get("/getMasterData/:type", (req, res) => {
-  const { type } = req.params;
+app.get("/getMasterData", (req, res) => {
   try {
-    const query =
-      type == "all dept"
-        ? "Select * from mastertable;"
-        : `SELECT \`Academic yr\`,\`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\` FROM mastertable where Dept = ?`;
-    db.query(query, [type], (err, ress) => {
+    db.query(`SELECT * FROM mastertable`, (err, ress) => {
       if (err) {
         return res.status(400).send(err.message);
       }
@@ -709,64 +653,30 @@ app.get("/getMasterData/:type", (req, res) => {
 });
 
 // set master data
-app.post("/setMasterData/:typee", (req, res) => {
-  const { typee } = req.params;
+app.post("/setMasterData", (req, res) => {
   const { data } = req.body;
-  const isAll = typee == "all dept";
-  console.log(isAll);
   try {
-    // const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``);
-    // const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
-    //   ", "
-    // )}) VALUES ?`;
+    const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``); // Extracting column names from the first object in the array
+    const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
+      ", "
+    )}) VALUES ?`;
 
     // console.log(colomnNames);
 
     // Extract values from the data object
-    // const values = data.map((entry) => Object.values(entry));
+    const values = data.map((entry) => Object.values(entry));
     // return res.status(200).send({ values });
 
-    const values = data
-      .filter(({ Dept }) => (isAll ? true : Dept === typee))
-      .map(
-        ({
-          "Academic yr": academicYear,
-          Dept,
-          "UG/PG": ugpg,
-          "Theory/Lab": theoryLab,
-          Semester,
-          Section,
-          "Sub Code": subCode,
-          "Sub Name": subName,
-          Staff,
-          "StaffParent Dept": staffParentDept,
-          "Open Elective/Regular/Core Elective": electiveType,
-          "Sub Grouping": subGrouping,
-        }) => [
-          academicYear,
-          Dept,
-          ugpg,
-          theoryLab,
-          Semester,
-          Section,
-          subCode,
-          subName,
-          Staff,
-          staffParentDept,
-          electiveType,
-          subGrouping,
-        ]
-      );
-
-    // Construct the REPLACE INTO query
-    const query = `REPLACE INTO mastertable (\`Academic yr\`, Dept, \`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\`) VALUES ?`;
-
-    transactionProcess(
-      isAll ? `mastertable` : `mastertable where Dept = '${typee}'`,
-      query,
-      values,
-      res
-    );
+    // console.log(values);
+    // db.query(`TRUNCATE TABLE mastertable`);
+    transactionProcess("mastertable", insertQuery, values, res);
+    // db.query(insertQuery, [values], (error, results) => {
+    //   if (error) {
+    //     return res.status(400).send(error.message);
+    //   } else {
+    //     return res.status(200).send("Master Data Inserted :)");
+    //   }
+    // });
   } catch (error) {
     console.log(error.message);
     return res.status(400).send(error.message);
