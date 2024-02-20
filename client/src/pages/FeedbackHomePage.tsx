@@ -17,7 +17,7 @@ const FeedbackHomePage = () => {
     for (let i = 0; i < coursesData?.courses.length; i++) {
       const subject = coursesData?.courses[i];
 
-      const type = subject?.["Theory/Lab"];
+      const type = subject?.["Theory/Lab"]?.toLowerCase().trim();
 
       if (!subjectsByType[type as string]) {
         subjectsByType[type as string] = { name: type, subjects: [] };
@@ -27,6 +27,7 @@ const FeedbackHomePage = () => {
     }
 
     const result = Object.values(subjectsByType);
+    console.log(result);
 
     setCourses(result);
     setIsLoading(false);
@@ -76,7 +77,7 @@ const FeedbackHomePage = () => {
                   className="w-full overflow-hidden rounded-md border-2 border-black/80 "
                 >
                   {/* head */}
-                  <div className="bg-black/80 p-3 py-2 text-lg font-semibold text-white">
+                  <div className="bg-black/80 p-3 py-2 text-lg font-semibold capitalize text-white">
                     <h1 className="">{course.name}</h1>
                   </div>
 

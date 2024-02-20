@@ -27,16 +27,25 @@ const useJsonToExcel = () => {
     }
   };
 
-  const JsonToExcelQuestions = (data: QuestionDb[], filename: string) => {
+  const JsonToExcelQuestions = (
+    data: QuestionDb[],
+    filename: string,
+    typee: string,
+  ) => {
     try {
+      const isOthers = typee == "others";
+      // console.log(isOthers, typee);
+
       const maxOptions = Math.max(
         ...data.map((entry) => JSON.parse(entry.question).options.length),
       );
 
-      console.log(JSON.parse(data[0].question));
+      // console.log(JSON.parse(data[0].question));
 
       // Create the header row dynamically
-      const headers = ["ID", "Question"];
+      const headers = isOthers
+        ? ["ID", "Question", "Type"]
+        : ["ID", "Question"];
       for (let i = 0; i < maxOptions; i++) {
         headers.push(`Option ${i + 1}`);
       }
@@ -50,11 +59,10 @@ const useJsonToExcel = () => {
       // Insert data into the worksheet
       data.forEach((entry) => {
         // console.log(entry);
-
-        const { id, question } = entry;
+        const { id, question, type } = entry;
         const parsedQuestion = JSON.parse(question);
         const { question: q, options } = parsedQuestion;
-        const row = [id, q];
+        const row = isOthers ? [id, q, type] : [id, q];
         for (let i = 0; i < maxOptions; i++) {
           row.push(options[i] || null);
         }

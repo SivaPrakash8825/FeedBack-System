@@ -71,7 +71,13 @@ const FindUserDetails = (username) => {
 app.get("/getQuestions/:type", (req, res) => {
   const { type } = req.params;
   try {
-    db.query(`SELECT * FROM questions WHERE type=?`, [type], (err, ress) => {
+    console.log(type);
+    const query =
+      type == "others"
+        ? `SELECT * FROM questions where type NOT IN ('lab', 'infra', 'theory');`
+        : `SELECT * FROM questions WHERE type='${type}'`;
+
+    db.query(query, (err, ress) => {
       if (err) {
         return res.status(400).send(err.message);
       }
@@ -87,26 +93,36 @@ app.post("/setQuestions/:typee", async (req, res) => {
   const { typee } = req.params;
   const data = req.body.data;
   try {
+    const isOthers = typee == "others";
     // console.log(data);
     // db.query(`DELETE FROM questions where type = ?;`, [typee]);
     db.query(
       "CREATE TABLE IF NOT EXISTS `questions` (`id` int NOT NULL,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`question`,`type`));",
       async (err, ress) => {
         if (!err) {
-          const values = data
-            .filter(({ type }) => type === typee)
-            .map(({ id, type, question }) => [id, type, question]);
+          const values = isOthers
+            ? data.map(({ id, type, question }) => [id, type, question])
+            : data
+                .filter(({ type }) => type === typee)
+                .map(({ id, type, question }) => [id, type, question]);
 
           // console.log(values);
 
           const query = `REPLACE INTO questions (id,type,question) VALUES ?`;
           // console.log(query);
-          transactionProcess(
-            `questions where type = '${typee}'`,
-            query,
-            values,
-            res
-          );
+          isOthers
+            ? transactionProcess(
+                `questions where type not in ('lab','theory','infra')`,
+                query,
+                values,
+                res
+              )
+            : transactionProcess(
+                `questions where type = '${typee}'`,
+                query,
+                values,
+                res
+              );
           // db.query(query, (error, results) => {
           //   if (error) {
           //     return res.status(400).send(error.message);
@@ -409,20 +425,19 @@ app.post("/generateReportSubject", (req, res) => {
     subtype,
   } = req.body;
   const acyr = academicyear.slice(0, 5) + academicyear.slice(-2);
-  // console.log(
-  //   dept,
-  //   degree,
-  //   sem,
-  //   section,
-  //   assessmenttype,
-  //   acyr,
-  //   password,
-  //   subcode,
-  //   type
-  // );
+  console.log(
+    acyr,
+    dept,
+    degree,
+    sem,
+    section,
+    assessmenttype,
+    subcode,
+    subtype
+  );
   if (password == "Kcet@") {
     db.query(
-      "SELECT a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.`Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept;",
+      "SELECT a.`Sub Code`, a.`Sub Name', a.Staff, a.`StaffParent Dept`, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.'Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept;",
       [acyr, dept, degree, sem, section, assessmenttype],
       (error, result) => {
         if (result) {
@@ -487,7 +502,6 @@ app.post("/getCourses", (req, res) => {
     };
 
     const dept = username.substring(0, 2);
-
     const section = sectionOptions[parseInt(username.charAt(2))];
     const sem = parseInt(username.charAt(3));
     const year = semToYearOptions[sem];
@@ -839,7 +853,7 @@ const transactionProcess = (tablename, insertQuery, insertData, res) => {
         }
 
         console.log("Table Deleted");
-        console.log(insertQuery, insertData);
+        // console.log(insertQuery, insertData);
         // Insert new data
         db.query(insertQuery, [insertData], (error, results) => {
           if (error) {
