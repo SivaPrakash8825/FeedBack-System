@@ -17,7 +17,7 @@ const Generatepdf2 = (
 ): ToastProp => {
   try {
     const pdf = new jsPDF("landscape");
-    const a = typeof DepartmentName;
+    
 
     const createTable = (
       header: string[],
@@ -152,7 +152,7 @@ const Generatepdf2 = (
           autoTable(pdf, tableProps2);
 
           pdf.text(
-            `HOD/${DepartmentName[data.dept]}`,
+            `HOD/${data.dept}`,
             pdfWidth - 20,
             // @ts-ignore
             pdf.lastAutoTable.finalY + 20,
@@ -169,11 +169,11 @@ const Generatepdf2 = (
         data.Staff,
         data[`Sub Name`],
         data.coursecode,
+        data.dept
       );
     }
 
-    // Save the PDF with a specific filename
-    console.log(department);
+    
 
     department && subtype != "infra"
       ? pdf.save(`${department}_sem${semester}_sec${section}.pdf`)
