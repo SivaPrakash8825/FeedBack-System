@@ -38,7 +38,7 @@ export interface UserDetails {
 }
 
 interface SubjectsWithName {
-  name: string;
+  name: string | undefined;
   subjects: Array<Course>;
 }
 

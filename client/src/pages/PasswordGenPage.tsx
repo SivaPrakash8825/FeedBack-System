@@ -66,7 +66,7 @@ const PasswordGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
       setValue: setSemester,
     },
     {
-      list: ["A", "B", "C"],
+      list: ["A", "B", "C", "D", "E"],
       label: "section",
       value: section,
       setValue: setSection,

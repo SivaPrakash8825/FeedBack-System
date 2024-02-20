@@ -1,11 +1,4 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import useRole from "../store/useRole";
-import axios from "axios";
-
-type Props = {};
-
-const NotFoundPage = (props: Props) => {
+const NotFoundPage = () => {
   // const { role, setRole } = useRole();
   // const navigate = useNavigate();
   // const logout = async () => {

@@ -6,13 +6,19 @@ type Props = {
   label?: string;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
-  value: string ;
+  value: string;
   list: string[];
 
   setValue: (val: string) => void;
 };
 
-const SelectTextField = ({ label, list, value, setValue }: Props) => {
+const SelectTextField = ({
+  label,
+  placeholder,
+  list,
+  value,
+  setValue,
+}: Props) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const selectRef = useRef<null | HTMLDivElement>(null);
 
@@ -37,7 +43,7 @@ const SelectTextField = ({ label, list, value, setValue }: Props) => {
         className={`relative w-full rounded-md border-2 ${showDropdown ? "border-gray-500 " : "border-gray-300"} cursor-pointer select-none p-2 transition-all`}
       >
         <p className={` ${value ? "uppercase" : "capitalize text-gray-400"}`}>
-          {value || `Select ${label}`}
+          {value || (placeholder ? `Select ${placeholder}` : `Select ${label}`)}
         </p>
         {/* Dropdown */}
         {

@@ -407,8 +407,11 @@ app.post("/generateReport", (req, res) => {
     );
   } else {
     db.query(
-      `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.stdtype as Board,t2.comments,t2.dept from submaster as t1,${subtype} as t2 where t1.\`Sub Code\`=t2.coursecode AND t1.\`Theory/Lab\`='${subtype}'  AND t1.\`Academic yr\`=? AND t2.section=? AND t2.dept=? AND t2.sem=? AND t2.assessmenttype=? AND t2.degreetype=? order by t2.coursecode,t2.username ASC;`,
-      [academicyear, section, dept, sem, assessmenttype, degree],
+      `select t1.Staff,t1.\`Sub Name\`,t2.coursecode,t2.marks,t2.username,t2.stdtype as Board,t2.comments,t2.dept from mastertable as t1,${subtype} as t2 
+      where t1.\`Academic yr\`=t2.academicyear AND t2.section=t1.Section AND t1.Semester=t2.sem And t1.\`Sub Code\` = t2.coursecode
+      And t1.Dept=t2.dept AND t2.academicyear=? AND t2.dept=? AND t2.sem=? AND t2.section=? AND
+      t2.assessmenttype=? AND t2.degreetype=?; `,
+      [academicyear, dept, sem, section, assessmenttype, degree],
       (error, result) => {
         console.log(error);
         if (result) {
@@ -435,15 +438,13 @@ app.post("/generateReportSubject", (req, res) => {
     subcode,
     subtype,
   } = req.body;
-
   const acyr = academicyear.slice(0, 5) + academicyear.slice(-2);
   if (password == "Kcet@") {
     db.query(
-      `SELECT a.\`Sub Code\`, a.\`Sub Name\`, a.Staff, c.dept, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.\`Sub Code\` = c.coursecode AND c.academicyear = a.\`Academic yr\` WHERE a.\`Sub Code\` IN (SELECT coursecode FROM ${subtype} WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.\`Sub Code\`, a.\`Sub Name\`, a.Staff, c.dept;`,
+      "SELECT a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.`Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept;",
       [acyr, dept, degree, sem, section, assessmenttype],
       (error, result) => {
         if (result) {
-          console.log(result);
           res.status(200).send(result);
         } else {
           res.status(400).send({ msg: error });
@@ -512,7 +513,7 @@ app.post("/getCourses", (req, res) => {
     console.log(academicyr, dept, degree, sem, section, year);
 
     db.query(
-      "SELECT * FROM submaster WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? AND (`Sub Code` not in (select coursecode from theory where username=? and coursecode=`Sub Code` and submaster.`Theory/Lab`='Theory') AND `Sub Code` not in (select coursecode from lab where username=? and coursecode=`Sub Code` and submaster.`Theory/Lab`='Lab')) AND (`Sub Grouping` not in (select subgroup from theory where username=? and subgroup=`Sub Grouping` and submaster.`Theory/Lab`='Theory') AND `Sub Grouping` not in (select subgroup from lab where username=? and subgroup=`Sub Grouping` and submaster.`Theory/Lab`='Lab'));",
+      "SELECT * FROM mastertable WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? AND (`Sub Code` not in (select coursecode from theory where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Theory') AND `Sub Code` not in (select coursecode from lab where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Lab')) AND (`Sub Grouping` not in (select subgroup from theory where username=? and subgroup=`Sub Grouping` and mastertable.`Theory/Lab`='Theory') AND `Sub Grouping` not in (select subgroup from lab where username=? and subgroup=`Sub Grouping` and mastertable.`Theory/Lab`='Lab'));",
       [
         academicyr,
         dept,
