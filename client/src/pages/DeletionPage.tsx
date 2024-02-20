@@ -29,7 +29,7 @@ const DeletionPage = ({academicyearlist}:{academicyearlist:string[]}) => {
     setOption(val);
   };
 
-  const deleteRecords = async () => {
+  const deleteRecords = async (option:string) => {
     const val = confirm("Are you sure to delete?");
     if (val) {
       const { data } = await axios.post(
@@ -52,16 +52,13 @@ const DeletionPage = ({academicyearlist}:{academicyearlist:string[]}) => {
   };
 
   const filter = (data:responseType[]) => {
-    
-    
     if (asstype.toLowerCase() == "all" && academicyr.toLowerCase() == "all") {
       setDuplicateRows(data);
     } else {
       const arr = data.filter((val:responseType )=> {
-        return academicyr.toLowerCase() != "all" && asstype.toLowerCase() != "all" ? true : val.assessmenttype.toLowerCase() == asstype.toLowerCase() ? true : val.academicyear == academicyr ? true : false;
+        return academicyr.toLowerCase() != "all" && asstype.toLowerCase() != "all" ? val.academicyear==academicyr && val.assessmenttype.toLowerCase()==asstype.toLowerCase() :asstype.toLowerCase() == "all"?val.academicyear==academicyr:val.assessmenttype.toLowerCase()==asstype.toLowerCase() ;
         
       });
-      
       
       setDuplicateRows(arr);
     }
@@ -72,6 +69,7 @@ const DeletionPage = ({academicyearlist}:{academicyearlist:string[]}) => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_ENDPOINT}/getdeletiondata/${value}`,
     );
+    console.log(data);
     
     
     setRows(data);
@@ -94,41 +92,33 @@ const DeletionPage = ({academicyearlist}:{academicyearlist:string[]}) => {
         <th>no data</th>
       )
     } else {
-      return Object.keys(rows[0]).map(val => {
-        return (<th className=" border p-3 capitalize  ">
+      return <>
+        {Object.keys(rows[0]).map((val,index) => {
+        return (<th key={index} className=" border p-3 capitalize  ">
         {val}
            </th>)
-      })
+        })}
+        <th>Trash</th>
+      </>
     }
   
   
   }
   const SetTableBody = () => {
-    return duplicaterows.map(data => {
-      return <tr>
-        <td className=" border p-3">
-                    <RadioField
-                      options={[
-                        `${data.assessmenttype}/${data.academicyear}/${data.dept}/${data.sem}/${data.section}`,
-                      ]}
-                      invisible
-                      option={option}
-                      setOption={setOptionFun}
-                    />
-                  </td>
-        {Object.values(data).map((val )=> {
-        return <td className=" text-center border p-3 uppercase ">{val}</td>
+    return duplicaterows.map((data,index) => {
+      return <tr key={index}>
+        
+        {Object.values(data).map((val,index )=> {
+        return <td key={index} className=" text-center border p-3 uppercase ">{val}</td>
         })} 
         <td
-          onClick={deleteRecords}
-          className={` border p-3 text-center ${option == `${data.assessmenttype}/${data.academicyear}/${data.dept}/${data.sem}/${data.section}` ? " cursor-pointer" : " pointer-events-none opacity-[0.5]"}`}
-          >
-                    🗑️
-                  </td>
+          onClick={()=>deleteRecords(`${data.assessmenttype}/${data.academicyear}/${data.dept}/${data.sem}/${data.section} `)}
+          className={` border p-3 text-center cursor-pointer` }
+        >
+            🗑️
+          </td>
       </tr>
     })
-  
-  
   }
   return (
     <div className="mx-auto flex min-h-[calc(100vh-6rem)] items-center justify-center gap-0 ">
@@ -164,12 +154,12 @@ const DeletionPage = ({academicyearlist}:{academicyearlist:string[]}) => {
             <thead>
             <tr className=" border rounded-sm ">
               {( value == "Feedbacklogin")?(<th className="  p-3 capitalize  ">
-             Boost Up the Site
-                </th>) :(<><th className=" border p-3">Select</th><SetTableHead/> <th className=" border p-3">Trash</th></> ) }
+             delete the expired login data
+                </th>) :(<SetTableHead/>  ) }
             </tr>
             </thead>
             <tbody>             
-                  {(value == "Feedbacklogin") ? (rows.length==0?(<td className="p-2 opacity-[0.5] pointer-events-none"><Button title="Boost Up ⚡" onClick={deleteRecords} /></td>):(<td className="p-2"><Button title="Boost Up ⚡" onClick={deleteRecords} /></td>)):<SetTableBody/>}
+                  {(value == "Feedbacklogin") ? (rows.length==0?(<tr><td className="p-2 opacity-[0.5] pointer-events-none"><Button title=" Delete⚡"  /></td></tr>):(<tr><td className="p-2"><Button title="Delete⚡" onClick={()=>deleteRecords("")} /></td></tr>)):<SetTableBody/>}
             </tbody>
           </table>
         </div>

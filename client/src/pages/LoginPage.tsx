@@ -49,7 +49,7 @@ const LoginPage = ({ setUsername, username }: Props) => {
             });
           } else {
             setRole("user");
-            return navigate(`/feedback/${username}`);
+            return navigate(`/feedback/${username}?stdtype=${encodeURIComponent(JSON.stringify({ stdtype:option }))}`);
           }
         } else {
           setToast({ msg: "Invalid Credentials", variant: "error" });
