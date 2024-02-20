@@ -639,9 +639,14 @@ app.post("/setDepartments", (req, res) => {
 });
 
 // get master data
-app.get("/getMasterData", (req, res) => {
+app.get("/getMasterData/:type", (req, res) => {
+  const { type } = req.params;
   try {
-    db.query(`SELECT * FROM mastertable`, (err, ress) => {
+    const query =
+      type == "all dept"
+        ? "Select * from mastertable;"
+        : `SELECT \`Academic yr\`,\`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\` FROM mastertable where Dept = ?`;
+    db.query(query, [type], (err, ress) => {
       if (err) {
         return res.status(400).send(err.message);
       }
