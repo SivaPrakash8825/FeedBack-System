@@ -658,30 +658,64 @@ app.get("/getMasterData/:type", (req, res) => {
 });
 
 // set master data
-app.post("/setMasterData", (req, res) => {
+app.post("/setMasterData/:typee", (req, res) => {
+  const { typee } = req.params;
   const { data } = req.body;
+  const isAll = typee == "all dept";
+  console.log(isAll);
   try {
-    const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``); // Extracting column names from the first object in the array
-    const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
-      ", "
-    )}) VALUES ?`;
+    // const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``);
+    // const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
+    //   ", "
+    // )}) VALUES ?`;
 
     // console.log(colomnNames);
 
     // Extract values from the data object
-    const values = data.map((entry) => Object.values(entry));
+    // const values = data.map((entry) => Object.values(entry));
     // return res.status(200).send({ values });
 
-    // console.log(values);
-    // db.query(`TRUNCATE TABLE mastertable`);
-    transactionProcess("mastertable", insertQuery, values, res);
-    // db.query(insertQuery, [values], (error, results) => {
-    //   if (error) {
-    //     return res.status(400).send(error.message);
-    //   } else {
-    //     return res.status(200).send("Master Data Inserted :)");
-    //   }
-    // });
+    const values = data
+      .filter(({ Dept }) => (isAll ? true : Dept === typee))
+      .map(
+        ({
+          "Academic yr": academicYear,
+          Dept,
+          "UG/PG": ugpg,
+          "Theory/Lab": theoryLab,
+          Semester,
+          Section,
+          "Sub Code": subCode,
+          "Sub Name": subName,
+          Staff,
+          "StaffParent Dept": staffParentDept,
+          "Open Elective/Regular/Core Elective": electiveType,
+          "Sub Grouping": subGrouping,
+        }) => [
+          academicYear,
+          Dept,
+          ugpg,
+          theoryLab,
+          Semester,
+          Section,
+          subCode,
+          subName,
+          Staff,
+          staffParentDept,
+          electiveType,
+          subGrouping,
+        ]
+      );
+
+    // Construct the REPLACE INTO query
+    const query = `REPLACE INTO mastertable (\`Academic yr\`, Dept, \`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\`) VALUES ?`;
+
+    transactionProcess(
+      isAll ? `mastertable` : `mastertable where Dept = '${typee}'`,
+      query,
+      values,
+      res
+    );
   } catch (error) {
     console.log(error.message);
     return res.status(400).send(error.message);
