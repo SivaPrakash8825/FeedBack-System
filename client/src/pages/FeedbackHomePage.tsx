@@ -20,11 +20,11 @@ const FeedbackHomePage = () => {
 
       const type = subject?.["Theory/Lab"];
 
-      if (!subjectsByType[type]) {
-        subjectsByType[type] = { name: type, subjects: [] };
+      if (!subjectsByType[type as string]) {
+        subjectsByType[type as string] = { name: type, subjects: [] };
       }
 
-      subjectsByType[type].subjects.push(subject);
+      subjectsByType[type as string].subjects.push(subject);
     }
 
     const result = Object.values(subjectsByType);

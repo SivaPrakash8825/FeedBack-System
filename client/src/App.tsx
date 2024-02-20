@@ -113,10 +113,10 @@ function App() {
           {/* <Route
             element={
               <>
-                <ExcelToJson />
+                <DeleteEmptyCells />
               </>
             }
-            path="/dummy"
+            path="/admin/dummy"
           /> */}
 
           <Route path="*" element={<NotFoundPage />} />
