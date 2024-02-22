@@ -73,8 +73,11 @@ const ReportGenPage = ({
           return calculateAverageMarks(mark);
         });
         // console.log(averageMarks);
-        const finalAvg = calculateAverageMarks(averageMarks).toFixed(2);
-        // console.log(finalAvg);
+        const finalAvg = (
+          (calculateAverageMarks(averageMarks) / 5) *
+          100
+        ).toFixed(2);
+        // console.log((parseFloat(finalAvg) / 5) * 100);
         const assessment = assessMark(finalAvg);
 
         const { subject_marks, ...rest } = student;

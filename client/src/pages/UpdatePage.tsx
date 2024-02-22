@@ -101,13 +101,13 @@ const UpdatePage = () => {
         `${import.meta.env.VITE_ENDPOINT}/${api}`,
       );
       console.log(data);
-      if (data.length == 0) {
-        setToast({ msg: "No data", variant: "error" });
-        return;
-      }
+      // if (data.length == 0) {
+      //   setToast({ msg: "No data", variant: "error" });
+      //   return;
+      // }
       type == "question"
         ? JsonToExcelQuestions(data, filename, subType)
-        : JsonToExcel(data, filename);
+        : JsonToExcel(data, filename, data.length == 0);
     } catch (error) {
       console.log(error.message);
     }

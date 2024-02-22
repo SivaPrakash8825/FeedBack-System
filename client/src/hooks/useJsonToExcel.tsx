@@ -5,20 +5,27 @@ import { QuestionDb } from "../../types";
 const useJsonToExcel = () => {
   const setToast = useToast((state) => state.setToast);
 
-  const JsonToExcel = (data: Array<object>, fileName: string) => {
+  const JsonToExcel = (
+    data: Array<object>,
+    fileName: string,
+    isEmpty?: boolean,
+  ) => {
     try {
-      // Create a new workbook
-      const workbook = XLSX.utils.book_new();
+      let worksheet;
+      let workbook: XLSX.WorkBook;
+      workbook = XLSX.utils.book_new();
+      console.log(data.length);
+
+      if (Object.keys(data[0])[0] == "COLUMN_NAME") {
+        const header = data.map((item) => item.COLUMN_NAME);
+        const emptyData = [header];
+        worksheet = XLSX.utils.aoa_to_sheet(emptyData);
+      } else {
+        worksheet = XLSX.utils.json_to_sheet(data);
+      }
       console.log(data);
 
-      // Convert JSON data to a worksheet
-      const worksheet = XLSX.utils.json_to_sheet(data);
-      // console.log(worksheet);
-
-      // Add the worksheet to the workbook
       XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-      // Save the workbook to an Excel file
       XLSX.writeFile(workbook, fileName);
       setToast({ msg: "Sheet Downloaded :)", variant: "success" });
     } catch (error) {

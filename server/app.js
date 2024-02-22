@@ -587,7 +587,19 @@ app.get("/getDepartments", (req, res) => {
       if (err) {
         return res.status(400).send(err.message);
       }
-      return res.status(200).send(ress);
+      console.log(ress);
+      if (ress.length == 0) {
+        db.query(
+          " SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'theory';",
+          (errr, resss) => {
+            if (errr) {
+              return res.status(200).send(errr);
+            }
+            console.log(resss);
+            return res.status(200).send(resss);
+          }
+        );
+      } else return res.status(200).send(ress);
     });
   } catch (error) {
     return res.status(400).send(error.message);
