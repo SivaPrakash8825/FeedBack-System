@@ -85,6 +85,7 @@ app.post("/setQuestions/:typee", async (req, res) => {
   try {
     // console.log(data);
     // db.query(`DELETE FROM questions where type = ?;`, [typee]);
+    // db.query(`DELETE FROM questions where type = ?;`, [typee]);
     db.query(
       "CREATE TABLE IF NOT EXISTS `questions` (`id` int NOT NULL,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`question`,`type`));",
       async (err, ress) => {
@@ -107,6 +108,21 @@ app.post("/setQuestions/:typee", async (req, res) => {
             values,
             res
           );
+          // db.query(query, (error, results) => {
+          //   if (error) {
+          //     return res.status(400).send(error.message);
+          //   } else {
+          //     return res.status(200).send("Questions Inserted :)");
+          //   }
+          // });
+          // const query = `REPLACE INTO questions (id,type,question) VALUES ?`;
+          // // console.log(query);
+          // transactionProcess(
+          //   `questions where type = '${typee}'`,
+          //   query,
+          //   values,
+          //   res
+          // );
           // db.query(query, (error, results) => {
           //   if (error) {
           //     return res.status(400).send(error.message);
@@ -614,22 +630,25 @@ app.post("/setDepartments", (req, res) => {
           const insertQuery = `REPLACE INTO departments (${columnNames.join(
             ", "
           )}) VALUES ?`;
+          db.query(
+            "CREATE TABLE IF NOT EXISTS `departments` (`deptid` int NOT NULL,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptsname`,`deptname`))",
+            (err, ress) => {
+              if (!err) {
+                const columnNames = Object.keys(data[0]).map(
+                  (column) => `\`${column}\``
+                ); // Extracting column names from the first object in the array
+                const insertQuery = `REPLACE INTO departments (${columnNames.join(
+                  ", "
+                )}) VALUES ?`;
 
-          // console.log(colomnNames);
-
-          // Extract values from the data object
-          const values = data.map((entry) => Object.values(entry));
-          transactionProcess("departments", insertQuery, values, res);
-          // db.query(`TRUNCATE TABLE departments`);
-          // db.query(insertQuery, [values], (error, results) => {
-          //   if (error) {
-          //     return res.status(400).send(error.message);
-          //   } else {
-          //     return res.status(200).send("Department Inserted :)");
-          //   }
-          // });
-        } else {
-          res.status(200).send(err.message);
+                // Extract values from the data object
+                const values = data.map((entry) => Object.values(entry));
+                transactionProcess("departments", insertQuery, values, res);
+              } else {
+                res.status(200).send(err.message);
+              }
+            }
+          );
         }
       }
     );
@@ -639,6 +658,7 @@ app.post("/setDepartments", (req, res) => {
 });
 
 // get master data
+
 app.get("/getMasterData/:type", (req, res) => {
   const { type } = req.params;
   try {
@@ -647,10 +667,16 @@ app.get("/getMasterData/:type", (req, res) => {
         ? "Select * from mastertable;"
         : `SELECT \`Academic yr\`,\`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\` FROM mastertable where Dept = ?`;
     db.query(query, [type], (err, ress) => {
-      if (err) {
-        return res.status(400).send(err.message);
-      }
-      return res.status(200).send(ress);
+      const query =
+        type == "all dept"
+          ? "Select * from mastertable;"
+          : `SELECT \`Academic yr\`,\`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\` FROM mastertable where Dept = ?`;
+      db.query(query, [type], (err, ress) => {
+        if (err) {
+          return res.status(400).send(err.message);
+        }
+        return res.status(200).send(ress);
+      });
     });
   } catch (error) {
     return res.status(400).send(error.message);
@@ -658,6 +684,7 @@ app.get("/getMasterData/:type", (req, res) => {
 });
 
 // set master data
+
 app.post("/setMasterData/:typee", (req, res) => {
   const { typee } = req.params;
   const { data } = req.body;
@@ -668,10 +695,15 @@ app.post("/setMasterData/:typee", (req, res) => {
     // const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
     //   ", "
     // )}) VALUES ?`;
+    // const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``);
+    // const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
+    //   ", "
+    // )}) VALUES ?`;
 
     // console.log(colomnNames);
 
     // Extract values from the data object
+    // const values = data.map((entry) => Object.values(entry));
     // const values = data.map((entry) => Object.values(entry));
     // return res.status(200).send({ values });
 
@@ -858,7 +890,6 @@ const transactionProcess = (tablename, insertQuery, insertData, res) => {
     console.log(error.message.split(":")[1]);
   }
 };
-
 app.listen(port, () => {
   console.log(`server start listening on ${port}`);
 });
