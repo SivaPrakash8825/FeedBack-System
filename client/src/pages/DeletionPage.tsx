@@ -17,19 +17,19 @@ type responseType = {
   section: string;
 };
 
-const DeletionPage = ({academicyearlist}:{academicyearlist:string[]}) => {
+const DeletionPage = ({ academicyearlist }: { academicyearlist: string[] }) => {
   const [option, setOption] = useState("");
   const setToast = useToast((state) => state.setToast);
   const [value, setValue] = useState("Feedbacklogin");
   const [rows, setRows] = useState([]);
   const [duplicaterows, setDuplicateRows] = useState<responseType[]>([]);
-  const [asstype,setAssType]=useState("All")
-  const [academicyr,setAcademicyr]=useState("All")
+  const [asstype, setAssType] = useState("All");
+  const [academicyr, setAcademicyr] = useState("All");
   const setOptionFun = (val: string) => {
     setOption(val);
   };
 
-  const deleteRecords = async (option:string) => {
+  const deleteRecords = async (option: string) => {
     const val = confirm("Are you sure to delete?");
     if (val) {
       const { data } = await axios.post(
@@ -51,27 +51,30 @@ const DeletionPage = ({academicyearlist}:{academicyearlist:string[]}) => {
     }
   };
 
-  const filter = (data:responseType[]) => {
+  const filter = (data: responseType[]) => {
     if (asstype.toLowerCase() == "all" && academicyr.toLowerCase() == "all") {
       setDuplicateRows(data);
     } else {
-      const arr = data.filter((val:responseType )=> {
-        return academicyr.toLowerCase() != "all" && asstype.toLowerCase() != "all" ? val.academicyear==academicyr && val.assessmenttype.toLowerCase()==asstype.toLowerCase() :asstype.toLowerCase() == "all"?val.academicyear==academicyr:val.assessmenttype.toLowerCase()==asstype.toLowerCase() ;
-        
+      const arr = data.filter((val: responseType) => {
+        return academicyr.toLowerCase() != "all" &&
+          asstype.toLowerCase() != "all"
+          ? val.academicyear == academicyr &&
+              val.assessmenttype.toLowerCase() == asstype.toLowerCase()
+          : asstype.toLowerCase() == "all"
+            ? val.academicyear == academicyr
+            : val.assessmenttype.toLowerCase() == asstype.toLowerCase();
       });
-      
+
       setDuplicateRows(arr);
     }
-    
-  }
+  };
 
   const getDeletionData = async () => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_ENDPOINT}/getdeletiondata/${value}`,
     );
     console.log(data);
-    
-    
+
     setRows(data);
     value != "Feedbacklogin" ? filter(data) : null;
   };
@@ -82,44 +85,51 @@ const DeletionPage = ({academicyearlist}:{academicyearlist:string[]}) => {
 
   useEffect(() => {
     filter(rows);
-  },[asstype,academicyr])
+  }, [asstype, academicyr]);
 
-
-  
   const SetTableHead = () => {
-    if (rows.length <= 0) { 
-      return (
-        <th>no data</th>
-      )
+    if (rows.length <= 0) {
+      return <th>no data</th>;
     } else {
-      return <>
-        {Object.keys(rows[0]).map((val,index) => {
-        return (<th key={index} className=" border p-3 capitalize  ">
-        {val}
-           </th>)
-        })}
-        <th>Trash</th>
-      </>
+      return (
+        <>
+          {Object.keys(rows[0]).map((val, index) => {
+            return (
+              <th key={index} className=" border p-3 capitalize  ">
+                {val}
+              </th>
+            );
+          })}
+          <th>Trash</th>
+        </>
+      );
     }
-  
-  
-  }
+  };
   const SetTableBody = () => {
-    return duplicaterows.map((data,index) => {
-      return <tr key={index}>
-        
-        {Object.values(data).map((val,index )=> {
-        return <td key={index} className=" text-center border p-3 uppercase ">{val}</td>
-        })} 
-        <td
-          onClick={()=>deleteRecords(`${data.assessmenttype}/${data.academicyear}/${data.dept}/${data.sem}/${data.section} `)}
-          className={` border p-3 text-center cursor-pointer` }
-        >
+    return duplicaterows.map((data, index) => {
+      return (
+        <tr key={index}>
+          {Object.values(data).map((val, index) => {
+            return (
+              <td key={index} className=" border p-3 text-center uppercase ">
+                {val}
+              </td>
+            );
+          })}
+          <td
+            onClick={() =>
+              deleteRecords(
+                `${data.assessmenttype}/${data.academicyear}/${data.dept}/${data.sem}/${data.section} `,
+              )
+            }
+            className={` cursor-pointer border p-3 text-center`}
+          >
             🗑️
           </td>
-      </tr>
-    })
-  }
+        </tr>
+      );
+    });
+  };
   return (
     <div className="mx-auto flex min-h-[calc(100vh-6rem)] items-center justify-center gap-0 ">
       <div className="flex min-h-[60vh] w-[80vw] gap-x-5 ">
@@ -142,24 +152,47 @@ const DeletionPage = ({academicyearlist}:{academicyearlist:string[]}) => {
                 setValue={setAssType}
               />
               <SelectTextField
-                list={["all",...academicyearlist]}
+                list={["all", ...academicyearlist]}
                 value={academicyr}
                 setValue={setAcademicyr}
               />
             </div>
           </div>
         </div>
-        <div className=" w-[60%]  flex flex-col  mt-4 items-center ">
-          <table className=" border-collapse w-full " >
+        <div className=" mt-4  flex w-[60%]  flex-col items-center ">
+          <table className=" w-full border-collapse ">
             <thead>
-            <tr className=" border rounded-sm ">
-              {( value == "Feedbacklogin")?(<th className="  p-3 capitalize  ">
-             delete the expired login data
-                </th>) :(<SetTableHead/>  ) }
-            </tr>
+              <tr className=" rounded-sm border ">
+                {value == "Feedbacklogin" ? (
+                  <th className="  p-3 capitalize  ">
+                    delete the expired login data
+                  </th>
+                ) : (
+                  <SetTableHead />
+                )}
+              </tr>
             </thead>
-            <tbody>             
-                  {(value == "Feedbacklogin") ? (rows.length==0?(<tr><td className="p-2 opacity-[0.5] pointer-events-none"><Button title=" Delete⚡"  /></td></tr>):(<tr><td className="p-2"><Button title="Delete⚡" onClick={()=>deleteRecords("")} /></td></tr>)):<SetTableBody/>}
+            <tbody>
+              {value == "Feedbacklogin" ? (
+                rows.length == 0 ? (
+                  <tr>
+                    <td className="pointer-events-none p-2 opacity-[0.5]">
+                      <Button title=" Delete⚡" />
+                    </td>
+                  </tr>
+                ) : (
+                  <tr>
+                    <td className="p-2">
+                      <Button
+                        title="Delete⚡"
+                        onClick={() => deleteRecords("")}
+                      />
+                    </td>
+                  </tr>
+                )
+              ) : (
+                <SetTableBody />
+              )}
             </tbody>
           </table>
         </div>

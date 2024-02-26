@@ -13,12 +13,10 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 
 app.use(cookieParser());
-app.use(express.json({ limit: "5mb" }));
-// console.log("Limit file size: " + limit);
 
 // app.use(bodyparser.urlencoded({ extended: true }));
 
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
 app.use(
   cors({
     origin: ["http://localhost:5173"],
@@ -48,8 +46,6 @@ const FindUserDetails = (username) => {
     1: "A",
     2: "B",
     3: "C",
-    4: "D",
-    5: "E",
   };
   const degree = {
     U: "UG",
@@ -95,8 +91,12 @@ app.post("/setQuestions/:typee", async (req, res) => {
       async (err, ress) => {
         if (!err) {
           const values = data
-            .filter(({ type }) => type === typee)
-            .map(({ id, type, question }) => [id, type, question]);
+            .filter(({ type }) => type == typee)
+            .map(({ id, type, question }) => [
+              id,
+              type,
+              JSON.stringify(question),
+            ]);
 
           // console.log(values);
 
@@ -657,58 +657,6 @@ app.post("/setDepartments", (req, res) => {
   }
 });
 
-// get maseter login data
-app.get("/getMasterLogin", (req, res) => {
-  try {
-    db.query(`SELECT * FROM masterlogin`, (err, ress) => {
-      if (err) {
-        return res.status(400).send(err.message);
-      }
-      return res.status(200).send(ress);
-    });
-  } catch (error) {
-    return res.status(400).send(error.message);
-  }
-});
-
-// set master login data
-app.post("/setMasterLogin", (req, res) => {
-  const { data } = req.body;
-  try {
-    db.query(
-      "CREATE TABLE IF NOT EXISTS masterLogin (id INT NOT NULL,dept VARCHAR(20),username VARCHAR(30),password VARCHAR(30),PRIMARY KEY (dept,username));",
-      (err, ress) => {
-        if (!err) {
-          const insertQuery = `REPLACE INTO masterlogin (id,dept,username,password) VALUES ?`;
-
-          // console.log(colomnNames);
-
-          // Extract values from the data object
-          const values = data.map(({ id, dept, username, password }) => [
-            id,
-            dept,
-            username,
-            password,
-          ]);
-          transactionProcess("masterlogin", insertQuery, values, res);
-          // db.query(`TRUNCATE TABLE departments`);
-          // db.query(insertQuery, [values], (error, results) => {
-          //   if (error) {
-          //     return res.status(400).send(error.message);
-          //   } else {
-          //     return res.status(200).send("Department Inserted :)");
-          //   }
-          // });
-        } else {
-          res.status(200).send(err.message);
-        }
-      }
-    );
-  } catch (error) {
-    return res.status(400).send(error.message);
-  }
-});
-
 // get master data
 
 app.get("/getMasterData/:type", (req, res) => {
@@ -914,7 +862,7 @@ const transactionProcess = (tablename, insertQuery, insertData, res) => {
         }
 
         console.log("Table Deleted");
-        console.log(insertQuery, insertData);
+        // console.log(insertQuery, insertData);
         // Insert new data
         db.query(insertQuery, [insertData], (error, results) => {
           if (error) {
