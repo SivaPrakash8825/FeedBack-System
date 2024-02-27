@@ -33,7 +33,7 @@ const FeedbackPage = () => {
     let quesarr: any[] = [];
     for (const value of data) {
       const val = JSON.parse(value.question);
-      console.log(val);
+      // console.log(val);
 
       quesarr = [
         ...quesarr,
@@ -86,7 +86,7 @@ const FeedbackPage = () => {
           },
           { withCredentials: true },
         );
-        
+
         console.log(data);
 
         if (data) {

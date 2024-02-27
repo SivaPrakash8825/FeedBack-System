@@ -50,9 +50,7 @@ const useJsonToExcel = () => {
       // console.log(JSON.parse(data[0].question));
 
       // Create the header row dynamically
-      const headers = isOthers
-        ? ["ID", "Question", "Type"]
-        : ["ID", "Question"];
+      const headers = isOthers ? ["Question", "Type"] : ["Question"];
       for (let i = 0; i < maxOptions; i++) {
         headers.push(`Option ${i + 1}`);
       }
@@ -66,10 +64,10 @@ const useJsonToExcel = () => {
       // Insert data into the worksheet
       data.forEach((entry) => {
         // console.log(entry);
-        const { id, question, type } = entry;
+        const { question, type } = entry;
         const parsedQuestion = JSON.parse(question);
         const { question: q, options } = parsedQuestion;
-        const row = isOthers ? [id, q, type] : [id, q];
+        const row = isOthers ? [q, type] : [q];
         for (let i = 0; i < maxOptions; i++) {
           row.push(options[i] || null);
         }

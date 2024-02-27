@@ -189,7 +189,6 @@ const useExcelToJson = () => {
           {},
         );
         return {
-          id: text.ID,
           type: isOthers ? text.type : typee,
           question: JSON.stringify({
             question: text.question,

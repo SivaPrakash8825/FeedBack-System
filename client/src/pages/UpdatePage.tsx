@@ -29,7 +29,8 @@ const UpdatePage = () => {
     {
       title: "Questions",
       select: {
-        list: ["lab", "theory", "infra", "others"],
+        list: ["lab", "theory", "infra"],
+        // list: ["lab", "theory", "infra", "others"],
         value: subType,
         setValue: setSubType,
         placeholder: "Type",

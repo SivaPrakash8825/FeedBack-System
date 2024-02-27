@@ -97,18 +97,18 @@ app.post("/setQuestions/:typee", async (req, res) => {
     // console.log(data);
     // db.query(`DELETE FROM questions where type = ?;`, [typee]);
     db.query(
-      "CREATE TABLE IF NOT EXISTS `questions` (`id` int NOT NULL,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`question`,`type`));",
+      "CREATE TABLE if not exists `questions` (`id` int NOT NULL AUTO_INCREMENT,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`id`,`question`,`type`));",
       async (err, ress) => {
         if (!err) {
           const values = isOthers
-            ? data.map(({ id, type, question }) => [id, type, question])
+            ? data.map(({ type, question }) => [type, question])
             : data
                 .filter(({ type }) => type === typee)
-                .map(({ id, type, question }) => [id, type, question]);
+                .map(({ type, question }) => [type, question]);
 
           // console.log(values);
 
-          const query = `REPLACE INTO questions (id,type,question) VALUES ?`;
+          const query = `REPLACE INTO questions (type,question) VALUES ?`;
           // console.log(query);
           isOthers
             ? transactionProcess(
@@ -583,24 +583,27 @@ app.post("/getcoursecode", (req, res) => {
 // get department data
 app.get("/getDepartments", (req, res) => {
   try {
-    db.query(`SELECT * FROM departments`, (err, ress) => {
-      if (err) {
-        return res.status(400).send(err.message);
-      }
-      console.log(ress);
-      if (ress.length == 0) {
-        db.query(
-          " SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'theory';",
-          (errr, resss) => {
-            if (errr) {
-              return res.status(200).send(errr);
+    db.query(
+      `SELECT deptsname, deptname, deptfullname FROM departments`,
+      (err, ress) => {
+        if (err) {
+          return res.status(400).send(err.message);
+        }
+        console.log(ress);
+        if (ress.length == 0) {
+          db.query(
+            " SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'theory';",
+            (errr, resss) => {
+              if (errr) {
+                return res.status(200).send(errr);
+              }
+              console.log(resss);
+              return res.status(200).send(resss);
             }
-            console.log(resss);
-            return res.status(200).send(resss);
-          }
-        );
-      } else return res.status(200).send(ress);
-    });
+          );
+        } else return res.status(200).send(ress);
+      }
+    );
   } catch (error) {
     return res.status(400).send(error.message);
   }
@@ -611,20 +614,20 @@ app.post("/setDepartments", (req, res) => {
   const { data } = req.body;
   try {
     db.query(
-      "CREATE TABLE IF NOT EXISTS `departments` (`deptid` int NOT NULL,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptsname`,`deptname`))",
+      "CREATE TABLE IF NOT EXISTS `departments` (`deptid` int NOT NULL AUTO_INCREMENT,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptid`,`deptsname`,`deptname`));",
       (err, ress) => {
         if (!err) {
-          const columnNames = Object.keys(data[0]).map(
-            (column) => `\`${column}\``
-          ); // Extracting column names from the first object in the array
-          const insertQuery = `REPLACE INTO departments (${columnNames.join(
-            ", "
-          )}) VALUES ?`;
+          // const columnNames = Object.keys(data[0]).map(
+          //   (column) => `\`${column}\``
+          // );
+          const insertQuery = `REPLACE INTO departments (deptsname, deptname, deptfullname) VALUES ?`;
 
           // console.log(colomnNames);
-
-          // Extract values from the data object
-          const values = data.map((entry) => Object.values(entry));
+          const values = data.map(({ deptsname, deptname, deptfullname }) => [
+            deptsname,
+            deptname,
+            deptfullname,
+          ]);
           transactionProcess("departments", insertQuery, values, res);
           // db.query(`TRUNCATE TABLE departments`);
           // db.query(insertQuery, [values], (error, results) => {
@@ -647,7 +650,7 @@ app.post("/setDepartments", (req, res) => {
 // get maseter login data
 app.get("/getMasterLogin", (req, res) => {
   try {
-    db.query(`SELECT * FROM masterlogin`, (err, ress) => {
+    db.query(`SELECT dept,username,password FROM masterlogin`, (err, ress) => {
       if (err) {
         return res.status(400).send(err.message);
       }
@@ -663,16 +666,13 @@ app.post("/setMasterLogin", (req, res) => {
   const { data } = req.body;
   try {
     db.query(
-      "CREATE TABLE IF NOT EXISTS masterLogin (id INT NOT NULL,dept VARCHAR(20),username VARCHAR(30),password VARCHAR(30),PRIMARY KEY (dept,username));",
+      "CREATE TABLE if not exists `masterlogin` (`id` int NOT NULL AUTO_INCREMENT,`dept` varchar(20) NOT NULL,`username` varchar(30) NOT NULL,`password` varchar(30) DEFAULT NULL,PRIMARY KEY (`id`,`dept`,`username`));",
       (err, ress) => {
         if (!err) {
-          const insertQuery = `REPLACE INTO masterlogin (id,dept,username,password) VALUES ?`;
+          const insertQuery = `REPLACE INTO masterlogin (dept,username,password) VALUES ?`;
 
           // console.log(colomnNames);
-
-          // Extract values from the data object
-          const values = data.map(({ id, dept, username, password }) => [
-            id,
+          const values = data.map(({ dept, username, password }) => [
             dept,
             username,
             password,
