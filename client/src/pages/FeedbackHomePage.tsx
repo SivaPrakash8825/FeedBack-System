@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useLocation, useParams } from "react-router-dom";
 import { SubjectsByType, SubjectsWithName, UserDetails } from "../../types";
 import Spinner from "../components/Spinner";
 import useUserDetails from "../store/useUserDetails";
@@ -9,6 +9,7 @@ const FeedbackHomePage = () => {
   const { username: userName } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const { setUserDetails, userDetails } = useUserDetails();
+  const location = useLocation();
   const [courses, setCourses] = useState<SubjectsWithName[]>([]);
 
   const convertData = (coursesData: UserDetails) => {
@@ -42,7 +43,14 @@ const FeedbackHomePage = () => {
           username: userName,
         },
       );
-      console.log(coursesData);
+      const searchParams = new URLSearchParams(location.search);
+    const stdType: string | null = searchParams.get("stdtype");
+    if (stdType) {
+      const res: { stdtype: string } = JSON.parse(
+        decodeURIComponent(stdType),
+      );
+      coursesData["stdType"] =res.stdtype=="hosteller"?"H":"D" ;
+    }
       setUserDetails(
         typeof coursesData === "string"
           ? ({ username: userName } as UserDetails)
@@ -90,7 +98,7 @@ const FeedbackHomePage = () => {
                           className={
                             "cursor-pointer p-5 transition-all hover:bg-gray-100"
                           }
-                          to={`/feedback/${userName}/${subject["Theory/Lab"]}?subject=${encodeURIComponent(JSON.stringify({ coursecode: subject["Sub Code"] }))}`}
+                          to={`/feedback/${userName}/${subject["Theory/Lab"]}?subject=${encodeURIComponent(JSON.stringify({ coursecode: subject["Sub Code"] ,subgrouping:subject["Sub Grouping"]}))}`}
                         >
                           <h1 className="text-lg   font-semibold">
                             {subject["Sub Code"]}
