@@ -97,21 +97,11 @@ app.post("/setQuestions/:typee", async (req, res) => {
       "CREATE TABLE if not exists `questions` (`id` int NOT NULL AUTO_INCREMENT,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`id`,`question`,`type`));",
       async (err, ress) => {
         if (!err) {
-<<<<<<< HEAD
           const values = isOthers
             ? data.map(({ type, question }) => [type, question])
             : data
                 .filter(({ type }) => type === typee)
                 .map(({ type, question }) => [type, question]);
-=======
-          const values = data
-            .filter(({ type }) => type == typee)
-            .map(({ id, type, question }) => [
-              id,
-              type,
-              JSON.stringify(question),
-            ]);
->>>>>>> d32015297348395b9eacd5024121e4314028e5f0
 
           // console.log(values);
 
