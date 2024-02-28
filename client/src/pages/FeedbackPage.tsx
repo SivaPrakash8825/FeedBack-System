@@ -10,6 +10,7 @@ import Spinner from "../components/Spinner";
 const FeedbackPage = () => {
   const navigate = useNavigate();
   const ref = useRef<HTMLTextAreaElement | null>(null);
+  const [comment, setComment] = useState("");
   const [questions, setQuestion] = useState<
     {
       question: string;
@@ -136,20 +137,6 @@ const FeedbackPage = () => {
     );
   };
 
-  const TextArea = () => {
-    return (
-      <div className="flex flex-col gap-3 font-semibold">
-        <p>
-          Suggestion and Comments<span className=" text-red-500"> *</span>
-        </p>
-        <textarea
-          ref={ref}
-          className=" h-48 w-full resize-none rounded-md border-2 border-gray-300 p-3 outline-gray-500"
-        />
-      </div>
-    );
-  };
-
   return (
     <div className=" flex min-h-screen w-full flex-col items-center justify-center  ">
       {!loading ? (
@@ -165,7 +152,19 @@ const FeedbackPage = () => {
                 />
               );
             })}
-          <TextArea />
+
+          {/* TextArea */}
+          <div className="flex flex-col gap-3 font-semibold">
+            <p>
+              Suggestion and Comments<span className=" text-red-500"> *</span>
+            </p>
+            <textarea
+              ref={ref}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className=" h-48 w-full resize-none rounded-md border-2 border-gray-300 p-3 outline-gray-500"
+            />
+          </div>
           <Button title="Submit" disable={btnLock} onClick={submitFeedback} />
         </div>
       ) : (
