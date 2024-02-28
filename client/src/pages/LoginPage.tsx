@@ -87,7 +87,7 @@ const LoginPage = ({ setUsername, username }: Props) => {
           type="password"
         />
 
-        {username.trim() !== "admin" && (
+        {!username.trim().toLowerCase().includes("admin") && (
           <RadioField
             option={option}
             setOption={setOptionFun}

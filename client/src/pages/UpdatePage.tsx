@@ -20,7 +20,7 @@ const UpdatePage = () => {
   const masterFileRef = useRef<HTMLInputElement>(null);
   const masterLoginFileRef = useRef<HTMLInputElement>(null);
   // const [options,setOptions] = useState();
-  const [subType, setSubType] = useState("lab");
+  const [subType, setSubType] = useState<string>("lab");
   const [departments, setDepartments] = useState<Array<string>>([]);
   const [dept, setDept] = useState("all dept");
   //   const type = "lab";
@@ -29,7 +29,8 @@ const UpdatePage = () => {
     {
       title: "Questions",
       select: {
-        list: ["lab", "theory", "infra", "others"],
+        list: ["lab", "theory", "infra"],
+        // list: ["lab", "theory", "infra", "others"],
         value: subType,
         setValue: setSubType,
         placeholder: "Type",
@@ -43,6 +44,7 @@ const UpdatePage = () => {
         api: `getQuestions/${subType}`,
         filename: `${subType.toUpperCase()}_QUESTIONS.xlsx`,
         type: "question",
+        value: subType,
       },
     },
     {
@@ -100,13 +102,13 @@ const UpdatePage = () => {
         `${import.meta.env.VITE_ENDPOINT}/${api}`,
       );
       console.log(data);
-      if (data.length == 0) {
-        setToast({ msg: "No data", variant: "error" });
-        return;
-      }
+      // if (data.length == 0) {
+      //   setToast({ msg: "No data", variant: "error" });
+      //   return;
+      // }
       type == "question"
-        ? JsonToExcelQuestions(data, filename)
-        : JsonToExcel(data, filename);
+        ? JsonToExcelQuestions(data, filename, subType)
+        : JsonToExcel(data, filename, data.length == 0);
     } catch (error) {
       console.log(error.message);
     }
@@ -128,9 +130,9 @@ const UpdatePage = () => {
           "all dept",
           ...data.map((d: { deptsname: string }) => d.deptsname),
         ]);
-        // setDept(data[0]?.deptsname);
-      } catch (error) {
-        console.log(error.message);
+        // setDept(data[0]?.deptsname: React.ChangeEvent<HTMLInputElement>, typee: string, subType?: string;
+      } catch (err) {
+        console.log(err.message);
       }
     };
     getDepartments();

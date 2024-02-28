@@ -39,7 +39,7 @@ const Generatepdf2 = (
 
       const maxWidth = pdfWidth - 20; // Adjust the maximum width as needed
       if (subtype != "infra") {
-        const text = `Department of ${DepartmentName[dept]}`;
+        const text = `Department of ${DepartmentName[dept as keyof typeof DepartmentName]}`;
         const text1 = `Academic Year : ${academicyr} ${semType} Semester`;
         const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUBJECTS FOR SUB CODE - ${coursecode} SEM - ${semester} SECTION - ${section} `;
         const text3 = `Academic Year:${academicyr} ${semester % 2 == 0 ? "ODD" : "EVEN"}-SEM `;

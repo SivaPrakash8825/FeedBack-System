@@ -67,7 +67,13 @@ const FindUserDetails = (username) => {
 app.get("/getQuestions/:type", (req, res) => {
   const { type } = req.params;
   try {
-    db.query(`SELECT * FROM questions WHERE type=?`, [type], (err, ress) => {
+    console.log(type);
+    const query =
+      type == "others"
+        ? `SELECT * FROM questions where type NOT IN ('lab', 'infra', 'theory');`
+        : `SELECT * FROM questions WHERE type='${type}'`;
+
+    db.query(query, (err, ress) => {
       if (err) {
         return res.status(400).send(err.message);
       }
@@ -83,31 +89,37 @@ app.post("/setQuestions/:typee", async (req, res) => {
   const { typee } = req.params;
   const data = req.body.data;
   try {
+    const isOthers = typee == "others";
     // console.log(data);
     // db.query(`DELETE FROM questions where type = ?;`, [typee]);
     // db.query(`DELETE FROM questions where type = ?;`, [typee]);
     db.query(
-      "CREATE TABLE IF NOT EXISTS `questions` (`id` int NOT NULL,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`question`,`type`));",
+      "CREATE TABLE if not exists `questions` (`id` int NOT NULL AUTO_INCREMENT,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`id`,`question`,`type`));",
       async (err, ress) => {
         if (!err) {
-          const values = data
-            .filter(({ type }) => type == typee)
-            .map(({ id, type, question }) => [
-              id,
-              type,
-              JSON.stringify(question),
-            ]);
+          const values = isOthers
+            ? data.map(({ type, question }) => [type, question])
+            : data
+                .filter(({ type }) => type === typee)
+                .map(({ type, question }) => [type, question]);
 
           // console.log(values);
 
-          const query = `REPLACE INTO questions (id,type,question) VALUES ?`;
+          const query = `REPLACE INTO questions (type,question) VALUES ?`;
           // console.log(query);
-          transactionProcess(
-            `questions where type = '${typee}'`,
-            query,
-            values,
-            res
-          );
+          isOthers
+            ? transactionProcess(
+                `questions where type not in ('lab','theory','infra')`,
+                query,
+                values,
+                res
+              )
+            : transactionProcess(
+                `questions where type = '${typee}'`,
+                query,
+                values,
+                res
+              );
           // db.query(query, (error, results) => {
           //   if (error) {
           //     return res.status(400).send(error.message);
@@ -455,9 +467,19 @@ app.post("/generateReportSubject", (req, res) => {
     subtype,
   } = req.body;
   const acyr = academicyear.slice(0, 5) + academicyear.slice(-2);
+  console.log(
+    acyr,
+    dept,
+    degree,
+    sem,
+    section,
+    assessmenttype,
+    subcode,
+    subtype
+  );
   if (password == "Kcet@") {
     db.query(
-      "SELECT a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept, GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.`Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff, c.dept;",
+      "SELECT a.`Sub Code`, a.`Sub Name`,a.`StaffParent Dept`,a.Staff,GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.`Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` and a.Dept = c.dept and a.Semester = c.sem and a.Section = c.section and a.`UG/PG` = c.degreetype WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff,a.`StaffParent Dept`",
       [acyr, dept, degree, sem, section, assessmenttype],
       (error, result) => {
         if (result) {
@@ -513,7 +535,6 @@ app.post("/getCourses", (req, res) => {
     };
 
     const dept = username.substring(0, 2);
-
     const section = sectionOptions[parseInt(username.charAt(2))];
     const sem = parseInt(username.charAt(3));
     const year = semToYearOptions[sem];
@@ -605,12 +626,27 @@ app.post("/getcoursecode", (req, res) => {
 // get department data
 app.get("/getDepartments", (req, res) => {
   try {
-    db.query(`SELECT * FROM departments`, (err, ress) => {
-      if (err) {
-        return res.status(400).send(err.message);
+    db.query(
+      `SELECT deptsname, deptname, deptfullname FROM departments`,
+      (err, ress) => {
+        if (err) {
+          return res.status(400).send(err.message);
+        }
+        console.log(ress);
+        if (ress.length == 0) {
+          db.query(
+            " SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'theory';",
+            (errr, resss) => {
+              if (errr) {
+                return res.status(200).send(errr);
+              }
+              console.log(resss);
+              return res.status(200).send(resss);
+            }
+          );
+        } else return res.status(200).send(ress);
       }
-      return res.status(200).send(ress);
-    });
+    );
   } catch (error) {
     return res.status(400).send(error.message);
   }
@@ -621,34 +657,80 @@ app.post("/setDepartments", (req, res) => {
   const { data } = req.body;
   try {
     db.query(
-      "CREATE TABLE IF NOT EXISTS `departments` (`deptid` int NOT NULL,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptsname`,`deptname`))",
+      "CREATE TABLE IF NOT EXISTS `departments` (`deptid` int NOT NULL AUTO_INCREMENT,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptid`,`deptsname`,`deptname`));",
       (err, ress) => {
         if (!err) {
-          const columnNames = Object.keys(data[0]).map(
-            (column) => `\`${column}\``
-          ); // Extracting column names from the first object in the array
-          const insertQuery = `REPLACE INTO departments (${columnNames.join(
-            ", "
-          )}) VALUES ?`;
-          db.query(
-            "CREATE TABLE IF NOT EXISTS `departments` (`deptid` int NOT NULL,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptsname`,`deptname`))",
-            (err, ress) => {
-              if (!err) {
-                const columnNames = Object.keys(data[0]).map(
-                  (column) => `\`${column}\``
-                ); // Extracting column names from the first object in the array
-                const insertQuery = `REPLACE INTO departments (${columnNames.join(
-                  ", "
-                )}) VALUES ?`;
+          // const columnNames = Object.keys(data[0]).map(
+          //   (column) => `\`${column}\``
+          // );
+          const insertQuery = `REPLACE INTO departments (deptsname, deptname, deptfullname) VALUES ?`;
 
-                // Extract values from the data object
-                const values = data.map((entry) => Object.values(entry));
-                transactionProcess("departments", insertQuery, values, res);
-              } else {
-                res.status(200).send(err.message);
-              }
-            }
-          );
+          // console.log(colomnNames);
+          const values = data.map(({ deptsname, deptname, deptfullname }) => [
+            deptsname,
+            deptname,
+            deptfullname,
+          ]);
+          transactionProcess("departments", insertQuery, values, res);
+          // db.query(`TRUNCATE TABLE departments`);
+          // db.query(insertQuery, [values], (error, results) => {
+          //   if (error) {
+          //     return res.status(400).send(error.message);
+          //   } else {
+          //     return res.status(200).send("Department Inserted :)");
+          //   }
+          // });
+        } else {
+          res.status(200).send(err.message);
+        }
+      }
+    );
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
+// get maseter login data
+app.get("/getMasterLogin", (req, res) => {
+  try {
+    db.query(`SELECT dept,username,password FROM masterlogin`, (err, ress) => {
+      if (err) {
+        return res.status(400).send(err.message);
+      }
+      return res.status(200).send(ress);
+    });
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
+// set master login data
+app.post("/setMasterLogin", (req, res) => {
+  const { data } = req.body;
+  try {
+    db.query(
+      "CREATE TABLE if not exists `masterlogin` (`id` int NOT NULL AUTO_INCREMENT,`dept` varchar(20) NOT NULL,`username` varchar(30) NOT NULL,`password` varchar(30) DEFAULT NULL,PRIMARY KEY (`id`,`dept`,`username`));",
+      (err, ress) => {
+        if (!err) {
+          const insertQuery = `REPLACE INTO masterlogin (dept,username,password) VALUES ?`;
+
+          // console.log(colomnNames);
+          const values = data.map(({ dept, username, password }) => [
+            dept,
+            username,
+            password,
+          ]);
+          transactionProcess("masterlogin", insertQuery, values, res);
+          // db.query(`TRUNCATE TABLE departments`);
+          // db.query(insertQuery, [values], (error, results) => {
+          //   if (error) {
+          //     return res.status(400).send(error.message);
+          //   } else {
+          //     return res.status(200).send("Department Inserted :)");
+          //   }
+          // });
+        } else {
+          res.status(200).send(err.message);
         }
       }
     );

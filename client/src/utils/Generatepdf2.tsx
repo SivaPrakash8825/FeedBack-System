@@ -17,7 +17,7 @@ const Generatepdf2 = (
   avgrows?: RowInput[],
 ): ToastProp => {
   try {
-    console.log(type);
+    // console.log(type);
     const semType = semester % 2 == 0 ? "EVEN" : "ODD";
     // const semType2 = semester % 2 == 0 ? "END" : "MID";
 
@@ -35,7 +35,7 @@ const Generatepdf2 = (
 
     // Define table rows
     const rowss = [["Row 1, Cell 1", "Row 1, Cell 2", "Row 1, Cell 3"]];
-    console.log(rowss.length);
+    // console.log(rowss.length);
 
     const pdf = new jsPDF("landscape");
 

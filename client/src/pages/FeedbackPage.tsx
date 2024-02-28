@@ -10,6 +10,7 @@ import Spinner from "../components/Spinner";
 const FeedbackPage = () => {
   const navigate = useNavigate();
   const ref = useRef<HTMLTextAreaElement | null>(null);
+  const [comment, setComment] = useState("");
   const [questions, setQuestion] = useState<
     {
       question: string;
@@ -19,7 +20,10 @@ const FeedbackPage = () => {
     }[]
   >([]);
   const [btnLock, setBtnLock] = useState(true);
-  const [subject, setSubject] = useState<{ coursecode: string,subgrouping:string }>();
+  const [subject, setSubject] = useState<{
+    coursecode: string;
+    subgrouping: string;
+  }>();
   const { userDetails } = useUserDetails();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
@@ -32,10 +36,8 @@ const FeedbackPage = () => {
     );
     let quesarr: any[] = [];
     for (const value of data) {
-      
-      
       const val = JSON.parse(value.question);
-      console.log(val);
+      // console.log(val);
 
       quesarr = [
         ...quesarr,
@@ -72,7 +74,7 @@ const FeedbackPage = () => {
 
   const submitFeedback = async () => {
     console.log(userDetails?.stdType);
-    
+
     if (ref.current) {
       if (!ref.current.value) {
         ref.current.focus();
@@ -88,11 +90,13 @@ const FeedbackPage = () => {
             type: type,
             coursecode: subject?.coursecode,
             comments: ref.current.value,
-            subgroup:subject?.subgrouping,
+            subgroup: subject?.subgrouping,
           },
           { withCredentials: true },
         );
-      
+
+        console.log(data);
+
         if (data) {
           navigate(-1);
         }
@@ -104,7 +108,7 @@ const FeedbackPage = () => {
     const searchParams = new URLSearchParams(location.search);
     const subjectString: string | null = searchParams.get("subject");
     if (subjectString) {
-      const res: { coursecode: string ,subgrouping:string} = JSON.parse(
+      const res: { coursecode: string; subgrouping: string } = JSON.parse(
         decodeURIComponent(subjectString),
       );
       setSubject(res);
@@ -140,20 +144,6 @@ const FeedbackPage = () => {
     );
   };
 
-  const TextArea = () => {
-    return (
-      <div className="flex flex-col gap-3 font-semibold">
-        <p>
-          Suggestion and Comments<span className=" text-red-500"> *</span>
-        </p>
-        <textarea
-          ref={ref}
-          className=" h-48 w-full resize-none rounded-md border-2 border-gray-300 p-3 outline-gray-500"
-        />
-      </div>
-    );
-  };
-
   return (
     <div className=" flex min-h-screen w-full flex-col items-center justify-center  ">
       {!loading ? (
@@ -169,7 +159,19 @@ const FeedbackPage = () => {
                 />
               );
             })}
-          <TextArea />
+
+          {/* TextArea */}
+          <div className="flex flex-col gap-3 font-semibold">
+            <p>
+              Suggestion and Comments<span className=" text-red-500"> *</span>
+            </p>
+            <textarea
+              ref={ref}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className=" h-48 w-full resize-none rounded-md border-2 border-gray-300 p-3 outline-gray-500"
+            />
+          </div>
           <Button title="Submit" disable={btnLock} onClick={submitFeedback} />
         </div>
       ) : (

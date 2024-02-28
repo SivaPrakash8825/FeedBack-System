@@ -139,8 +139,10 @@ const useExcelToJson = () => {
     e: React.ChangeEvent<HTMLInputElement>,
     typee: string,
   ) => {
+    const isOthers = typee == "others";
+
     const file = e.target.files?.[0];
-    console.log(file);
+    console.log(typee);
 
     if (!file) return;
 
@@ -162,6 +164,8 @@ const useExcelToJson = () => {
       console.log(headers);
 
       const jsonData = rows.map((row) => {
+        // console.log(row);
+
         const text = headers.reduce(
           (acc: any, header: string, index: number) => {
             const value = row[index] !== undefined ? row[index] : null;
@@ -173,6 +177,8 @@ const useExcelToJson = () => {
                 acc.options = [];
               }
               acc.options.push(value);
+            } else if (header.toLowerCase() === "type") {
+              acc.type = value;
             } else {
               acc[header] = value;
             }
@@ -183,8 +189,7 @@ const useExcelToJson = () => {
           {},
         );
         return {
-          id: text.ID,
-          type: typee,
+          type: isOthers ? text.type : typee,
           question: JSON.stringify({
             question: text.question,
             options: text.options,

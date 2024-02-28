@@ -9,7 +9,7 @@ const { masterTableData, questions, departments } = require("./constants");
 const createQuestions = () => {
   // Creates Table
   db.query(
-    "CREATE TABLE IF NOT EXISTS `questions` (`id` int NOT NULL,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`question`,`type`));",
+    "CREATE TABLE if not exists `questions` (`id` int NOT NULL AUTO_INCREMENT,`question` varchar(250) NOT NULL,`type` varchar(10) NOT NULL,PRIMARY KEY (`id`,`question`,`type`));",
     (err, res) => {
       if (!err) {
         const values = questions.map(({ id, type, question }) => [
@@ -58,13 +58,13 @@ generateLogin();
 const createMasterLogin = () => {
   try {
     db.query(
-      "CREATE TABLE IF NOT EXISTS masterLogin (id INT NOT NULL,dept VARCHAR(20),username VARCHAR(30),password VARCHAR(30),PRIMARY KEY (dept,username));",
+      "CREATE TABLE if not exists `masterlogin` (`id` int NOT NULL AUTO_INCREMENT,`dept` varchar(20) NOT NULL,`username` varchar(30) NOT NULL,`password` varchar(30) DEFAULT NULL,PRIMARY KEY (`id`,`dept`,`username`))",
       (err, res) => {
         if (!err) {
           const query =
-            "REPLACE INTO masterLogin (id,dept, username,password) VALUES (?,?,?,?);";
+            "REPLACE INTO masterLogin (dept, username,password) VALUES (?,?,?);";
 
-          db.query(query, [1, "all", "admin", "admin"], (error, results) => {
+          db.query(query, ["all", "admin", "admin"], (error, results) => {
             if (error) {
               console.log(error.message);
             } else {
@@ -173,18 +173,17 @@ createTheorytable();
 const createDepartmentTable = () => {
   try {
     db.query(
-      "CREATE TABLE IF NOT EXISTS `departments` (`deptid` int NOT NULL,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptsname`,`deptname`))",
-
+      "CREATE TABLE IF NOT EXISTS `departments` (`deptid` int NOT NULL AUTO_INCREMENT,`deptsname` varchar(10) NOT NULL,`deptname` varchar(10) NOT NULL,`deptfullname` varchar(45) NOT NULL,PRIMARY KEY (`deptid`,`deptsname`,`deptname`));",
       (err, res) => {
         if (!err) {
           // Add Questions to table
           const values = departments
             .map(
-              ({ deptid, deptsname, deptname, deptfullname }) =>
-                `(${deptid},'${deptsname}','${deptname}','${deptfullname}')`
+              ({ deptsname, deptname, deptfullname }) =>
+                `('${deptsname}','${deptname}','${deptfullname}')`
             )
             .join(",");
-          const query = `REPLACE INTO departments (deptid, deptsname, deptname, deptfullname) VALUES ${values}`;
+          const query = `REPLACE INTO departments (deptsname, deptname, deptfullname) VALUES ${values}`;
 
           db.query(query, (error, results) => {
             if (error) {
