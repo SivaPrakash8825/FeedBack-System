@@ -46,6 +46,8 @@ const FindUserDetails = (username) => {
     1: "A",
     2: "B",
     3: "C",
+    4: "D",
+    5: "E",
   };
   const degree = {
     U: "UG",
@@ -196,6 +198,8 @@ app.post("/generateLogin", (req, res) => {
       a: 1,
       b: 2,
       c: 3,
+      d: 4,
+      e: 5,
       pre: 1,
       post: 2,
       "mgmt-pre": 3,
@@ -370,7 +374,10 @@ app.post("/storeanswer", (req, res) => {
           comments,
         ],
         (error, result) => {
-          if (error) console.log(error);
+          if (error) {
+            console.log(error);
+            res.status(400).send(error.message);
+          }
           if (result) {
             res.status(200).send(result);
           }
@@ -395,7 +402,10 @@ app.post("/storeanswer", (req, res) => {
           subgroup,
         ],
         (error, result) => {
-          if (error) console.log(error);
+          if (error) {
+            console.log(error);
+            res.status(400).send(error.message);
+          }
           if (result) {
             res.status(200).send(result);
           }
@@ -515,6 +525,8 @@ app.post("/getCourses", (req, res) => {
       1: "A",
       2: "B",
       3: "C",
+      4: "D",
+      5: "E",
     };
     const assessmentTypeOptions = {
       1: "pre",

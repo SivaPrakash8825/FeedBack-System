@@ -17,6 +17,7 @@ const useJsonToExcel = () => {
       console.log(data.length);
 
       if (Object.keys(data[0])[0] == "COLUMN_NAME") {
+        // @ts-ignore
         const header = data.map((item) => item.COLUMN_NAME);
         const emptyData = [header];
         worksheet = XLSX.utils.aoa_to_sheet(emptyData);
