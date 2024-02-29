@@ -50,7 +50,7 @@ const Generatepdf2 = (
     pdf.addImage(logoImage, "JPEG", xCoordinate, 10, imageWidth, 32); // Change the coordinates and dimensions as needed
 
     const maxWidth = pdfWidth - 20; // Adjust the maximum width as needed
-    const text = `Department of ${DepartmentName[department]}`;
+    const text = `Department of ${DepartmentName[department as keyof typeof DepartmentName]}`;
     const text1 = `Academic Year : ${academicyr} ${semType} Semester`;
     const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUBJECTS FOR SEM - ${semester} SECTION - ${section} `;
     // const text1 = "test";
@@ -102,7 +102,7 @@ const Generatepdf2 = (
         const tableProps2: UserOptions = {
           startY: startYSecondTable,
           head: [avgheader],
-          body: [avgrows],
+          body: [avgrows] as RowInput[],
           theme: "grid",
           styles: {
             fontSize: 5,
@@ -130,7 +130,7 @@ const Generatepdf2 = (
     );
 
     // Save the PDF with a specific filename
-    pdf.save("table.pdf");
+    pdf.save(`${department}_${semester}(${section})_Feedback_Report.pdf`);
     return { msg: "Report Generated :)", variant: "success" };
   } catch (error) {
     console.log(error.message);

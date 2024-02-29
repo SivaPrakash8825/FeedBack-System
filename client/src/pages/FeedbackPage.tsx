@@ -63,7 +63,9 @@ const FeedbackPage = () => {
       setQuestion((prevState) => {
         return prevState.map((obj, ind) => {
           if (ind === index - 1) {
-            const mark = obj.options.length - obj.options.indexOf(opt);
+            const mark =
+              obj.options.filter((opt) => opt && opt.trim()).length -
+              obj.options.indexOf(opt);
             return { ...obj, option: opt, mark: mark }; // Update only the object feild
           }
           return obj; // Return unchanged object for other indices
@@ -73,34 +75,26 @@ const FeedbackPage = () => {
   };
 
   const submitFeedback = async () => {
-    console.log(userDetails?.stdType);
+    const marks = questions.map((data) => data.mark);
+    const values = JSON.stringify({ answers: marks });
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_ENDPOINT}/storeanswer`,
+      {
+        username: userDetails?.username,
+        marks: values,
+        stdtype: userDetails?.stdType,
+        type: type,
+        coursecode: subject?.coursecode,
+        comments: ref.current?.value,
+        subgroup: subject?.subgrouping,
+      },
+      { withCredentials: true },
+    );
 
-    if (ref.current) {
-      if (!ref.current.value) {
-        ref.current.focus();
-      } else {
-        const marks = questions.map((data) => data.mark);
-        const values = JSON.stringify({ answers: marks });
-        const { data } = await axios.post(
-          `${import.meta.env.VITE_ENDPOINT}/storeanswer`,
-          {
-            username: userDetails?.username,
-            marks: values,
-            stdtype: userDetails?.stdType,
-            type: type,
-            coursecode: subject?.coursecode,
-            comments: ref.current.value,
-            subgroup: subject?.subgrouping,
-          },
-          { withCredentials: true },
-        );
+    console.log(data);
 
-        console.log(data);
-
-        if (data) {
-          navigate(-1);
-        }
-      }
+    if (data) {
+      navigate(-1);
     }
   };
 
@@ -161,10 +155,8 @@ const FeedbackPage = () => {
             })}
 
           {/* TextArea */}
-          <div className="flex flex-col gap-3 font-semibold">
-            <p>
-              Suggestion and Comments<span className=" text-red-500"> *</span>
-            </p>
+          <div className="flex flex-col gap-3">
+            <p className="font-semibold">Suggestion and Comments</p>
             <textarea
               ref={ref}
               value={comment}
