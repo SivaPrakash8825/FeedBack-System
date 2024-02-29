@@ -14,7 +14,7 @@ const ReportGenPage = ({
   academicyearlist: string[];
 }) => {
   const setToast = useToast((state) => state.setToast);
- const {ForTheoryAndLab,ForInfra}= useReportGenerator()
+  const { ForTheoryAndLab, ForInfra } = useReportGenerator();
 
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
@@ -38,15 +38,15 @@ const ReportGenPage = ({
 
     function assessMark(markk: string) {
       const mark = parseFloat(markk);
-      if (mark >= 0 && mark < 1) {
+      if (mark >= 0 && mark < 40) {
         return "Normal";
-      } else if (mark >= 1 && mark < 2) {
+      } else if (mark >= 40 && mark < 60) {
         return "Average";
-      } else if (mark >= 2 && mark < 3) {
+      } else if (mark >= 60 && mark < 80) {
         return "Good";
-      } else if (mark >= 3 && mark < 4) {
+      } else if (mark >= 80 && mark < 90) {
         return "Very Good";
-      } else if (mark >= 4 && mark <= 5) {
+      } else if (mark >= 90 && mark <= 100) {
         return "Excellent";
       } else {
         return "Invalid mark";
@@ -196,7 +196,8 @@ const ReportGenPage = ({
   const fetchData = async () => {
     try {
       const apiType =
-        reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise" || subtype=="infra"
+        reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise" ||
+        subtype == "infra"
           ? "generateReport"
           : "generateReportSubject";
 
@@ -222,8 +223,6 @@ const ReportGenPage = ({
   };
 
   const genLoginId = async () => {
-    
-    
     const isAnyEmpty =
       subtype != "infra"
         ? value.some((item) => item.value == "" || 0)
@@ -240,45 +239,39 @@ const ReportGenPage = ({
       const data = await fetchData();
 
       // console.log(data);
-       
-       
-      
+
       if (data.length) {
-        if (reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise" || subtype=="infra") {
-
-
+        if (
+          reporttype.replace(/\s+/g, "").toLowerCase().trim() == "markwise" ||
+          subtype == "infra"
+        ) {
           if (subtype.trim() != "infra") {
-            
             console.log(data);
-            
-            const {header,
-              newallfield,
-              avgheader,
-          }=ForTheoryAndLab(data);
+
+            const { header, newallfield, avgheader } = ForTheoryAndLab(data);
             generatePdf1(
-              header,newallfield,
+              header,
+              newallfield,
               reporttype,
               department,
               academicyr,
               parseInt(semester),
               subtype,
               section,
-              avgheader
+              avgheader,
             );
           } else {
-            const {header,
-              newallfield,
-              avgheader,
-          }=ForInfra(data);
+            const { header, newallfield, avgheader } = ForInfra(data);
             generatePdf1(
-              header,newallfield,
+              header,
+              newallfield,
               reporttype,
               department,
               academicyr,
               parseInt(semester),
               subtype,
               section,
-              avgheader
+              avgheader,
             );
           }
         } else {
@@ -289,7 +282,6 @@ const ReportGenPage = ({
           msg: "No Data!!",
           variant: "error",
         });
-        
       }
     }
   };
@@ -311,7 +303,6 @@ const ReportGenPage = ({
                     value={data.value}
                     setValue={data.setValue}
                     label={data.label}
-                    
                   />
                 </div>
               ) : (
