@@ -359,7 +359,7 @@ app.post("/storeanswer", (req, res) => {
   try {
     if (type.toLowerCase() == "infra") {
       db.query(
-        `REPLACE INTO ${type}(username,stdtype,coursecode,academicyear,section,dept,sem,assessmenttype,degreetype,marks,comments) VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
+        `REPLACE INTO ${type}(username,stdtype,coursecode,academicyear,section,dept,sem,assessmenttype,degreetype,marks,comments,subgroup) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
         [
           username,
           stdtype,
@@ -372,6 +372,7 @@ app.post("/storeanswer", (req, res) => {
           detials.degreetype,
           marks,
           comments,
+          subgroup,
         ],
         (error, result) => {
           if (error) {

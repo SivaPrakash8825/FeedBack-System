@@ -37,8 +37,10 @@ const Generatepdf2 = (
       // Add the image at the calculated center coordinates
       pdf.addImage(logoImage, "JPEG", xCoordinate, 10, imageWidth, 32); // Change the coordinates and dimensions as needed
 
-      const maxWidth = pdfWidth - 20; // Adjust the maximum width as needed
+      const maxWidth = pdfWidth - 20;
+      let startY = 0;// Adjust the maximum width as needed
       if (subtype != "infra") {
+         startY = 82;
         const text = `Department of ${DepartmentName[dept as keyof typeof DepartmentName]}`;
         const text1 = `Academic Year : ${academicyr} ${semType} Semester`;
         const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUB CODE - ${coursecode} SEM - ${semester} SEC - ${section} `;
@@ -60,13 +62,14 @@ const Generatepdf2 = (
         pdf.text(text4, 21, 73);
         pdf.text(text5, pdfWidth - 20, 79, { align: "right" });
       } else {
+        startY = 65;
         const text2 = `${academicyr} Infrastructure  Analysis Report  For  ${DepartmentName[dept]}  `;
         pdf.setFontSize(15);
         pdf.text(text2, pdfWidth / 2, 60, { align: "center" });
       }
 
       // Set table properties
-      const startY = 65;
+      
 
       const columnstyle: any =
         header.length == 2
@@ -178,7 +181,7 @@ const Generatepdf2 = (
     
 
     department && subtype != "infra"
-      ? pdf.save(`${department}_sem${semester}_sec${section}.pdf`)
+      ? pdf.save(`${subtype}_${department}__${semester}_${section}.pdf`)
       : pdf.save(`infra_${academicyr}.pdf`);
     return {
       msg: "created successfully",
