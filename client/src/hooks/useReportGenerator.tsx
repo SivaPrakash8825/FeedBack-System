@@ -22,7 +22,7 @@ const useReportGenerator = () => {
             "comments",
             "Sub Name",
             "dept",
-
+"subgroup",
             "assessmenttype",
           ].includes(val.trim()),
       ),
@@ -85,7 +85,7 @@ const useReportGenerator = () => {
 
     const calculateAverage = (column: any) => {
       const sum = column.reduce((acc: any, value: any) => acc + value, 0);
-      return (sum / column.length).toFixed(4);
+      return (sum / column.length).toFixed(2);
     };
     // const newallfield.
     // console.log(newallfield);
