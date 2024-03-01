@@ -13,11 +13,12 @@ const Generatepdf2 = (
   semester: number,
   subtype: string,
   section: string,
+  assType: string,
   avgheader?: string[],
   avgrows?: RowInput[],
 ): ToastProp => {
   try {
-    // console.log(type);
+    console.log(type, assType);
     const semType = semester % 2 == 0 ? "EVEN" : "ODD";
     // const semType2 = semester % 2 == 0 ? "END" : "MID";
 
@@ -52,7 +53,7 @@ const Generatepdf2 = (
     const maxWidth = pdfWidth - 20; // Adjust the maximum width as needed
     const text = `Department of ${DepartmentName[department as keyof typeof DepartmentName]}`;
     const text1 = `Academic Year : ${academicyr} ${semType} Semester`;
-    const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUBJECTS FOR SEM - ${semester} SECTION - ${section} `;
+    const text2 = `${assType == "pre" ? "MID" : "END"} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUBJECTS FOR SEM - ${semester} SECTION - ${section} `;
     // const text1 = "test";
     const lines = pdf.splitTextToSize(text, maxWidth);
 

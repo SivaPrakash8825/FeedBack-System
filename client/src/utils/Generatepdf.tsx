@@ -14,10 +14,10 @@ const Generatepdf2 = (
   subtype: string,
   section: string,
   avgheader: string[],
+  assType: string,
 ): ToastProp => {
   try {
     const pdf = new jsPDF("landscape");
-    
 
     const createTable = (
       header: string[],
@@ -38,12 +38,12 @@ const Generatepdf2 = (
       pdf.addImage(logoImage, "JPEG", xCoordinate, 10, imageWidth, 32); // Change the coordinates and dimensions as needed
 
       const maxWidth = pdfWidth - 20;
-      let startY = 0;// Adjust the maximum width as needed
+      let startY = 0; // Adjust the maximum width as needed
       if (subtype != "infra") {
-         startY = 82;
+        startY = 82;
         const text = `Department of ${DepartmentName[dept as keyof typeof DepartmentName]}`;
-        const text1 = `Academic Year : ${academicyr} ${semType} Semester`;
-        const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUB CODE - ${coursecode} SEM - ${semester} SEC - ${section} `;
+        const text1 = `Academic Year : ${academicyr} ${semType == "FINAL" ? "EVEN" : "ODD"} Semester`;
+        const text2 = `${assType == "pre" ? "MID" : "END"} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUB CODE - ${coursecode} SEM - ${semester} SEC - ${section} `;
         const text3 = `Academic Year:${academicyr} ${semester % 2 == 0 ? "ODD" : "EVEN"}-SEM `;
         const text4 = `Faculty Name : ${staffname}`;
         const text5 = `Course Name : ${subname}`;
@@ -69,7 +69,6 @@ const Generatepdf2 = (
       }
 
       // Set table properties
-      
 
       const columnstyle: any =
         header.length == 2
@@ -174,11 +173,9 @@ const Generatepdf2 = (
         data.Staff,
         data[`Sub Name`],
         data.coursecode,
-        data.dept
+        data.dept,
       );
     }
-
-    
 
     department && subtype != "infra"
       ? pdf.save(`${subtype}_${department}__${semester}_${section}.pdf`)

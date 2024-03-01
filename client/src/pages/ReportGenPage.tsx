@@ -110,6 +110,7 @@ const ReportGenPage = ({
       parseInt(semester),
       subtype,
       section,
+      asstype,
     );
     return setToast(status);
   };
@@ -259,6 +260,7 @@ const ReportGenPage = ({
               subtype,
               section,
               avgheader,
+              asstype,
             );
           } else {
             const { header, newallfield, avgheader } = ForInfra(data);
@@ -272,6 +274,7 @@ const ReportGenPage = ({
               subtype,
               section,
               avgheader,
+              asstype,
             );
           }
         } else {

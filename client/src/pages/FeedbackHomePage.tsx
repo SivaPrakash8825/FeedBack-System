@@ -13,6 +13,8 @@ const FeedbackHomePage = () => {
   const [courses, setCourses] = useState<SubjectsWithName[]>([]);
 
   const convertData = (coursesData: UserDetails) => {
+    // console.log(coursesData);
+
     const subjectsByType: SubjectsByType = {};
 
     for (let i = 0; i < coursesData?.courses.length; i++) {
@@ -112,7 +114,7 @@ const FeedbackHomePage = () => {
                               subject[
                                 "Open Elective/Regular/Core Elective"
                               ]?.trim() != "" && (
-                                <h1 className="my-auto h-fit rounded-full border-[2px] border-black bg-black px-2 py-0.5 text-[.72rem] font-semibold text-white">
+                                <h1 className="my-auto h-fit  rounded-full border-[2px] border-black bg-black  px-1.5 py-0.5 text-[0.65rem] font-bold uppercase leading-3 text-white">
                                   {
                                     subject[
                                       "Open Elective/Regular/Core Elective"
