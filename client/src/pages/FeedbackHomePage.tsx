@@ -44,13 +44,13 @@ const FeedbackHomePage = () => {
         },
       );
       const searchParams = new URLSearchParams(location.search);
-    const stdType: string | null = searchParams.get("stdtype");
-    if (stdType) {
-      const res: { stdtype: string } = JSON.parse(
-        decodeURIComponent(stdType),
-      );
-      coursesData["stdType"] =res.stdtype=="hosteller"?"H":"D" ;
-    }
+      const stdType: string | null = searchParams.get("stdtype");
+      if (stdType) {
+        const res: { stdtype: string } = JSON.parse(
+          decodeURIComponent(stdType),
+        );
+        coursesData["stdType"] = res.stdtype == "hosteller" ? "H" : "D";
+      }
       setUserDetails(
         typeof coursesData === "string"
           ? ({ username: userName } as UserDetails)
@@ -98,13 +98,18 @@ const FeedbackHomePage = () => {
                           className={
                             "cursor-pointer p-5 transition-all hover:bg-gray-100"
                           }
-                          to={`/feedback/${userName}/${subject["Theory/Lab"]}?subject=${encodeURIComponent(JSON.stringify({ coursecode: subject["Sub Code"] ,subgrouping:subject["Sub Grouping"]}))}`}
+                          to={`/feedback/${userName}/${subject["Theory/Lab"]}?subject=${encodeURIComponent(JSON.stringify({ coursecode: subject["Sub Code"], subgrouping: subject["Sub Grouping"] }))}`}
                         >
-                          <h1 className="text-lg   font-semibold">
-                            {subject["Sub Code"]}
-                            {" - "}
-                            {subject["Sub Name"]}{" "}
-                          </h1>
+                          <div className="flex gap-3">
+                            <h1 className="text-lg   font-semibold">
+                              {subject["Sub Code"]}
+                              {" - "}
+                              {subject["Sub Name"]}{" "}
+                            </h1>
+                            <h1 className="my-auto h-fit rounded-full border-[2px] border-black bg-black px-2 py-0.5 text-[.72rem] font-semibold text-white">
+                              {subject["Open Elective/Regular/Core Elective"]}
+                            </h1>
+                          </div>
                           <h1 className="text-sm font-medium">
                             {subject["Staff"]}
                           </h1>
