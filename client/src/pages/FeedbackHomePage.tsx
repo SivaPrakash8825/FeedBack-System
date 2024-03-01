@@ -106,9 +106,20 @@ const FeedbackHomePage = () => {
                               {" - "}
                               {subject["Sub Name"]}{" "}
                             </h1>
-                            <h1 className="my-auto h-fit rounded-full border-[2px] border-black bg-black px-2 py-0.5 text-[.72rem] font-semibold text-white">
-                              {subject["Open Elective/Regular/Core Elective"]}
-                            </h1>
+                            {subject[
+                              "Open Elective/Regular/Core Elective"
+                            ]?.toLowerCase() != "reg" &&
+                              subject[
+                                "Open Elective/Regular/Core Elective"
+                              ]?.trim() != "" && (
+                                <h1 className="my-auto h-fit rounded-full border-[2px] border-black bg-black px-2 py-0.5 text-[.72rem] font-semibold text-white">
+                                  {
+                                    subject[
+                                      "Open Elective/Regular/Core Elective"
+                                    ]
+                                  }
+                                </h1>
+                              )}
                           </div>
                           <h1 className="text-sm font-medium">
                             {subject["Staff"]}
