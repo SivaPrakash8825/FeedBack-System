@@ -35,6 +35,14 @@ const useExcelToJson = () => {
       // console.log(file);
 
       if (!file) return;
+      console.log(file.name, type);
+      if (
+        type &&
+        !file.name.toLowerCase().trim().includes(type.toLowerCase())
+      ) {
+        setToast({ msg: "Insert the Valid Excel File", variant: "error" });
+        return;
+      }
 
       const reader = new FileReader();
 
@@ -63,8 +71,8 @@ const useExcelToJson = () => {
             ? [...jsonResult[0], "Dept"]
             : jsonResult[0];
         // console.log(headers);
-        console.log(jsonResult);
-        console.log(headers);
+        // console.log(jsonResult);
+        // console.log(headers);
 
         const jsonData = jsonResult
           .slice(1)
@@ -142,26 +150,34 @@ const useExcelToJson = () => {
     const isOthers = typee == "others";
 
     const file = e.target.files?.[0];
-    console.log(typee);
+    // console.log(typee);
 
     if (!file) return;
+
+    // console.log(file.name, typee);
+    if (!file.name.toLowerCase().trim().includes(typee.toLowerCase())) {
+      setToast({ msg: "Insert the Valid Excel File", variant: "error" });
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (event) => {
       if (!event.target) return;
+
       const data = new Uint8Array(event.target.result as ArrayBuffer);
+
       const workbook = XLSX.read(data, { type: "array" });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
 
       const rows: Array<Array<string | number>> = XLSX.utils.sheet_to_json(
         sheet,
-        { header: 1 },
+        { header: 1, defval: " " },
       );
-      console.log(rows);
+      // console.log(rows);
 
       const headers = rows.shift() as string[];
-      console.log(headers);
+      // console.log(headers);
 
       const jsonData = rows.map((row) => {
         // console.log(row);
