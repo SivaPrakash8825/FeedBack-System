@@ -75,6 +75,7 @@ const FeedbackPage = () => {
   };
 
   const submitFeedback = async () => {
+    setLoading(true)
     const marks = questions.map((data) => data.mark);
     const values = JSON.stringify({ answers: marks });
     const { data } = await axios.post(
@@ -91,8 +92,8 @@ const FeedbackPage = () => {
       { withCredentials: true },
     );
 
-    console.log(data);
-
+    
+    setLoading(false)
     if (data) {
       navigate(-1);
     }
@@ -164,7 +165,8 @@ const FeedbackPage = () => {
               className=" h-48 w-full resize-none rounded-md border-2 border-gray-300 p-3 outline-gray-500"
             />
           </div>
-          <Button title="Submit" disable={btnLock} onClick={submitFeedback} />
+          
+          <Button title="Submit" disable={btnLock} loading={loading} onClick={submitFeedback} />
         </div>
       ) : (
         <Spinner size="lg" />

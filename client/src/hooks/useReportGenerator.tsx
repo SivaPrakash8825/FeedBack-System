@@ -22,7 +22,7 @@ const useReportGenerator = () => {
             "comments",
             "Sub Name",
             "dept",
-
+"subgroup",
             "assessmenttype",
           ].includes(val.trim()),
       ),
@@ -60,11 +60,19 @@ const useReportGenerator = () => {
               ...parseanswer(val),
             ],
           ],
-          usercomments: [[val.username, val.comments]],
+          usercomments: [],
         };
+        if (val.comments.trim() && val.comments) {
+          
+          
+          allfields[key].usercomments=[[val.username, val.comments]]
+      }
       } else {
-        const usercom = [val.username, val.comments];
+        if (val.comments.trim() && val.comments) {
+          const usercom = [val.username, val.comments];
 
+        allfields[key].usercomments.push(usercom);
+        }
         allfields[key].marks.push([
           val.username,
           val.stdtype,
@@ -72,7 +80,6 @@ const useReportGenerator = () => {
           val.sem,
           ...parseanswer(val),
         ]);
-        allfields[key].usercomments.push(usercom);
       }
     });
 
@@ -85,7 +92,7 @@ const useReportGenerator = () => {
 
     const calculateAverage = (column: any) => {
       const sum = column.reduce((acc: any, value: any) => acc + value, 0);
-      return (sum / column.length).toFixed(4);
+      return (sum / column.length).toFixed(2);
     };
     // const newallfield.
     // console.log(newallfield);
@@ -112,7 +119,7 @@ const useReportGenerator = () => {
     newallfield: any;
     avgheader: any;
   } {
-    console.log(data.newallfield);
+   
     const allfields: any = {};
     const header = [];
     const avgheader = [];
@@ -161,17 +168,28 @@ const useReportGenerator = () => {
         allfields[key] = {
           ...val,
           dept: val.dept,
+        
           marks: [[val.username, ...parseanswer(val)]],
-          usercomments: [[val.username, val.comments]],
+        usercomments:[]
         };
+        if (val.comments.trim() && val.comments) {
+          
+          
+          allfields[key].usercomments=[[val.username, val.comments]]
+      }
+        
       } else {
-        const usercom = [val.username, val.comments];
+        if (val.comments.trim() && val.comments) {
+          const usercom = [val.username, val.comments];
+          allfields[key].usercomments.push(usercom);
+        }
 
         allfields[key].marks.push([val.username, ...parseanswer(val)]);
-        allfields[key].usercomments.push(usercom);
       }
     });
     const newallfield = Object.values(allfields);
+    
+    
     const transpose = (matrix: any[]) => {
       return matrix[0]
         .map((_: any, colIndex: number) => matrix.map((row) => row[colIndex]))

@@ -37,11 +37,13 @@ const Generatepdf2 = (
       // Add the image at the calculated center coordinates
       pdf.addImage(logoImage, "JPEG", xCoordinate, 10, imageWidth, 32); // Change the coordinates and dimensions as needed
 
-      const maxWidth = pdfWidth - 20; // Adjust the maximum width as needed
+      const maxWidth = pdfWidth - 20;
+      let startY = 0;// Adjust the maximum width as needed
       if (subtype != "infra") {
+         startY = 82;
         const text = `Department of ${DepartmentName[dept as keyof typeof DepartmentName]}`;
         const text1 = `Academic Year : ${academicyr} ${semType} Semester`;
-        const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUBJECTS FOR SUB CODE - ${coursecode} SEM - ${semester} SECTION - ${section} `;
+        const text2 = `${semType} SEMESTER FEEDBACK ANALYSIS REPORT FOR ${subtype.toUpperCase()} SUB CODE - ${coursecode} SEM - ${semester} SEC - ${section} `;
         const text3 = `Academic Year:${academicyr} ${semester % 2 == 0 ? "ODD" : "EVEN"}-SEM `;
         const text4 = `Faculty Name : ${staffname}`;
         const text5 = `Course Name : ${subname}`;
@@ -56,17 +58,18 @@ const Generatepdf2 = (
         pdf.setFontSize(13);
         pdf.text(text2, pdfWidth / 2, 66, { align: "center" });
         pdf.setFontSize(10);
-        pdf.text(text3, 50, 76, { align: "center" });
-        pdf.text(text4, pdfWidth / 2, 76, { align: "right" });
-        pdf.text(text5, pdfWidth - 20, 76, { align: "right" });
+        pdf.text(text3, 50, 78, { align: "center" });
+        pdf.text(text4, 21, 73);
+        pdf.text(text5, pdfWidth - 20, 79, { align: "right" });
       } else {
-        const text2 = `${academicyr} INFRASTRUCTURE  ANALYSIS REPORT  FOR  ${DepartmentName[dept]}- DEPT  `;
-        pdf.setFontSize(13);
-        pdf.text(text2, pdfWidth / 2, 66, { align: "center" });
+        startY = 65;
+        const text2 = `${academicyr} Infrastructure  Analysis Report  For  ${DepartmentName[dept]}  `;
+        pdf.setFontSize(15);
+        pdf.text(text2, pdfWidth / 2, 60, { align: "center" });
       }
 
       // Set table properties
-      const startY = 85;
+      
 
       const columnstyle: any =
         header.length == 2
@@ -121,6 +124,7 @@ const Generatepdf2 = (
       if (avgheader) {
         // @ts-ignore
         const startYFirstTable = pdf.lastAutoTable.finalY + 20;
+        pdf.setFontSize(15);
         //   const estimatedFirstTableHeight = (rows.length + 1) * 10; // Assuming each row height is 10
         if (startYFirstTable) {
           const lines = pdf.splitTextToSize(
@@ -128,7 +132,7 @@ const Generatepdf2 = (
             maxWidth,
           );
 
-          const startYSecondTable = startYFirstTable + 10;
+          const startYSecondTable = startYFirstTable + 5;
           pdf.text(lines, pdfWidth / 2, startYSecondTable - 2, {
             align: "center",
           });
@@ -139,7 +143,7 @@ const Generatepdf2 = (
             theme: "grid",
             tableLineColor: "white",
             styles: {
-              fontSize: 5,
+              fontSize: 9,
               cellPadding: 2,
               valign: "middle",
               halign: "center",
@@ -163,6 +167,7 @@ const Generatepdf2 = (
         }
       }
       pdf.addPage();
+      pdf.setFontSize(10);
       createTable(
         ["username", "comments"],
         data.usercomments,
@@ -176,7 +181,7 @@ const Generatepdf2 = (
     
 
     department && subtype != "infra"
-      ? pdf.save(`${department}_sem${semester}_sec${section}.pdf`)
+      ? pdf.save(`${subtype}_${department}__${semester}_${section}.pdf`)
       : pdf.save(`infra_${academicyr}.pdf`);
     return {
       msg: "created successfully",

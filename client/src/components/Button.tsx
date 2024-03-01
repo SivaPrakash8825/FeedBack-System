@@ -25,6 +25,7 @@ const Button = ({
     >
       <p className="select-none">{title}</p>
       {loading && <Spinner size="sm" type={type} />}
+      
     </button>
   );
 };
