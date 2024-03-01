@@ -137,7 +137,7 @@ const ReportGenPage = ({
       setValue: setAcademicyr,
     },
     {
-      list: ["theory", "lab", "infra", "others"],
+      list: ["theory", "lab", "infra"],
       label: "subject type",
       value: subtype,
       setValue: setSubtype,

@@ -46,6 +46,8 @@ const FindUserDetails = (username) => {
     1: "A",
     2: "B",
     3: "C",
+    4: "D",
+    5: "E",
   };
   const degree = {
     U: "UG",
@@ -196,6 +198,8 @@ app.post("/generateLogin", (req, res) => {
       a: 1,
       b: 2,
       c: 3,
+      d: 4,
+      e: 5,
       pre: 1,
       post: 2,
       "mgmt-pre": 3,
@@ -370,7 +374,10 @@ app.post("/storeanswer", (req, res) => {
           comments,
         ],
         (error, result) => {
-          if (error) console.log(error);
+          if (error) {
+            console.log(error);
+            res.status(400).send(error.message);
+          }
           if (result) {
             res.status(200).send(result);
           }
@@ -395,7 +402,10 @@ app.post("/storeanswer", (req, res) => {
           subgroup,
         ],
         (error, result) => {
-          if (error) console.log(error);
+          if (error) {
+            console.log(error);
+            res.status(400).send(error.message);
+          }
           if (result) {
             res.status(200).send(result);
           }
@@ -426,7 +436,7 @@ app.post("/generateReport", (req, res) => {
       [academicyear],
       (error, result) => {
         if (result) {
-          console.log(result);
+          // console.log(result);
           res.status(200).send(result);
         } else {
           res.status(400).send({ msg: error.message });
@@ -467,16 +477,16 @@ app.post("/generateReportSubject", (req, res) => {
     subtype,
   } = req.body;
   const acyr = academicyear.slice(0, 5) + academicyear.slice(-2);
-  console.log(
-    acyr,
-    dept,
-    degree,
-    sem,
-    section,
-    assessmenttype,
-    subcode,
-    subtype
-  );
+  // console.log(
+  //   acyr,
+  //   dept,
+  //   degree,
+  //   sem,
+  //   section,
+  //   assessmenttype,
+  //   subcode,
+  //   subtype
+  // );
   if (password == "Kcet@") {
     db.query(
       "SELECT a.`Sub Code`, a.`Sub Name`,a.`StaffParent Dept`,a.Staff,GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.`Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` and a.Dept = c.dept and a.Semester = c.sem and a.Section = c.section and a.`UG/PG` = c.degreetype WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff,a.`StaffParent Dept`",
@@ -515,6 +525,8 @@ app.post("/getCourses", (req, res) => {
       1: "A",
       2: "B",
       3: "C",
+      4: "D",
+      5: "E",
     };
     const assessmentTypeOptions = {
       1: "pre",
@@ -547,7 +559,7 @@ app.post("/getCourses", (req, res) => {
 
     // should change !!!
     const assessmenttype = section === "C" ? "mgmt-pre" : "mgmt-final";
-    console.log(academicyr, dept, degree, sem, section, year);
+    // console.log(academicyr, dept, degree, sem, section, year);
 
     db.query(
       "SELECT * FROM mastertable WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? AND (`Sub Code` not in (select coursecode from theory where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Theory') AND `Sub Code` not in (select coursecode from lab where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Lab')) AND (`Sub Grouping` not in (select subgroup from theory where username=? and subgroup=`Sub Grouping` and mastertable.`Theory/Lab`='Theory') AND `Sub Grouping` not in (select subgroup from lab where username=? and subgroup=`Sub Grouping` and mastertable.`Theory/Lab`='Lab'));",
@@ -632,7 +644,7 @@ app.get("/getDepartments", (req, res) => {
         if (err) {
           return res.status(400).send(err.message);
         }
-        console.log(ress);
+        // console.log(ress);
         if (ress.length == 0) {
           db.query(
             " SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'theory';",
@@ -640,7 +652,7 @@ app.get("/getDepartments", (req, res) => {
               if (errr) {
                 return res.status(200).send(errr);
               }
-              console.log(resss);
+              // console.log(resss);
               return res.status(200).send(resss);
             }
           );
@@ -771,7 +783,7 @@ app.post("/setMasterData/:typee", (req, res) => {
   const { typee } = req.params;
   const { data } = req.body;
   const isAll = typee == "all dept";
-  console.log(isAll);
+  // console.log(isAll);
   try {
     // const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``);
     // const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
