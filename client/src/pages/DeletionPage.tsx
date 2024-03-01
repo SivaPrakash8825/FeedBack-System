@@ -89,7 +89,7 @@ const DeletionPage = ({ academicyearlist }: { academicyearlist: string[] }) => {
 
   const SetTableHead = () => {
     if (rows.length <= 0) {
-      return <th>no data</th>;
+      return <th className="py-4 font-medium capitalize">no data</th>;
     } else {
       return (
         <>
