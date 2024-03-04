@@ -5,7 +5,7 @@ import { SubjectsByType, SubjectsWithName, UserDetails } from "../../types";
 import Spinner from "../components/Spinner";
 import useUserDetails from "../store/useUserDetails";
 
-const FeedbackHomePage = () => {
+const FeedbackHomePage = ({goTopView}:{goTopView:()=>void}) => {
   const { username: userName } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const { setUserDetails, userDetails } = useUserDetails();
@@ -63,6 +63,7 @@ const FeedbackHomePage = () => {
       console.log(error.message);
     } finally {
       setIsLoading(false);
+      goTopView()
     }
   };
 

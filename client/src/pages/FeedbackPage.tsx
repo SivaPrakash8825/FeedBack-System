@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import useUserDetails from "../store/useUserDetails";
 import Spinner from "../components/Spinner";
 
-const FeedbackPage = () => {
+const FeedbackPage = ({goTopView}:{goTopView:()=>void}) => {
   const navigate = useNavigate();
   const ref = useRef<HTMLTextAreaElement | null>(null);
   const [comment, setComment] = useState("");
@@ -50,6 +50,7 @@ const FeedbackPage = () => {
       ];
     }
     setQuestion(quesarr);
+    goTopView();
   };
 
   const setOption = (opt: string, index?: number) => {
