@@ -49,7 +49,9 @@ const LoginPage = ({ setUsername, username }: Props) => {
             });
           } else {
             setRole("user");
-            return navigate(`/feedback/${username}?stdtype=${encodeURIComponent(JSON.stringify({ stdtype:option }))}`);
+            return navigate(
+              `/feedback/${username}?stdtype=${encodeURIComponent(JSON.stringify({ stdtype: option }))}`,
+            );
           }
         } else {
           setToast({ msg: "Invalid Credentials", variant: "error" });
@@ -68,7 +70,7 @@ const LoginPage = ({ setUsername, username }: Props) => {
   };
 
   return (
-    <main className="flex min-h-screen w-full flex-col items-center gap-10 bg-white px-10 py-4 ">
+    <main className="flex  min-h-screen w-full flex-col items-center gap-10 bg-white px-10 py-4 ">
       {/* LOGO */}
       <img src={LOGO} alt="logo" className="mx-auto h-36" />
       {/* Title */}
