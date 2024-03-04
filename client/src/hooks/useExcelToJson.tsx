@@ -178,43 +178,77 @@ const useExcelToJson = () => {
 
       const headers = rows.shift() as string[];
       // console.log(headers);
+      console.log(rows);
 
-      const jsonData = rows.map((row) => {
-        // console.log(row);
+      // const jsonData = rows.map((row) => {
 
-        const text = headers.reduce(
-          (acc: any, header: string, index: number) => {
-            const value = row[index] !== undefined ? row[index] : null;
-            if (header.toLowerCase() === "question") {
-              acc.question = value;
-              acc.options = undefined;
-            } else if (header.toLowerCase().includes("option")) {
-              if (!acc.options) {
-                acc.options = [];
-              }
-              acc.options.push(value);
-            } else if (header.toLowerCase() === "type") {
-              acc.type = value;
-            } else {
-              acc[header] = value;
-            }
-            // console.log(acc.question);
-
-            return acc;
-          },
-          {},
-        );
-        return {
-          type: isOthers ? text.type : typee,
-          question: JSON.stringify({
-            question: text.question,
-            options: text.options,
-          }),
-        };
+      // });
+      let errorMsg = "";
+      const jsonData = [];
+      const filteredRows = rows.filter((subArray) => {
+        return !subArray.every((value) => value.toString().trim() === "");
       });
+      for (let i = 0; i < filteredRows.length; i++) {
+        const row = filteredRows[i];
+
+        let question: string | null = null;
+        let options: Array<string> = [];
+        let type: string | null = null;
+
+        for (let index = 0; index < headers.length; index++) {
+          const header = headers[index];
+          const value = row[index] !== undefined ? row[index] : null;
+
+          if (header.toLowerCase() === "question") {
+            // if (value?.trim() == "") {
+            //   console.log("hai");
+            //   return;
+            // }
+            // console.log(value);
+
+            question = value;
+            options = undefined;
+          } else if (header.toLowerCase().includes("option")) {
+            if (!options) {
+              options = [];
+            }
+            options.push(value);
+          } else if (header.toLowerCase() === "type") {
+            type = value;
+          } else {
+            // Handle additional headers if needed
+          }
+          // console.log(question);
+        }
+
+        if (question?.trim() == "") {
+          errorMsg = "Question shouldn't be empty";
+          break;
+        } else if (
+          options?.filter((option) => option.trim() != "").length < 2
+        ) {
+          // console.log(options?.filter((option) => option.trim() != "").length);
+          errorMsg = "A Question must have atleast two options";
+          break;
+        } else {
+          let questionObj: { type: string; question: string } = {
+            type: isOthers ? text.type : typee,
+            question: JSON.stringify({
+              question: question || "",
+              options: options || [],
+            }),
+          };
+          jsonData.push(questionObj);
+        }
+        console.log(options.length);
+
+        //  return questionObj;
+      }
       // setJsonData(jsonData);
       console.log(jsonData);
-      setQuestionsIntoDb(jsonData, typee);
+      // setQuestionsIntoDb(jsonData, typee);
+      if (errorMsg == "") setQuestionsIntoDb(jsonData, typee);
+      else setToast({ msg: errorMsg, variant: "error" });
     };
     reader.readAsArrayBuffer(file);
   };
