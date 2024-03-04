@@ -192,7 +192,7 @@ const useExcelToJson = () => {
         const row = filteredRows[i];
 
         let question: string | null = null;
-        let options: Array<string> = [];
+        let options: Array<string> | undefined = [];
         let type: string | null = null;
 
         for (let index = 0; index < headers.length; index++) {
@@ -206,15 +206,15 @@ const useExcelToJson = () => {
             // }
             // console.log(value);
 
-            question = value;
+            question = value as string;
             options = undefined;
           } else if (header.toLowerCase().includes("option")) {
             if (!options) {
               options = [];
             }
-            options.push(value);
+            options.push(value as string);
           } else if (header.toLowerCase() === "type") {
-            type = value;
+            type = value as string;
           } else {
             // Handle additional headers if needed
           }
@@ -225,14 +225,15 @@ const useExcelToJson = () => {
           errorMsg = "Question shouldn't be empty";
           break;
         } else if (
+          options &&
           options?.filter((option) => option.trim() != "").length < 2
         ) {
           // console.log(options?.filter((option) => option.trim() != "").length);
           errorMsg = "A Question must have atleast two options";
           break;
         } else {
-          let questionObj: { type: string; question: string } = {
-            type: isOthers ? text.type : typee,
+          let questionObj: { type: string | null; question: string } = {
+            type: isOthers ? type : typee,
             question: JSON.stringify({
               question: question || "",
               options: options || [],
@@ -240,7 +241,7 @@ const useExcelToJson = () => {
           };
           jsonData.push(questionObj);
         }
-        console.log(options.length);
+        console.log(options?.length);
 
         //  return questionObj;
       }

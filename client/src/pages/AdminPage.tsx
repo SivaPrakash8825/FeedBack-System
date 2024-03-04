@@ -51,7 +51,7 @@ const Card = ({
 }) => (
   <Link to={link} className="group">
     <div
-      className={`bg-primary flex flex-col items-center  justify-around  gap-3 rounded-md  p-6 py-10 text-white  transition-all duration-300 ease-in-out hover:-translate-y-6 active:scale-95 active:duration-150 `}
+      className={`flex flex-col items-center justify-around gap-3  rounded-md  bg-primary p-6  py-10 text-white shadow-box-sm transition-all  duration-300 ease-in-out hover:-translate-y-6 hover:shadow-box active:scale-95 active:duration-150 `}
     >
       {icon}
       <h2 className="text-wrap text-center text-2xl font-semibold">{title}</h2>
