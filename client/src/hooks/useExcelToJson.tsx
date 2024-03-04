@@ -86,6 +86,20 @@ const useExcelToJson = () => {
 
             row.forEach((cellValue, index) => {
               const header = headers[index];
+              // console.log(header);
+              if (header == "Academic yr") {
+                let stringWithoutSpaces = cellValue.replace(/\s/g, "");
+                obj[header] =
+                  cellValue.toString().trim() === ""
+                    ? " "
+                    : stringWithoutSpaces.substring(0, 4) +
+                      "-" +
+                      stringWithoutSpaces.substring(
+                        stringWithoutSpaces.length - 2,
+                      );
+                return;
+              }
+
               // console.log(
               //   cellValue,
               //   (obj[header] = cellValue.toString().trim() == ""),
