@@ -9,7 +9,7 @@ export default {
 
       boxShadow: {
         box: "6px 6px 0px black",
-        "box-sm": "4px 4px 0px black",
+        "box-sm": "3px 3px 0px black",
       },
 
       colors: {
