@@ -34,7 +34,9 @@ const RadioField = ({
               />
               {/* Radio Label */}
 
-              <p className={`capitalize ${invisible ? "sr-only" : null}`}>
+              <p
+                className={`select-none capitalize ${invisible ? "sr-only" : null}`}
+              >
                 {opt}
               </p>
             </div>
