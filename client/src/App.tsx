@@ -4,7 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import FeedbackPage from "./pages/FeedbackPage";
 import AdminPage from "./pages/AdminPage";
 import useRole from "./store/useRole";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "./components/Header";
 import PasswordGenPage from "./pages/PasswordGenPage";
 import ReportGenPage from "./pages/ReportGenPage";
@@ -17,21 +17,28 @@ import UpdatePage from "./pages/UpdatePage";
 
 function App() {
   const role = useRole((state) => state.role);
+  const divRef=useRef<HTMLDivElement | null>(null)
   const [username, setUsername] = useState<string>("");
   const [academicyearlist, setAcademicyearlist] = useState<string[]>([]);
   useEffect(() => {
     const curYear = new Date().getFullYear();
     const years = [];
+  
+    
     for (let i = curYear - 5; i < curYear + 2; i++) {
       years.push(`${i}-${(i + 1) % 100}`);
     }
-
     setAcademicyearlist(years);
-    
   }, []);
+  const goTopView = () => {
+    if (divRef.current) {
+      divRef.current.scrollIntoView({behavior:"smooth"})
+    }
+  }
+
 
   return (
-    <>
+    <div ref={divRef}>
       <BrowserRouter>
         <ForAuth />
         {role && <Header />}
@@ -47,7 +54,7 @@ function App() {
           <Route
             element={
               <ProtectedRoute>
-                <FeedbackHomePage />
+                <FeedbackHomePage goTopView={goTopView}/>
               </ProtectedRoute>
             }
             path="/feedback/:username"
@@ -56,7 +63,7 @@ function App() {
           <Route
             element={
               <ProtectedRoute>
-                <FeedbackPage />
+                <FeedbackPage goTopView={goTopView}/>
               </ProtectedRoute>
             }
             path="/feedback/:username/:type"
@@ -123,7 +130,7 @@ function App() {
         </Routes>
         <Toast />
       </BrowserRouter>
-    </>
+    </div>
   );
 }
 
