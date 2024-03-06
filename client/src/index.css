@@ -25,3 +25,7 @@
 /* ::-webkit-scrollbar-track-piece{
     he;
 } */
+
+.shadow-box {
+  box-shadow: 6px 6px 0px black;
+}

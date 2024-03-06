@@ -85,10 +85,10 @@ const FeedbackHomePage = ({goTopView}:{goTopView:()=>void}) => {
                 // Box
                 <div
                   key={i}
-                  className="w-full overflow-hidden rounded-md border-2 border-black/80 "
+                  className="border-primary/80 w-full overflow-hidden rounded-md border-2 "
                 >
                   {/* head */}
-                  <div className="bg-black/80 p-3 py-2 text-lg font-semibold capitalize text-white">
+                  <div className="bg-primary p-3 py-2 text-lg font-semibold capitalize text-white">
                     <h1 className="">{course.name}</h1>
                   </div>
 

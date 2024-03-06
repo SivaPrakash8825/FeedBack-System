@@ -86,6 +86,20 @@ const useExcelToJson = () => {
 
             row.forEach((cellValue, index) => {
               const header = headers[index];
+              // console.log(header);
+              if (header == "Academic yr") {
+                let stringWithoutSpaces = cellValue.replace(/\s/g, "");
+                obj[header] =
+                  cellValue.toString().trim() === ""
+                    ? " "
+                    : stringWithoutSpaces.substring(0, 4) +
+                      "-" +
+                      stringWithoutSpaces.substring(
+                        stringWithoutSpaces.length - 2,
+                      );
+                return;
+              }
+
               // console.log(
               //   cellValue,
               //   (obj[header] = cellValue.toString().trim() == ""),
@@ -178,43 +192,78 @@ const useExcelToJson = () => {
 
       const headers = rows.shift() as string[];
       // console.log(headers);
+      console.log(rows);
 
-      const jsonData = rows.map((row) => {
-        // console.log(row);
+      // const jsonData = rows.map((row) => {
 
-        const text = headers.reduce(
-          (acc: any, header: string, index: number) => {
-            const value = row[index] !== undefined ? row[index] : null;
-            if (header.toLowerCase() === "question") {
-              acc.question = value;
-              acc.options = undefined;
-            } else if (header.toLowerCase().includes("option")) {
-              if (!acc.options) {
-                acc.options = [];
-              }
-              acc.options.push(value);
-            } else if (header.toLowerCase() === "type") {
-              acc.type = value;
-            } else {
-              acc[header] = value;
-            }
-            // console.log(acc.question);
-
-            return acc;
-          },
-          {},
-        );
-        return {
-          type: isOthers ? text.type : typee,
-          question: JSON.stringify({
-            question: text.question,
-            options: text.options,
-          }),
-        };
+      // });
+      let errorMsg = "";
+      const jsonData = [];
+      const filteredRows = rows.filter((subArray) => {
+        return !subArray.every((value) => value.toString().trim() === "");
       });
+      for (let i = 0; i < filteredRows.length; i++) {
+        const row = filteredRows[i];
+
+        let question: string | null = null;
+        let options: Array<string> | undefined = [];
+        let type: string | null = null;
+
+        for (let index = 0; index < headers.length; index++) {
+          const header = headers[index];
+          const value = row[index] !== undefined ? row[index] : null;
+
+          if (header.toLowerCase() === "question") {
+            // if (value?.trim() == "") {
+            //   console.log("hai");
+            //   return;
+            // }
+            // console.log(value);
+
+            question = value as string;
+            options = undefined;
+          } else if (header.toLowerCase().includes("option")) {
+            if (!options) {
+              options = [];
+            }
+            options.push(value as string);
+          } else if (header.toLowerCase() === "type") {
+            type = value as string;
+          } else {
+            // Handle additional headers if needed
+          }
+          // console.log(question);
+        }
+
+        if (question?.trim() == "") {
+          errorMsg = "Question shouldn't be empty";
+          break;
+        } else if (
+          options &&
+          options?.filter((option) => option.trim() != "").length < 2
+        ) {
+          // console.log(options?.filter((option) => option.trim() != "").length);
+          errorMsg = "A Question must have atleast two options";
+          break;
+        } else {
+          let questionObj: { type: string | null; question: string } = {
+            type: isOthers ? type : typee,
+            question: JSON.stringify({
+              question: question || "",
+              options: options || [],
+            }),
+          };
+          jsonData.push(questionObj);
+        }
+        console.log(options?.length);
+
+        //  return questionObj;
+      }
       // setJsonData(jsonData);
       console.log(jsonData);
-      setQuestionsIntoDb(jsonData, typee);
+      // setQuestionsIntoDb(jsonData, typee);
+      if (errorMsg == "") setQuestionsIntoDb(jsonData, typee);
+      else setToast({ msg: errorMsg, variant: "error" });
     };
     reader.readAsArrayBuffer(file);
   };
