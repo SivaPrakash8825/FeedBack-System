@@ -69,7 +69,7 @@ const FindUserDetails = (username) => {
 app.get("/getQuestions/:type", (req, res) => {
   const { type } = req.params;
   try {
-    console.log(type);
+    // console.log(type);
     const query =
       type == "others"
         ? `SELECT * FROM questions where type NOT IN ('lab', 'infra', 'theory');`
@@ -879,7 +879,7 @@ app.get("/getdeletiondata/:type", (req, res) => {
 
 app.post("/deleterecords", (req, res) => {
   const { data } = req.body;
-  console.log(data);
+  // console.log(data);
 
   try {
     if (data.table == "Feedbacklogin") {
@@ -909,7 +909,7 @@ app.post("/deleterecords", (req, res) => {
       const dept = val[2];
       const sem = parseInt(val[3]);
       const section = val[4];
-      console.log(data.table, val[0], academicyear, dept, sem, section);
+      // console.log(data.table, val[0], academicyear, dept, sem, section);
       db.query(
         `select username from ${data.table} where assessmenttype=? AND academicyear=? AND dept=? AND sem=? AND section=?;`,
         [val[0].trim(), academicyear.trim(), dept.trim(), sem, section.trim()],
