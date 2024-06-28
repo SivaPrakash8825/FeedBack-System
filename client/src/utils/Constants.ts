@@ -13,6 +13,3 @@ export const DepartmentName = {
   PS: "DepartmentName",
   MB: "DepartmentName",
 };
-
-
-// testing
