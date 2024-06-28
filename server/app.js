@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(express.json({ limit: "5mb" }));
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:4173","http://localhost:8082","http://localhost:5173","http://172.16.6.203:8082"],
     credentials: true,
   })
 );
@@ -490,13 +490,13 @@ app.post("/generateReportSubject", (req, res) => {
   // );
   if (password == "Kcet@") {
     db.query(
-      "SELECT a.`Sub Code`, a.`Sub Name`,a.`StaffParent Dept`,a.Staff,GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN theory c ON a.`Sub Code` = c.coursecode AND c.academicyear = a.`Academic yr` and a.Dept = c.dept and a.Semester = c.sem and a.Section = c.section and a.`UG/PG` = c.degreetype WHERE a.`Sub Code` IN (SELECT coursecode FROM theory WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ?) GROUP BY a.`Sub Code`, a.`Sub Name`, a.Staff,a.`StaffParent Dept`",
+      `SELECT a.\`Sub Code\`, a.\`Sub Name\`,a.\`StaffParent Dept\`,a.Staff,GROUP_CONCAT(c.marks SEPARATOR '-') AS subject_marks FROM mastertable a JOIN ${subtype} c ON a.\`Sub Code\` = c.coursecode AND c.academicyear = a.\`Academic yr\` and a.Dept = c.dept and a.Semester = c.sem and a.Section = c.section and a.\`UG/PG\` = c.degreetype WHERE a.\`Sub Code\` IN (SELECT coursecode FROM ${subtype} WHERE academicyear = ? AND dept = ? AND degreetype = ? AND sem = ? AND section = ? AND assessmenttype = ? ) GROUP BY a.\`Sub Code\`, a.\`Sub Name\`, a.Staff,a.\`StaffParent Dept\``,
       [acyr, dept, degree, sem, section, assessmenttype],
       (error, result) => {
         if (result) {
           res.status(200).send(result);
         } else {
-          res.status(400).send({ msg: error });
+          res.status(400).send({ subtype,msg: error });
         }
       }
     );
