@@ -547,27 +547,17 @@ app.post("/getCourses", (req, res) => {
       8: "IV",
     };
 
-    const dept = username.substring(0, 2);
-    const section = sectionOptions[parseInt(username.charAt(2))];
-    const sem = parseInt(username.charAt(3));
-    const year = semToYearOptions[sem];
-    // doubt !!!
-    const academicyr = `20${username.substring(4, 6)}-${
-      parseInt(username.substring(4, 6)) + 1
-    }`;
-    const degree = username.charAt(6) === "U" ? "UG" : "PG";
-    // const count = parseInt(username.substring(7));
+    const { academicyear, assessmenttype, degreetype, dept, section, sem } =
+      FindUserDetails(username);
 
-    // should change !!!
-    const assessmenttype = section === "C" ? "mgmt-pre" : "mgmt-final";
-    // console.log(academicyr, dept, degree, sem, section, year);
+    const year = semToYearOptions[sem];
 
     db.query(
       "SELECT * FROM mastertable WHERE `Academic yr` = ? and Dept = ? and `UG/PG` = ? and Semester = ? and Section = ? AND (`Sub Code` not in (select coursecode from theory where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Theory') AND `Sub Code` not in (select coursecode from lab where username=? and coursecode=`Sub Code` and mastertable.`Theory/Lab`='Lab')) AND (`Sub Grouping` not in (select subgroup from theory where username=? and subgroup=`Sub Grouping` and mastertable.`Theory/Lab`='Theory') AND `Sub Grouping` not in (select subgroup from lab where username=? and subgroup=`Sub Grouping` and mastertable.`Theory/Lab`='Lab'));",
       [
-        academicyr,
+        academicyear,
         dept,
-        degree,
+        degreetype,
         sem,
         section,
         username,
@@ -581,6 +571,19 @@ app.post("/getCourses", (req, res) => {
           return res.status(400).send(err.message);
         }
 
+        if (assessmenttype !== "POST") {
+          return res.status(200).send({
+            courses: [...result],
+            academicyear,
+            dept,
+            degreetype,
+            sem,
+            section,
+            year,
+            username,
+          });
+        }
+
         db.query(
           "SELECT * FROM mastertable WHERE `Theory/Lab` = 'Infra' and `Sub Code` not in (SELECT coursecode from infra where username = ?);",
           [username],
@@ -591,9 +594,9 @@ app.post("/getCourses", (req, res) => {
             if (ress.length != 0 || result.length != 0) {
               return res.status(200).send({
                 courses: [...result, ...ress],
-                academicyr,
+                academicyear,
                 dept,
-                degree,
+                degreetype,
                 sem,
                 section,
                 year,
