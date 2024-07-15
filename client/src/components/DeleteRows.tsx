@@ -14,7 +14,7 @@ const DeleteEmptyCells = () => {
       const worksheet = workbook.Sheets[sheetName];
 
       // Iterate through each row and column to remove empty cells
-      const range = XLSX.utils.decode_range(worksheet["!ref"]);
+      const range = XLSX.utils.decode_range(worksheet["!ref"]!);
       for (let rowNum = range.s.r; rowNum <= range.e.r; rowNum++) {
         for (let colNum = range.s.c; colNum <= range.e.c; colNum++) {
           const cellAddress = XLSX.utils.encode_cell({ r: rowNum, c: colNum });

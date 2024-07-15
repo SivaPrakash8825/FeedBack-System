@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import autoTable, { UserOptions } from "jspdf-autotable";
 import logoImage from "../assets/logo.jpg";
-import { DepartmentName } from "./Constants";
+import { DepartmentName, DeptKey } from "./Constants";
 import { ToastProp } from "../store/useToast";
 
 const Generatepdf2 = (
@@ -63,7 +63,7 @@ const Generatepdf2 = (
         pdf.text(text5, pdfWidth - 20, 79, { align: "right" });
       } else {
         startY = 65;
-        const text2 = `${academicyr} Infrastructure  Analysis Report  For  ${DepartmentName[dept]}  `;
+        const text2 = `${academicyr} Infrastructure  Analysis Report  For  ${DepartmentName[dept as DeptKey]}  `;
         pdf.setFontSize(15);
         pdf.text(text2, pdfWidth / 2, 60, { align: "center" });
       }
@@ -127,7 +127,7 @@ const Generatepdf2 = (
         //   const estimatedFirstTableHeight = (rows.length + 1) * 10; // Assuming each row height is 10
         if (startYFirstTable) {
           const lines = pdf.splitTextToSize(
-            `${DepartmentName[data.dept]} Question Wise Average `,
+            `${DepartmentName[data.dept as DeptKey]} Question Wise Average `,
             maxWidth,
           );
 

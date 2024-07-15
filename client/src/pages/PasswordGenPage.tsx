@@ -4,7 +4,7 @@ import InputTextField from "../components/InputTextField";
 import Button from "../components/Button";
 import axios from "axios";
 import generateExcel from "../utils/JsonToExcel";
-import useToast from "../store/useToast";
+import useToast, { ToastProp } from "../store/useToast";
 
 const PasswordGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
   
@@ -138,7 +138,7 @@ const PasswordGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
 
         const fileName = `${getYear[Math.ceil(parseInt(semester) / 2) as 1 | 2 | 3 | 4]}yr_${department}-${section}_feedback.xlsx`;
 
-        const status = generateExcel({ data, fileName });
+        const status = generateExcel({ data, fileName }) as ToastProp;
         return setToast(status);
       } catch (err) {
         console.log(err);
