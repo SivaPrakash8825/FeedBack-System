@@ -5,9 +5,14 @@ import Button from "../components/Button";
 import axios from "axios";
 import generateExcel from "../utils/JsonToExcel";
 import useToast, { ToastProp } from "../store/useToast";
+import useDepartment from "../store/useDepartment";
 
-const PasswordGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
-  
+const PasswordGenPage = ({
+  academicyearlist,
+}: {
+  academicyearlist: string[];
+}) => {
+  const { dept, setDept } = useDepartment();
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
   const [department, setDepartment] = useState("");
@@ -24,21 +29,20 @@ const PasswordGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
   const setToast = useToast((state) => state.setToast);
   const [loading, setLoading] = useState(false);
 
-  const getDepartmentList = async () => {
-    const { data } = await axios.get(
-      `${import.meta.env.VITE_ENDPOINT}/getDepartments`,
-    );
-    let list: string[] = [];
-    for (const val of data) {
-      list = [...list, val.deptsname];
-    }
-    setDepartmentList(list);
-  };
+  // const getDepartmentList = async () => {
+  //   const { data } = await axios.get(
+  //     `${import.meta.env.VITE_ENDPOINT}/getDepartments`,
+  //   );
+  //   let list: string[] = [];
+  //   for (const val of data) {
+  //     list = [...list, val.deptsname];
+  //   }
+  //   setDepartmentList(list);
+  // };
 
-  useEffect(() => {
-    
-    getDepartmentList();
-  }, []);
+  // useEffect(() => {
+  //   getDepartmentList();
+  // }, []);
 
   const value = [
     {
@@ -54,7 +58,7 @@ const PasswordGenPage = ({academicyearlist}:{academicyearlist:string[]}) => {
       setValue: setGraduation,
     },
     {
-      list: departmentlist,
+      list: dept,
       label: "department",
       value: department,
       setValue: setDepartment,

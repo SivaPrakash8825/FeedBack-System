@@ -7,6 +7,7 @@ import InputTextField from "../components/InputTextField";
 import RadioField from "../components/RadioField";
 import useRole from "../store/useRole";
 import useToast from "../store/useToast";
+import useDepartment from "../store/useDepartment";
 
 type Props = {
   username: string;
@@ -14,6 +15,7 @@ type Props = {
 };
 
 const LoginPage = ({ setUsername, username }: Props) => {
+  const { setDept } = useDepartment();
   const [option, setOption] = useState<string | null>(null);
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
@@ -40,6 +42,7 @@ const LoginPage = ({ setUsername, username }: Props) => {
         );
         if (checkRole.role == "admin") {
           setRole("admin");
+          setDept(checkRole.dept);
           return navigate("/admin");
         } else if (checkRole.role == "user") {
           if (!option) {

@@ -303,15 +303,22 @@ app.post("/loginAuth", (req, res) => {
         if (err) {
           return res.status(400).send(err.message);
         }
-        console.log(result[0].dept);
         if (result[0]) {
-          const token = jwt.sign(
-            { role: "admin", username: username },
-            process.env.JWT_SECRETKEY + ""
-          );
-          req.session.user = token;
-          // if()
-          return res.status(200).json({ role: "admin", dept: alresl });
+          db.query("select * from departments", (err, ress) => {
+            if (err) {
+              return res.status(400).send(err.message);
+            }
+            const dept = ress.map((key) => key.deptsname);
+            const token = jwt.sign(
+              { role: "admin", username: username },
+              process.env.JWT_SECRETKEY + ""
+            );
+            req.session.user = token;
+            return res.status(200).json({
+              role: "admin",
+              dept: result[0].dept === "all" ? dept : [result[0].dept],
+            });
+          });
         } else {
           db.query(
             "SELECT * FROM feedbackLogin WHERE username = ? and password = ? and validfrom <= CURDATE() AND validto >= CURDATE();",
