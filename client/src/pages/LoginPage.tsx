@@ -38,10 +38,10 @@ const LoginPage = ({ setUsername, username }: Props) => {
             withCredentials: true,
           },
         );
-        if (checkRole == "admin") {
+        if (checkRole.role == "admin") {
           setRole("admin");
           return navigate("/admin");
-        } else if (checkRole == "user") {
+        } else if (checkRole.role == "user") {
           if (!option) {
             setToast({
               msg: "Choose Hosteller or Day Scholar",

@@ -19,7 +19,12 @@ app.use(cookieParser());
 app.use(express.json({ limit: "5mb" }));
 app.use(
   cors({
-    origin: ["http://localhost:4173","http://localhost:8082","http://localhost:5173","http://172.16.6.203:8082"],
+    origin: [
+      "http://localhost:4173",
+      "http://localhost:8082",
+      "http://localhost:5173",
+      "http://172.16.6.203:8082",
+    ],
     credentials: true,
   })
 );
@@ -298,13 +303,15 @@ app.post("/loginAuth", (req, res) => {
         if (err) {
           return res.status(400).send(err.message);
         }
+        console.log(result[0].dept);
         if (result[0]) {
           const token = jwt.sign(
             { role: "admin", username: username },
             process.env.JWT_SECRETKEY + ""
           );
           req.session.user = token;
-          return res.status(200).send("admin");
+          // if()
+          return res.status(200).json({ role: "admin", dept: alresl });
         } else {
           db.query(
             "SELECT * FROM feedbackLogin WHERE username = ? and password = ? and validfrom <= CURDATE() AND validto >= CURDATE();",
@@ -319,7 +326,7 @@ app.post("/loginAuth", (req, res) => {
                   process.env.JWT_SECRETKEY + ""
                 );
                 req.session.user = token;
-                return res.status(200).send("user");
+                return res.status(200).send({ role: "user" });
               } else {
                 return res.status(200).send("Data Not Found!");
               }
@@ -496,7 +503,7 @@ app.post("/generateReportSubject", (req, res) => {
         if (result) {
           res.status(200).send(result);
         } else {
-          res.status(400).send({ subtype,msg: error });
+          res.status(400).send({ subtype, msg: error });
         }
       }
     );
