@@ -771,24 +771,32 @@ app.post("/setMasterLogin", (req, res) => {
 
 // get master data
 
-app.get("/getMasterData/:type", (req, res) => {
-  const { type } = req.params;
+app.get("/getMasterData/:dept/:academicYear", (req, res) => {
+  const { dept, academicYear } = req.params;
+  // console.log(dept, academicYear);
   try {
-    const query =
-      type == "all dept"
-        ? "Select * from mastertable;"
-        : `SELECT \`Academic yr\`,\`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\` FROM mastertable where Dept = ?`;
-    db.query(query, [type], (err, ress) => {
-      const query =
-        type == "all dept"
-          ? "Select * from mastertable;"
-          : `SELECT \`Academic yr\`,\`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\` FROM mastertable where Dept = ?`;
-      db.query(query, [type], (err, ress) => {
-        if (err) {
-          return res.status(400).send(err.message);
-        }
-        return res.status(200).send(ress);
-      });
+    let query;
+    let params = [];
+
+    if (dept === "all dept" && academicYear === "all") {
+      query = "SELECT * FROM mastertable;";
+    } else if (dept === "all dept") {
+      query = `SELECT * FROM mastertable WHERE \`Academic yr\` = ?;`;
+      params = [academicYear];
+    } else if (academicYear === "all") {
+      query = `SELECT \`Academic yr\`, \`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\`
+      FROM mastertable WHERE Dept = ?;`;
+      params = [dept];
+    } else {
+      query = `SELECT * FROM mastertable WHERE Dept = ? AND \`Academic yr\` = ?;`;
+      params = [dept, academicYear];
+    }
+
+    db.query(query, params, (err, ress) => {
+      if (err) {
+        return res.status(400).send(err.message);
+      }
+      return res.status(200).send(ress);
     });
   } catch (error) {
     return res.status(400).send(error.message);
@@ -797,30 +805,15 @@ app.get("/getMasterData/:type", (req, res) => {
 
 // set master data
 
-app.post("/setMasterData/:typee", (req, res) => {
-  const { typee } = req.params;
+app.post("/setMasterData/:dept/:academicYear", (req, res) => {
+  const { dept, academicYear } = req.params;
+  console.log(dept, academicYear);
   const { data } = req.body;
-  const isAll = typee == "all dept";
-  // console.log(isAll);
+  const isAll = dept == "all dept";
+
   try {
-    // const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``);
-    // const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
-    //   ", "
-    // )}) VALUES ?`;
-    // const columnNames = Object.keys(data[0]).map((column) => `\`${column}\``);
-    // const insertQuery = `REPLACE INTO mastertable (${columnNames.join(
-    //   ", "
-    // )}) VALUES ?`;
-
-    // console.log(colomnNames);
-
-    // Extract values from the data object
-    // const values = data.map((entry) => Object.values(entry));
-    // const values = data.map((entry) => Object.values(entry));
-    // return res.status(200).send({ values });
-
     const values = data
-      .filter(({ Dept }) => (isAll ? true : Dept === typee))
+      .filter(({ Dept }) => (isAll ? true : Dept === dept))
       .map(
         ({
           "Academic yr": academicYear,
@@ -855,7 +848,13 @@ app.post("/setMasterData/:typee", (req, res) => {
     const query = `REPLACE INTO mastertable (\`Academic yr\`, Dept, \`UG/PG\`, \`Theory/Lab\`, Semester, Section, \`Sub Code\`, \`Sub Name\`, Staff, \`StaffParent Dept\`, \`Open Elective/Regular/Core Elective\`, \`Sub Grouping\`) VALUES ?`;
 
     transactionProcess(
-      isAll ? `mastertable` : `mastertable where Dept = '${typee}'`,
+      isAll && academicYear == "all"
+        ? "mastertable"
+        : isAll
+        ? `mastertable where \`Academic yr\` = '${academicYear}'`
+        : academicYear == "all"
+        ? `mastertable where Dept = '${dept}'`
+        : `mastertable where Dept = '${dept}' AND \`Academic yr\` = '${academicYear}'`,
       query,
       values,
       res
