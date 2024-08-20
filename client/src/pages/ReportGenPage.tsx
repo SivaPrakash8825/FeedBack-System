@@ -7,35 +7,30 @@ import generatePdf from "../utils/Generatepdf2";
 import generatePdf1 from "../utils/Generatepdf";
 import useToast from "../store/useToast";
 import useReportGenerator from "../hooks/useReportGenerator";
+import useDepartment from "../store/useDepartment";
 
 const ReportGenPage = ({
   academicyearlist,
 }: {
   academicyearlist: string[];
 }) => {
+  const { dept } = useDepartment();
   const setToast = useToast((state) => state.setToast);
   const { ForTheoryAndLab, ForInfra } = useReportGenerator();
 
   const [academicyr, setAcademicyr] = useState("");
   const [graduation, setGraduation] = useState("");
   const [department, setDepartment] = useState("");
-  const [departmentlist, setDepartmentList] = useState<string[]>([]);
   const [semester, setSemester] = useState("");
   const [section, setSection] = useState("");
   const [asstype, setAsstype] = useState("");
   const [subtype, setSubtype] = useState("");
   const [reporttype, setReporttype] = useState("");
-  // const [subcode, setSubcode] = useState("");
   const [password, setPassword] = useState("");
-  // const [subcodelist, setSubCodeList] = useState<string[]>([]);
 
   const GenerateSubjectWisePdf = (
     data: { [x: string]: any; subject_marks: any }[],
   ) => {
-    // return;
-    // const header = [...Object.keys(data[0])];
-    // const rows = data.map((item) => Object.values(item));
-
     function assessMark(markk: string) {
       const mark = parseFloat(markk);
       if (mark >= 0 && mark < 40) {
@@ -123,7 +118,6 @@ const ReportGenPage = ({
     for (const val of data) {
       list = [...list, val.deptsname];
     }
-    setDepartmentList(list);
   };
 
   useEffect(() => {
@@ -144,7 +138,7 @@ const ReportGenPage = ({
       setValue: setSubtype,
     },
     {
-      list: departmentlist,
+      list: dept,
       label: "department",
       value: department,
       setValue: setDepartment,

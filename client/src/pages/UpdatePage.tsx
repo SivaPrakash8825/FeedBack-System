@@ -9,9 +9,9 @@ import useToast from "../store/useToast";
 import useExcelToJson from "../hooks/useExcelToJson";
 import useJsonToExcel from "../hooks/useJsonToExcel";
 
-type Props = {};
+type Props = { academicyearlist: string[] };
 
-const UpdatePage = () => {
+const UpdatePage = ({ academicyearlist }: Props) => {
   const { ExcelToJson, ExcelToJsonQuestions } = useExcelToJson();
   const { JsonToExcel, JsonToExcelQuestions } = useJsonToExcel();
   const setToast = useToast((state) => state.setToast);
@@ -23,6 +23,7 @@ const UpdatePage = () => {
   const [subType, setSubType] = useState<string>("lab");
   const [departments, setDepartments] = useState<Array<string>>([]);
   const [dept, setDept] = useState("all dept");
+  const [academicYear, setAcademicYear] = useState("all");
   //   const type = "lab";
 
   const updatePageData = [
@@ -55,16 +56,22 @@ const UpdatePage = () => {
         value: dept,
         setValue: setDept,
       },
+      select1: {
+        placeholder: "Academic Year",
+        list: ["all", ...academicyearlist],
+        value: academicYear,
+        setValue: setAcademicYear,
+      },
       ref: masterFileRef,
       upload: {
-        api: `setMasterData/${dept}`,
+        api: `setMasterData/${dept}/${academicYear}`,
         dept: dept,
       },
       download: {
-        api: `getMasterData/${dept}`,
+        api: `getMasterData/${dept}/${academicYear}`,
         filename: dept
-          ? `${dept.toUpperCase()}_MasterTable.xlsx`
-          : "MasterTable.xlsx",
+          ? `${academicYear.toUpperCase()} AY_${dept.toUpperCase()} DEPT_MasterTable.xlsx`
+          : `${academicYear.toUpperCase()}_MasterTable.xlsx`,
         type: "masterlogin",
       },
     },
@@ -145,16 +152,28 @@ const UpdatePage = () => {
           <div key={i} className="flex flex-col gap-5">
             <h1 className="text-center text-2xl font-bold">{data.title}</h1>
             <div className="flex flex-col gap-4">
-              {data.select && (
-                <div className="">
-                  <SelectTextField
-                    list={data.select.list}
-                    value={data.select.value}
-                    setValue={data.select.setValue}
-                    placeholder={data.select.placeholder}
-                  />
-                </div>
-              )}
+              <div className="flex gap-2">
+                {data.select && (
+                  <div className="w-full">
+                    <SelectTextField
+                      list={data.select.list}
+                      value={data.select.value}
+                      setValue={data.select.setValue}
+                      placeholder={data.select.placeholder}
+                    />
+                  </div>
+                )}
+                {data.select1 && (
+                  <div className="w-full">
+                    <SelectTextField
+                      list={data.select1.list}
+                      value={data.select1.value}
+                      setValue={data.select1.setValue}
+                      placeholder={data.select1.placeholder}
+                    />
+                  </div>
+                )}
+              </div>
               <div className="flex gap-6">
                 <input
                   className="hidden"

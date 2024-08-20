@@ -8,11 +8,13 @@ import { FaChartColumn } from "react-icons/fa6";
 import { TbTrashXFilled } from "react-icons/tb";
 import { BsDatabaseFillUp } from "react-icons/bs";
 import { IoDocumentLock } from "react-icons/io5";
+import useDepartment from "../store/useDepartment";
 
 const AdminPage = () => {
+  const { dept } = useDepartment();
   return (
     <section className=" mx-auto flex min-h-[calc(100vh-6rem)] items-center justify-center gap-0 bg-cover ">
-      <div className="grid grid-cols-4 items-center justify-center gap-10">
+      <div className="flex items-center justify-center gap-10">
         <Card
           icon={<FaChartColumn className="text-5xl text-white" />}
           title="Generate Report"
@@ -23,16 +25,20 @@ const AdminPage = () => {
           title="Generate Login"
           link="/admin/generate"
         />
-        <Card
-          icon={<BsDatabaseFillUp className="text-5xl text-white" />}
-          title="Update Data"
-          link="/admin/update"
-        />
-        <Card
-          icon={<TbTrashXFilled className="text-5xl text-white" />}
-          title="Delete Data"
-          link="/admin/delete"
-        />
+        {dept.length > 1 && (
+          <>
+            <Card
+              icon={<BsDatabaseFillUp className="text-5xl text-white" />}
+              title="Update Data"
+              link="/admin/update"
+            />
+            <Card
+              icon={<TbTrashXFilled className="text-5xl text-white" />}
+              title="Delete Data"
+              link="/admin/delete"
+            />
+          </>
+        )}
       </div>
     </section>
   );
