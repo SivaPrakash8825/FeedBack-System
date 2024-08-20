@@ -111,7 +111,7 @@ function App() {
             path="/admin/update"
             element={
               <ProtectedRoute shouldBeAdmin>
-                <UpdatePage />
+                <UpdatePage  academicyearlist={academicyearlist}/>
               </ProtectedRoute>
             }
           />
